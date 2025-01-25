@@ -5,3 +5,32 @@
 //  Created by Menno Spijker on 24/01/2025.
 //
 
+"welcome_title" = "Welkom bij DriveWise!";
+"welcome_subtitle" = "Om te beginnen, vul de gegevens van je voertuig in en klik op de knop \"Toevoegen\" om te starten met bijhouden.";
+"vehicle_name_title" = "Voertuignaam";
+"vehicle_name_placeholder" = "Voer de naam van het voertuig in";
+"license_plate_title" = "Kenteken";
+"license_plate_placeholder" = "Voer het kenteken in";
+"purchase_date_title" = "Aankoopdatum";
+"manufacturing_date_title" = "Bouwjaar";
+"mileage_title" = "Kilometerstand";
+"mileage_placeholder" = "Voer de kilometerstand in";
+"photo_title" = "Foto";
+"add_photo_button" = "Foto toevoegen";
+"save_vehicle_button" = "Voertuig opslaan";
+
+"license_plate_label" = "Kenteken";
+"mileage_label" = "Kilometerstand";
+"purchase_date_label" = "Aankoopdatum";
+"manufacturing_date_label" = "Bouwjaar";
+"delete_vehicle_button" = "Voertuig verwijderen";
+"delete_confirmation_title" = "Weet je zeker dat je dit voertuig wilt verwijderen?";
+"delete_confirmation_delete" = "Verwijderen";
+"delete_confirmation_cancel" = "Annuleren";
+
+"add" = "Toevoegen";
+"fuel_usage_title" = "Brandstofverbruik";
+"fuel_usage_no_content" = "Om inzicht te krijgen in je brandstofverbruik, voeg gegevens toe via de knop met het '+'-symbool.";
+"maintenance_title" = "Onderhoudsgeschiedenis";
+"maintenance_no_content" = "Geen onderhoudsgegevens beschikbaar. Voeg een record toe via de '+'-knop.";
+"show_more" = "Meer weergeven";

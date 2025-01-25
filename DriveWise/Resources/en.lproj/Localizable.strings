@@ -4,3 +4,33 @@
 //
 //  Created by Menno Spijker on 24/01/2025.
 //
+
+"welcome_title" = "Welcome to DriveWise!";
+"welcome_subtitle" = "To get started, please fill in the details of your vehicle, and then click the \"Add\" button to start tracking.";
+"vehicle_name_title" = "Vehicle Name";
+"vehicle_name_placeholder" = "Enter vehicle name";
+"license_plate_title" = "License Plate";
+"license_plate_placeholder" = "Enter license plate";
+"purchase_date_title" = "Purchase Date";
+"manufacturing_date_title" = "Manufacturing Date";
+"mileage_title" = "Mileage";
+"mileage_placeholder" = "Enter mileage";
+"photo_title" = "Photo";
+"add_photo_button" = "Add Photo";
+"save_vehicle_button" = "Save Vehicle";
+
+"license_plate_label" = "License Plate";
+"mileage_label" = "Mileage";
+"purchase_date_label" = "Purchase Date";
+"manufacturing_date_label" = "Manufacturing Date";
+"delete_vehicle_button" = "Delete Vehicle";
+"delete_confirmation_title" = "Are you sure you want to delete this vehicle?";
+"delete_confirmation_delete" = "Delete";
+"delete_confirmation_cancel" = "Cancel";
+
+"add" = "Add";
+"fuel_usage_title" = "Fuel Usage";
+"fuel_usage_no_content" = "To gain insights into your fuel usage, add data using the button with the '+' symbol.";
+"maintenance_title" = "Maintenance History";
+"maintenance_no_content" = "No maintenance records available. Add a record using the '+' button.";
+"show_more" = "Show more";
