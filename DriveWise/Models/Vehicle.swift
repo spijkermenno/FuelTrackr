@@ -2,9 +2,6 @@
 //  Vehicle.swift
 //  DriveWise
 //
-//  Created by Menno Spijker on 24/01/2025.
-//
-
 
 import SwiftData
 import Foundation
@@ -17,7 +14,9 @@ class Vehicle: Hashable {
     var manufacturingDate: Date
     var mileage: Int
     var photo: Data?
-    @Relationship(deleteRule: .cascade) var history: [HistoryItem] = []
+    
+    @Relationship(deleteRule: .cascade) var fuelUsages: [FuelUsage] = []
+    @Relationship(deleteRule: .cascade) var maintenances: [Maintenance] = [] // New relationship
 
     init(name: String, licensePlate: String, purchaseDate: Date, manufacturingDate: Date, mileage: Int, photo: Data? = nil) {
         self.name = name
@@ -28,7 +27,6 @@ class Vehicle: Hashable {
         self.photo = photo
     }
 
-    // Conform to Hashable
     static func == (lhs: Vehicle, rhs: Vehicle) -> Bool {
         return lhs.name == rhs.name &&
             lhs.licensePlate == rhs.licensePlate &&

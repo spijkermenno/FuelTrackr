@@ -25,16 +25,10 @@ struct AddVehicleView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
-                    Image(systemName: "car.2")
+                    Image("icon")
                         .resizable()
-                        .aspectRatio(contentMode: .fit) // Maintain aspect ratio
-                        .frame(height: 50) // Adjust height
-                        .padding()
-                    
-                    Text(NSLocalizedString("welcome_title", comment: "Welcome title"))
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .padding(.top)
+                        .frame(width: 150, height: 150)
+                        .cornerRadius(35)
                     
                     Text(NSLocalizedString("welcome_subtitle", comment: "Welcome subtitle"))
                         .foregroundColor(.secondary)
@@ -126,7 +120,9 @@ struct AddVehicleView: View {
                     }
                     .disabled(vehicleName.isEmpty || licensePlate.isEmpty || mileage == nil)
                 }
-                .padding(50)
+                .padding()
+                .navigationTitle(NSLocalizedString("welcome_title", comment: "Welcome title"))
+                .navigationBarTitleDisplayMode(.inline)
             }
         }
         .sheet(isPresented: $isImagePickerPresented) {

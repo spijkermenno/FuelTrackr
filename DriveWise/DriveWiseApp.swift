@@ -13,7 +13,7 @@ struct DriveWiseApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .modelContainer(for: [Vehicle.self, HistoryItem.self]) // Attach persistent container
+                .modelContainer(for: [Vehicle.self, FuelUsage.self]) // Attach persistent container
         }
     }
 }

@@ -11,19 +11,15 @@ import SwiftData
 struct ContentView: View {
     @Environment(\.modelContext) private var context
     @StateObject private var viewModel = VehicleViewModel()
-    @State private var isAddVehicleSheetPresented = false // Control sheet presentation
 
     var body: some View {
         NavigationView {
             VStack {
-                if let vehicle = viewModel.activeVehicle {
-                    ActiveVehicleView(vehicle: vehicle) {
-                        deleteVehicle(vehicle)
-                    }
+                if viewModel.activeVehicle != nil {
+                    ActiveVehicleView(viewModel: viewModel)
                 } else {
                     AddVehicleView {
-                        checkForActiveVehicles() // Refresh state after adding vehicle
-                        isAddVehicleSheetPresented = false // Dismiss the sheet
+                        checkForActiveVehicles()
                     }
                 }
             }
@@ -39,17 +35,6 @@ struct ContentView: View {
             print("Active vehicle found: \(vehicle.name)")
         } else {
             print("No active vehicle found.")
-        }
-    }
-
-    private func deleteVehicle(_ vehicle: Vehicle) {
-        context.delete(vehicle) // Delete the vehicle
-        do {
-            try context.save()
-            print("Vehicle deleted successfully.")
-            checkForActiveVehicles() // Refresh state after deletion
-        } catch {
-            print("Error deleting vehicle: \(error.localizedDescription)")
         }
     }
 }

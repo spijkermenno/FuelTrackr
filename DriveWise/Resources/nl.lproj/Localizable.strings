@@ -34,3 +34,29 @@
 "maintenance_title" = "Onderhoudsgeschiedenis";
 "maintenance_no_content" = "Geen onderhoudsgegevens beschikbaar. Voeg een record toe via de '+'-knop.";
 "show_more" = "Meer weergeven";
+
+"add_fuel_usage_title" = "Brandstofverbruik toevoegen";
+"fuel_entry_details" = "Details van het brandstofverbruik";
+
+"liters_label" = "Hoeveel liter heb je getankt?";
+"cost_label" = "Totale kosten (€)";
+"mileage_label" = "Huidige kilometerstand (km)";
+
+"price_per_liter" = "Prijs per liter";
+
+"cancel" = "Annuleren";
+"save" = "Opslaan";
+"fuel_usage_saved_success" = "Brandstofverbruik succesvol opgeslagen.";
+"fuel_usage_saved_error" = "Het opslaan van het brandstofverbruik is mislukt.";
+
+"all_fields_required_error" = "Alle velden moeten correct worden ingevuld.";
+"invalid_liters_error" = "Voer een geldig aantal liters in dat groter is dan 0.";
+"invalid_cost_error" = "Voer een geldig bedrag in dat groter is dan 0.";
+"invalid_mileage_error" = "De kilometerstand moet hoger zijn dan de huidige kilometerstand.";
+
+"maintenance_details" = "Onderhoudsdetails";
+"maintenance_type" = "Type onderhoud";
+"add_maintenance_title" = "Onderhoud toevoegen";
+"other_notes" = "Gelieve te specificeren";
+"maintenance_title" = "Onderhoudsregistraties";
+"maintenance_no_content" = "Geen onderhoudsregistraties beschikbaar";

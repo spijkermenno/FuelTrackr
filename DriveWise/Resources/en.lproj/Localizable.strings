@@ -34,3 +34,31 @@
 "maintenance_title" = "Maintenance History";
 "maintenance_no_content" = "No maintenance records available. Add a record using the '+' button.";
 "show_more" = "Show more";
+
+"add_fuel_usage_title" = "Add Fuel Usage";
+"fuel_entry_details" = "Fuel Entry Details";
+"liters_label" = "How many liters did you refuel?";
+"cost_label" = "Total cost (€)";
+"mileage_label" = "Current mileage (km)";
+
+"liters_placeholder" = "50L";
+"cost_placeholder" = "€ 76,50";
+
+"price_per_liter" = "Price per liter";
+
+"cancel" = "Cancel";
+"save" = "Save";
+"fuel_usage_saved_success" = "Fuel usage saved successfully.";
+"fuel_usage_saved_error" = "Failed to save fuel usage.";
+
+"all_fields_required_error" = "All fields must be filled with valid data.";
+"invalid_liters_error" = "Please enter a valid number of liters greater than 0.";
+"invalid_cost_error" = "Please enter a valid cost greater than 0.";
+"invalid_mileage_error" = "The mileage must be higher than the current mileage.";
+
+"maintenance_details" = "Maintenance Details";
+"maintenance_type" = "Maintenance Type";
+"add_maintenance_title" = "Add Maintenance";
+"other_notes" = "Please specify";
+"maintenance_title" = "Maintenance Records";
+"maintenance_no_content" = "No maintenance records available";
