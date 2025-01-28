@@ -1,0 +1,106 @@
+"welcome_title" = "Welkom bij FuelTrackr!";
+"welcome_subtitle" = "Om te beginnen, vul de gegevens van je voertuig in en klik op de knop 'Toevoegen' om te starten.";
+"vehicle_name_title" = "Voertuignaam";
+"vehicle_name_placeholder" = "Voer de naam van het voertuig in";
+"license_plate_title" = "Kenteken";
+"license_plate_placeholder" = "Voer het kenteken in";
+"purchase_date_title" = "Aankoopdatum";
+"manufacturing_date_title" = "Productiedatum";
+"mileage_title" = "Kilometerstand";
+"mileage_placeholder" = "Voer kilometerstand in (bijv. 120.000)";
+"photo_title" = "Foto";
+"add_photo_button" = "Foto toevoegen";
+"save_vehicle_button" = "Voertuig opslaan";
+
+"license_plate_label" = "Kenteken";
+"mileage_label" = "Kilometerstand";
+"purchase_date_label" = "Aankoopdatum";
+"manufacturing_date_label" = "Productiedatum";
+"delete_vehicle_button" = "Verwijder voertuig";
+"delete_vehicle_confirmation_title" = "Weet je zeker dat je dit voertuig wilt verwijderen?";
+"delete_confirmation_delete" = "Verwijderen";
+
+"add" = "Toevoegen";
+"fuel_usage_title" = "Brandstofgebruik";
+"fuel_usage_no_content" = "Om inzicht te krijgen in je brandstofgebruik, voeg gegevens toe met de knop met het '+'-symbool.";
+"maintenance_title" = "Onderhoudsgeschiedenis";
+"maintenance_no_content" = "Geen onderhoudsgegevens beschikbaar. Voeg een record toe met de '+'-knop.";
+"show_more" = "Meer weergeven";
+
+"add_fuel_usage_title" = "Brandstof toevoegen";
+"fuel_entry_details" = "Brandstofgegevens";
+"liters_label" = "Hoeveel liter heb je getankt?";
+"cost_label" = "Totale kosten (€)";
+"mileage_label" = "Huidige kilometerstand (km)";
+
+"liters_placeholder" = "Vul aantal in (bijv. 43,2)";
+"cost_placeholder" = "Vul prijs in (bijv. 76)";
+
+"price_per_liter" = "Prijs per liter";
+
+"cancel" = "Annuleren";
+"save" = "Opslaan";
+"fuel_usage_saved_success" = "Brandstofgegevens succesvol opgeslagen.";
+"fuel_usage_saved_error" = "Opslaan van brandstofgegevens mislukt.";
+
+"all_fields_required_error" = "Alle velden moeten correct worden ingevuld.";
+"invalid_liters_error" = "Voer een geldig aantal liters in dat groter is dan 0.";
+"invalid_cost_error" = "Voer een geldige kostenwaarde in die groter is dan 0.";
+"invalid_mileage_error" = "De kilometerstand moet hoger zijn dan de huidige kilometerstand.";
+
+"maintenance_details" = "Onderhoudsgegevens";
+"maintenance_type" = "Type onderhoud";
+"add_maintenance_title" = "Onderhoud toevoegen";
+"other_notes" = "Specificeer alsjeblieft";
+"maintenance_title" = "Onderhoudsrecords";
+
+"delete_confirmation_title" = "Weet je het zeker?";
+"delete_confirmation_delete" = "Verwijderen";
+
+"notifications_section" = "Meldingen";
+"enable_notifications" = "Meldingen inschakelen";
+"units_section" = "Eenheden";
+"measurement_system" = "Meetsysteem";
+"metric" = "Metrisch (km, L)";
+"imperial" = "Imperiaal (mi, gal)";
+"default_maintenance_intervals" = "Standaard onderhoudsintervallen";
+"tires" = "Banden";
+"oil_change" = "Olie verversen";
+"brakes" = "Remmen";
+"other" = "Anders";
+"settings_title" = "Instellingen";
+
+"add_fuel_usage_description" = "Houd elke tankbeurt nauwkeurig bij voor een compleet overzicht. Een gedetailleerde brandstofgeschiedenis helpt je trends en kosten te monitoren.";
+"add_maintenance_description" = "Je kunt zowel eerdere als recente onderhoudsbeurten toevoegen. Een volledige onderhoudsgeschiedenis helpt je om optimaal gebruik te maken van de app.";
+"fuel_saved_error" = "Opslaan van brandstofgegevens mislukt.";
+"maintenance_saved_success" = "Onderhoud succesvol opgeslagen.";
+"maintenance_saved_error" = "Opslaan van onderhoud mislukt.";
+"other_notes_placeholder" = "Geef een beschrijving op voor 'Overig'";
+"date_label" = "Datum";
+"select_date" = "Selecteer datum";
+"invalid_notes_error" = "Geef een beschrijving op voor het onderhoud.";
+"settings_description" = "Pas je app-ervaring aan door instellingen zoals meldingen, eenheden en standaard onderhoudsintervallen te beheren.";
+"enable_notifications_description" = "Schakel meldingen in of uit voor onderhoudsherinneringen.";
+"measurement_system_description" = "Selecteer het meetsysteem voor afstand en brandstof.";
+"notification_permission_error" = "Schakel meldingen in via de instellingen van je apparaat.";
+"general_error" = "Er is iets misgegaan. Probeer het opnieuw.";
+"show_all_maintenance" = "Bekijk alle onderhoudsrecords";
+"show_all_fuel" = "Bekijk alle brandstofrecords";
+"fuel_usage_list_title" = "Brandstofrecords";
+"maintenance_list_title" = "Onderhoudsrecords";
+"invalid_cost_error_generic" = "Ongeldige kosten. Controleer het invoerformaat.";
+"invalid_number_error" = "Ongeldig nummer. Zorg ervoor dat de invoer numeriek is.";
+"delete_confirmation_maintenance" = "Weet je zeker dat je dit onderhoudsrecord wilt verwijderen?";
+"delete_confirmation_fuel" = "Weet je zeker dat je dit brandstofrecord wilt verwijderen?";
+"delete_all" = "Alles verwijderen";
+"settings_reset" = "Instellingen resetten";
+
+"reset_section" = "Gegevens resetten";
+"reset_maintenance_button" = "Onderhoudsgegevens resetten";
+"reset_fuel_button" = "Brandstofgegevens resetten";
+"reset_confirmation_title" = "Weet je het zeker?";
+"reset_confirmation_confirm" = "Resetten";
+
+"notifications_disabled_title" = "Meldingen uitgeschakeld";
+"notifications_disabled_message" = "Schakel meldingen in via de instellingen van je iPhone, zonder deze toestemming krijg je geen herinneringen!";
+"ok" = "Doorgaan";
