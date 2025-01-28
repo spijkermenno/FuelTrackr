@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 struct SettingsPageView: View {
     private let repository = SettingsRepository()
@@ -22,6 +23,9 @@ struct SettingsPageView: View {
     @State private var resetType: ResetType = .none
     @State private var resetMessage: String? // Message to show in the notification
     @State private var showNotification = false // Control visibility of the notification
+    @State private var showAlert = false // Control system alert for notifications
+    @State private var alertTitle = "" // Title for alert
+    @State private var alertMessage = "" // Message for alert
 
     private enum ResetType {
         case maintenance
@@ -57,7 +61,6 @@ struct SettingsPageView: View {
 
                 Form {
                     // Notifications Section
-                    // Notifications Section
                     Section(header: Text(NSLocalizedString("notifications_section", comment: "Notifications"))) {
                         Toggle(NSLocalizedString("enable_notifications", comment: "Enable Notifications"), isOn: $isNotificationsEnabled)
                             .onChange(of: isNotificationsEnabled) { newValue in
@@ -80,7 +83,20 @@ struct SettingsPageView: View {
                         }
                         .pickerStyle(SegmentedPickerStyle())
                         .onChange(of: isUsingMetric) { newValue in
+                            let conversionFactor = 1.60934 // 1 mile = 1.60934 km
+                            if newValue { // Switching to metric (km)
+                                defaultTireInterval = 100 + Int((Double(defaultTireInterval) * conversionFactor).rounded(.toNearestOrEven) / 100) * 100
+                                defaultOilChangeInterval = 100 + Int((Double(defaultOilChangeInterval) * conversionFactor).rounded(.toNearestOrEven) / 100) * 100
+                                defaultBrakeCheckInterval = 100 + Int((Double(defaultBrakeCheckInterval) * conversionFactor).rounded(.toNearestOrEven) / 100) * 100
+                            } else { // Switching to imperial (mi)
+                                defaultTireInterval = Int((Double(defaultTireInterval) / conversionFactor).rounded(.toNearestOrEven) / 100) * 100
+                                defaultOilChangeInterval = Int((Double(defaultOilChangeInterval) / conversionFactor).rounded(.toNearestOrEven) / 100) * 100
+                                defaultBrakeCheckInterval = Int((Double(defaultBrakeCheckInterval) / conversionFactor).rounded(.toNearestOrEven) / 100) * 100
+                            }
                             repository.setUsingMetric(newValue)
+                            repository.setDefaultTireInterval(defaultTireInterval)
+                            repository.setDefaultOilChangeInterval(defaultOilChangeInterval)
+                            repository.setDefaultBrakeCheckInterval(defaultBrakeCheckInterval)
                         }
                     }
 
@@ -144,6 +160,9 @@ struct SettingsPageView: View {
         }
         .navigationTitle(NSLocalizedString("settings_title", comment: "Settings"))
         .navigationBarTitleDisplayMode(.inline)
+        .alert(isPresented: $showAlert) {
+            Alert(title: Text(alertTitle), message: Text(alertMessage), dismissButton: .default(Text(NSLocalizedString("ok", comment: "OK"))))
+        }
     }
 
     private func handleReset() {
@@ -184,7 +203,7 @@ struct SettingsPageView: View {
             }
         }
     }
-    
+
     private func checkNotificationStatus() {
         let center = UNUserNotificationCenter.current()
         center.getNotificationSettings { settings in
@@ -208,45 +227,12 @@ struct SettingsPageView: View {
                     isNotificationsEnabled = granted
                     repository.setNotificationsEnabled(granted)
                     if !granted {
-                        showNotificationPermissionAlert()
+                        alertTitle = NSLocalizedString("notifications_disabled_title", comment: "Notifications Disabled")
+                        alertMessage = NSLocalizedString("notifications_disabled_message", comment: "Enable notifications in settings for reminders.")
+                        showAlert = true
                     }
                 }
             }
-        }
-    }
-
-    private func showNotificationPermissionAlert() {
-        let alertTitle = NSLocalizedString("notifications_disabled_title", comment: "Notifications Disabled")
-        let alertMessage = NSLocalizedString("notifications_disabled_message", comment: "Enable notifications in settings for reminders.")
-        showAlert(title: alertTitle, message: alertMessage)
-    }
-
-    private func showAlert(title: String, message: String) {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return }
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: NSLocalizedString("ok", comment: "OK"), style: .default))
-        windowScene.windows.first?.rootViewController?.present(alert, animated: true)
-    }
-}
-
-// MARK: - Maintenance Interval Row
-struct MaintenanceIntervalRow: View {
-    let title: String
-    @Binding var value: Int
-    let unit: String
-    let onValueChange: (Int) -> Void
-
-    var body: some View {
-        HStack {
-            Text(title)
-            Spacer()
-            TextField("", value: $value, formatter: NumberFormatter())
-                .keyboardType(.numberPad)
-                .multilineTextAlignment(.trailing)
-                .frame(width: 80)
-                .onChange(of: value, perform: onValueChange)
-            Text(unit)
-                .foregroundColor(.secondary)
         }
     }
 }

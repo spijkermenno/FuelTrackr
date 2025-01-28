@@ -14,10 +14,14 @@ struct ActiveVehicleView: View {
     @State private var showAddFuelSheet = false
     @State private var showAddMaintenanceSheet = false // State for maintenance sheet
 
+    private let repository = SettingsRepository() // Access user settings
+
     var body: some View {
         guard let vehicle = viewModel.activeVehicle else {
             return AnyView(Text("No active vehicle found."))
         }
+
+        let isMetric = repository.isUsingMetric() // Fetch the setting once
 
         return AnyView(
             ScrollView {
@@ -45,7 +49,10 @@ struct ActiveVehicleView: View {
                     // Vehicle Details Section
                     VStack(alignment: .leading, spacing: 12) {
                         detailRow(label: NSLocalizedString("license_plate_label", comment: "Label for license plate"), value: vehicle.licensePlate)
-                        detailRow(label: NSLocalizedString("mileage_label", comment: "Label for mileage"), value: "\(vehicle.mileage) km")
+                        detailRow(
+                            label: NSLocalizedString("mileage_label", comment: "Label for mileage"),
+                            value: "\(convertMileage(vehicle.mileage, isMetric: isMetric)) \(isMetric ? "km" : "mi")"
+                        )
                         detailRow(label: NSLocalizedString("purchase_date_label", comment: "Label for purchase date"), value: vehicle.purchaseDate.formatted(date: .abbreviated, time: .omitted))
                         detailRow(label: NSLocalizedString("manufacturing_date_label", comment: "Label for manufacturing date"), value: vehicle.manufacturingDate.formatted(date: .abbreviated, time: .omitted))
                     }
@@ -88,5 +95,10 @@ struct ActiveVehicleView: View {
             Text(value)
                 .foregroundColor(.secondary)
         }
+    }
+
+    // MARK: - Conversion Helper
+    private func convertMileage(_ mileage: Int, isMetric: Bool) -> Int {
+        isMetric ? mileage : Int(Double(mileage) / 1.609) // Convert km to mi if imperial
     }
 }
