@@ -205,4 +205,22 @@ class VehicleViewModel: ObservableObject {
             return false
         }
     }
+    
+    func updateVehiclePurchaseStatus(isPurchased: Bool, context: ModelContext) {
+        activeVehicle?.isPurchased = isPurchased
+        saveContext(context: context)
+    }
+    
+    // MARK: Migrations
+    
+    func migrateVehicles(context: ModelContext) {
+        let allVehicles = try? context.fetch(FetchDescriptor<Vehicle>())
+        allVehicles?.forEach { vehicle in
+            if vehicle.isPurchased == nil {
+                print(vehicle)
+                vehicle.isPurchased = vehicle.purchaseDate <= Date()
+            }
+        }
+        try? context.save()
+    }
 }

@@ -26,6 +26,7 @@ struct ContentView: View {
                 }
             }
             .onAppear {
+                viewModel.migrateVehicles(context: context)
                 checkForActiveVehicles()
             }
         }

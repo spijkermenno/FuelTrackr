@@ -112,3 +112,10 @@
 "notifications_disabled_title" = "Notifications Disabled";
 "notifications_disabled_message" = "Enable notifications in settings for reminders.";
 "ok" = "OK";
+
+"vehicle_not_purchased_banner" = "This vehicle has not been purchased yet. Once you have bought it, please confirm below.";
+"vehicle_purchase_confirm" = "Confirm Purchase";
+"vehicle_purchase_cancel" = "Delete Vehicle";
+"vehicle_purchase_question" = "Have you purchased this vehicle yet?";
+"vehicle_purchase_success" = "Vehicle marked as purchased!";
+"vehicle_purchase_error" = "An error occurred while updating the vehicle status.";

@@ -13,16 +13,16 @@ struct ActiveVehicleView: View {
     @State private var showDeleteConfirmation = false
     @State private var showAddFuelSheet = false
     @State private var showAddMaintenanceSheet = false // State for maintenance sheet
-
+    
     private let repository = SettingsRepository() // Access user settings
-
+    
     var body: some View {
         guard let vehicle = viewModel.activeVehicle else {
             return AnyView(Text("No active vehicle found."))
         }
-
+        
         let isMetric = repository.isUsingMetric() // Fetch the setting once
-
+        
         return AnyView(
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
@@ -46,6 +46,20 @@ struct ActiveVehicleView: View {
                             .cornerRadius(10)
                     }
                     
+                    VehiclePurchaseBanner(
+                        isPurchased: vehicle.isPurchased,
+                        purchaseDate: vehicle.purchaseDate,
+                        onConfirmPurchase: {
+                            vehicle.isPurchased = true
+                            viewModel.updateVehiclePurchaseStatus(isPurchased: true, context: context)
+                            
+                            // update vehicle details like mileage etc
+                        },
+                        onDeleteVehicle: {
+                            viewModel.deleteActiveVehicle(context: context)
+                        }
+                    )
+                    
                     // Vehicle Details Section
                     VStack(alignment: .leading, spacing: 12) {
                         detailRow(label: NSLocalizedString("license_plate_label", comment: "Label for license plate"), value: vehicle.licensePlate)
@@ -59,33 +73,33 @@ struct ActiveVehicleView: View {
                     .padding()
                     .background(Color(.systemGray6))
                     .cornerRadius(10)
-
+                    
                     // Fuel History
-                    FuelUsageView(viewModel: viewModel, showAddFuelSheet: $showAddFuelSheet)
+                    FuelUsageView(viewModel: viewModel, showAddFuelSheet: $showAddFuelSheet, isVehicleActive: vehicle.isPurchased)
                     
                     // Maintenance History
-                    MaintenanceView(viewModel: viewModel, showAddMaintenanceSheet: $showAddMaintenanceSheet)
+                    MaintenanceView(viewModel: viewModel, showAddMaintenanceSheet: $showAddMaintenanceSheet, isVehicleActive: vehicle.isPurchased)
                 }
                 .padding()
             }
-            .navigationTitle(vehicle.name)
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink(destination: SettingsPageView(viewModel: viewModel)) {
-                        Image(systemName: "gear")
+                .navigationTitle(vehicle.name)
+                .navigationBarTitleDisplayMode(.large)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        NavigationLink(destination: SettingsPageView(viewModel: viewModel)) {
+                            Image(systemName: "gear")
+                        }
                     }
                 }
-            }
-            .sheet(isPresented: $showAddFuelSheet) {
-                AddFuelUsageSheet(viewModel: viewModel)
-            }
-            .sheet(isPresented: $showAddMaintenanceSheet) {
-                AddMaintenanceSheet(viewModel: viewModel)
-            }
+                .sheet(isPresented: $showAddFuelSheet) {
+                    AddFuelUsageSheet(viewModel: viewModel)
+                }
+                .sheet(isPresented: $showAddMaintenanceSheet) {
+                    AddMaintenanceSheet(viewModel: viewModel)
+                }
         )
     }
-
+    
     // MARK: - Detail Row
     private func detailRow(label: String, value: String) -> some View {
         HStack {
@@ -96,7 +110,7 @@ struct ActiveVehicleView: View {
                 .foregroundColor(.secondary)
         }
     }
-
+    
     // MARK: - Conversion Helper
     private func convertMileage(_ mileage: Int, isMetric: Bool) -> Int {
         isMetric ? mileage : Int(Double(mileage) / 1.609) // Convert km to mi if imperial

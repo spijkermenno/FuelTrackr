@@ -10,6 +10,7 @@ import SwiftUI
 struct FuelUsageView: View {
     @ObservedObject var viewModel: VehicleViewModel // Use the ViewModel
     @Binding var showAddFuelSheet: Bool // Binding to control the sheet from the parent
+    var isVehicleActive: Bool
     @State private var showAllFuelEntries = false // Control showing all entries
 
     var body: some View {
@@ -33,9 +34,10 @@ struct FuelUsageView: View {
                     .foregroundColor(.white)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
-                    .background(Color.blue)
+                    .background(isVehicleActive ? Color.blue : Color.gray.opacity(0.5))
                     .cornerRadius(8)
                 }
+                .disabled(!isVehicleActive)
             }
 
             // Display fuel entries or fallback content

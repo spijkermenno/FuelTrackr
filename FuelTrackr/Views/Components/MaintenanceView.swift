@@ -10,6 +10,7 @@ import SwiftUI
 struct MaintenanceView: View {
     @ObservedObject var viewModel: VehicleViewModel
     @Binding var showAddMaintenanceSheet: Bool
+    var isVehicleActive: Bool
     @State private var showAllMaintenanceEntries = false
     
     var body: some View {
@@ -32,9 +33,10 @@ struct MaintenanceView: View {
                     .foregroundColor(.white)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
-                    .background(Color.blue)
+                    .background(isVehicleActive ? Color.blue : Color.gray.opacity(0.5))
                     .cornerRadius(8)
                 }
+                .disabled(!isVehicleActive)
             }
 
             if let maintenances = viewModel.activeVehicle?.maintenances.sorted(by: { $0.date > $1.date }), !maintenances.isEmpty {

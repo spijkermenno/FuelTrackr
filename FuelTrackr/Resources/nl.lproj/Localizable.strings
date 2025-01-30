@@ -104,3 +104,10 @@
 "notifications_disabled_title" = "Meldingen uitgeschakeld";
 "notifications_disabled_message" = "Schakel meldingen in via de instellingen van je iPhone, zonder deze toestemming krijg je geen herinneringen!";
 "ok" = "Doorgaan";
+
+"vehicle_not_purchased_banner" = "De aankoopdatum van dit voertuig ligt in de toekomst, daarom is het inactief.";
+"vehicle_purchase_confirm" = "Bevestig aankoop";
+"vehicle_purchase_cancel" = "Voertuig verwijderen";
+"vehicle_purchase_question" = "Heb je dit voertuig inmiddels gekocht?";
+"vehicle_purchase_success" = "Voertuig is gemarkeerd als gekocht!";
+"vehicle_purchase_error" = "Er is een fout opgetreden bij het bijwerken van de voertuigstatus.";
