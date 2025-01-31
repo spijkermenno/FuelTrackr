@@ -7,8 +7,6 @@
 
 import Foundation
 
-import Foundation
-
 class SettingsRepository {
     private let defaults = UserDefaults.standard
 

@@ -20,50 +20,43 @@ struct AddFuelUsageSheet: View {
 
     var body: some View {
         NavigationView {
-            ScrollView { // Ensures usability on smaller screens
+            ScrollView {
                 VStack(spacing: 20) {
-                    // Title Section
-                    Text(NSLocalizedString("add_fuel_usage_title", comment: "Add Fuel Usage Title"))
+                    Text(NSLocalizedString("add_fuel_usage_title", comment: ""))
                         .font(.title2)
                         .fontWeight(.bold)
                         .multilineTextAlignment(.center)
                         .padding(.top, 20)
 
-                    // Description Section
-                    Text(NSLocalizedString("add_fuel_usage_description", comment: "Description for adding fuel usage"))
+                    Text(NSLocalizedString("add_fuel_usage_description", comment: ""))
                         .font(.body)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 32)
 
-                    // Form Section
                     VStack(spacing: 16) {
-                        // Liters Input
                         InputField(
-                            title: NSLocalizedString("liters_label", comment: "Label for liters"),
-                            placeholder: NSLocalizedString("liters_placeholder", comment: "Placeholder for liters"),
+                            title: NSLocalizedString("liters_label", comment: ""),
+                            placeholder: NSLocalizedString("liters_placeholder", comment: ""),
                             text: $liters,
                             keyboardType: .decimalPad
                         )
 
-                        // Cost Input
                         InputField(
-                            title: NSLocalizedString("cost_label", comment: "Label for cost"),
-                            placeholder: NSLocalizedString("cost_placeholder", comment: "Placeholder for cost"),
+                            title: NSLocalizedString("cost_label", comment: ""),
+                            placeholder: NSLocalizedString("cost_placeholder", comment: ""),
                             text: $cost,
                             keyboardType: .decimalPad
                         )
 
-                        // Mileage Input
                         let currentMileage = viewModel.activeVehicle?.mileage ?? 10000
                         InputField(
-                            title: NSLocalizedString("mileage_label", comment: "Label for mileage"),
+                            title: NSLocalizedString("mileage_label", comment: ""),
                             placeholder: "\(currentMileage) km",
                             text: $mileage,
                             keyboardType: .numberPad
                         )
                         
-                        // Error Section
                         if let errorMessage = errorMessage {
                             Text(errorMessage)
                                 .foregroundColor(.red)
@@ -72,15 +65,12 @@ struct AddFuelUsageSheet: View {
                                 .padding(.horizontal)
                         }
 
-                        // Buttons Section
                         HStack(spacing: 16) {
-                            Button(action: {
-                                dismiss()
-                            }) {
-                                Text(NSLocalizedString("cancel", comment: "Cancel button"))
+                            Button(action: { dismiss() }) {
+                                Text(NSLocalizedString("cancel", comment: ""))
                                     .frame(maxWidth: .infinity)
                                     .padding()
-                                    .background(Color(.systemGray5))
+                                    .background(Color(UIColor.secondarySystemBackground))
                                     .foregroundColor(.primary)
                                     .cornerRadius(8)
                             }
@@ -94,11 +84,11 @@ struct AddFuelUsageSheet: View {
                                     if viewModel.saveFuelUsage(context: context, liters: litersValue, cost: costValue, mileage: mileageValue) {
                                         dismiss()
                                     } else {
-                                        errorMessage = NSLocalizedString("fuel_usage_saved_error", comment: "Error saving fuel usage")
+                                        errorMessage = NSLocalizedString("fuel_usage_saved_error", comment: "")
                                     }
                                 }
                             }) {
-                                Text(NSLocalizedString("save", comment: "Save button"))
+                                Text(NSLocalizedString("save", comment: ""))
                                     .frame(maxWidth: .infinity)
                                     .padding()
                                     .background(Color.blue)
@@ -112,17 +102,13 @@ struct AddFuelUsageSheet: View {
                     .background(Color(.systemGray6))
                     .cornerRadius(12)
                     .padding(.horizontal)
-
-                    
                 }
-                .padding(.bottom) // Ensures buttons are not cut off
+                .padding(.bottom)
             }
             .background(Color(.systemGroupedBackground))
             .edgesIgnoringSafeArea(.bottom)
         }
     }
-
-    // MARK: - Helper Methods
 
     private func parseInput(_ input: String) -> Double? {
         let normalized = input.replacingOccurrences(of: decimalSeparator, with: ".")
@@ -131,17 +117,17 @@ struct AddFuelUsageSheet: View {
 
     private func validateAllFields() -> Bool {
         guard let litersValue = parseInput(liters), litersValue > 0 else {
-            errorMessage = NSLocalizedString("invalid_liters_error", comment: "Error for invalid liters")
+            errorMessage = NSLocalizedString("invalid_liters_error", comment: "")
             return false
         }
 
         guard let costValue = parseInput(cost), costValue > 0 else {
-            errorMessage = NSLocalizedString("invalid_cost_error", comment: "Error for invalid cost")
+            errorMessage = NSLocalizedString("invalid_cost_error", comment: "")
             return false
         }
 
         guard let mileageValue = Int(mileage), mileageValue > 0 else {
-            errorMessage = NSLocalizedString("invalid_mileage_error", comment: "Error for invalid mileage")
+            errorMessage = NSLocalizedString("invalid_mileage_error", comment: "")
             return false
         }
 

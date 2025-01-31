@@ -21,12 +21,13 @@ struct SettingsPageView: View {
     @State private var defaultBrakeCheckInterval: Int
     @State private var showResetConfirmation = false
     @State private var resetType: ResetType = .none
-    @State private var resetMessage: String? // Message to show in the notification
-    @State private var showNotification = false // Control visibility of the notification
-    @State private var showAlert = false // Control system alert for notifications
-    @State private var alertTitle = "" // Title for alert
-    @State private var alertMessage = "" // Message for alert
-
+    @State private var resetMessage: String?
+    @State private var showNotification = false
+    @State private var showAlert = false
+    @State private var alertTitle = ""
+    @State private var alertMessage = ""
+    @State private var showDeleteConfirmation = false
+    
     private enum ResetType {
         case maintenance
         case fuelUsage
@@ -45,7 +46,6 @@ struct SettingsPageView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // Notification Banner
                 if showNotification, let message = resetMessage {
                     Text(message)
                         .font(.footnote)
@@ -60,14 +60,14 @@ struct SettingsPageView: View {
                 }
 
                 Form {
-                    // Notifications Section
-                    Section(header: Text(NSLocalizedString("notifications_section", comment: "Notifications"))) {
-                        Toggle(NSLocalizedString("enable_notifications", comment: "Enable Notifications"), isOn: $isNotificationsEnabled)
+                    Section(header: Text(NSLocalizedString("notifications_section", comment: ""))) {
+                        Toggle(NSLocalizedString("enable_notifications", comment: ""), isOn: $isNotificationsEnabled)
                             .onChange(of: isNotificationsEnabled) { newValue in
                                 if newValue {
                                     requestNotificationPermission()
                                 } else {
                                     repository.setNotificationsEnabled(false)
+                                    NotificationManager.shared.cancelAllNotifications()
                                 }
                             }
                             .onAppear {
@@ -75,20 +75,19 @@ struct SettingsPageView: View {
                             }
                     }
 
-                    // Units Section
-                    Section(header: Text(NSLocalizedString("units_section", comment: "Units"))) {
-                        Picker(NSLocalizedString("measurement_system", comment: "Measurement System"), selection: $isUsingMetric) {
-                            Text(NSLocalizedString("metric", comment: "Metric (km, L)")).tag(true)
-                            Text(NSLocalizedString("imperial", comment: "Imperial (mi, gal)")).tag(false)
+                    Section(header: Text(NSLocalizedString("units_section", comment: ""))) {
+                        Picker(NSLocalizedString("measurement_system", comment: ""), selection: $isUsingMetric) {
+                            Text(NSLocalizedString("metric", comment: "")).tag(true)
+                            Text(NSLocalizedString("imperial", comment: "")).tag(false)
                         }
                         .pickerStyle(SegmentedPickerStyle())
                         .onChange(of: isUsingMetric) { newValue in
-                            let conversionFactor = 1.60934 // 1 mile = 1.60934 km
-                            if newValue { // Switching to metric (km)
+                            let conversionFactor = 1.60934
+                            if newValue {
                                 defaultTireInterval = 100 + Int((Double(defaultTireInterval) * conversionFactor).rounded(.toNearestOrEven) / 100) * 100
                                 defaultOilChangeInterval = 100 + Int((Double(defaultOilChangeInterval) * conversionFactor).rounded(.toNearestOrEven) / 100) * 100
                                 defaultBrakeCheckInterval = 100 + Int((Double(defaultBrakeCheckInterval) * conversionFactor).rounded(.toNearestOrEven) / 100) * 100
-                            } else { // Switching to imperial (mi)
+                            } else {
                                 defaultTireInterval = Int((Double(defaultTireInterval) / conversionFactor).rounded(.toNearestOrEven) / 100) * 100
                                 defaultOilChangeInterval = Int((Double(defaultOilChangeInterval) / conversionFactor).rounded(.toNearestOrEven) / 100) * 100
                                 defaultBrakeCheckInterval = Int((Double(defaultBrakeCheckInterval) / conversionFactor).rounded(.toNearestOrEven) / 100) * 100
@@ -100,10 +99,9 @@ struct SettingsPageView: View {
                         }
                     }
 
-                    // Default Maintenance Intervals Section
-                    Section(header: Text(NSLocalizedString("default_maintenance_intervals", comment: "Default Maintenance Intervals"))) {
+                    Section(header: Text(NSLocalizedString("default_maintenance_intervals", comment: ""))) {
                         MaintenanceIntervalRow(
-                            title: NSLocalizedString("tires", comment: "Tires"),
+                            title: NSLocalizedString("tires", comment: ""),
                             value: $defaultTireInterval,
                             unit: isUsingMetric ? "km" : "mi"
                         ) {
@@ -111,7 +109,7 @@ struct SettingsPageView: View {
                         }
 
                         MaintenanceIntervalRow(
-                            title: NSLocalizedString("oil_change", comment: "Oil Change"),
+                            title: NSLocalizedString("oil_change", comment: ""),
                             value: $defaultOilChangeInterval,
                             unit: isUsingMetric ? "km" : "mi"
                         ) {
@@ -119,7 +117,7 @@ struct SettingsPageView: View {
                         }
 
                         MaintenanceIntervalRow(
-                            title: NSLocalizedString("brakes", comment: "Brakes"),
+                            title: NSLocalizedString("brakes", comment: ""),
                             value: $defaultBrakeCheckInterval,
                             unit: isUsingMetric ? "km" : "mi"
                         ) {
@@ -127,13 +125,12 @@ struct SettingsPageView: View {
                         }
                     }
 
-                    // Reset Data Section
-                    Section(header: Text(NSLocalizedString("reset_section", comment: "Reset Data"))) {
+                    Section(header: Text(NSLocalizedString("reset_section", comment: ""))) {
                         Button(action: {
                             resetType = .maintenance
                             showResetConfirmation = true
                         }) {
-                            Text(NSLocalizedString("reset_maintenance_button", comment: "Reset all maintenance data"))
+                            Text(NSLocalizedString("reset_maintenance_button", comment: ""))
                                 .foregroundColor(.red)
                         }
 
@@ -141,27 +138,45 @@ struct SettingsPageView: View {
                             resetType = .fuelUsage
                             showResetConfirmation = true
                         }) {
-                            Text(NSLocalizedString("reset_fuel_button", comment: "Reset all fuel usage data"))
+                            Text(NSLocalizedString("reset_fuel_button", comment: ""))
+                                .foregroundColor(.red)
+                        }
+                        
+                        Button(action: {
+                            showDeleteConfirmation = true
+                        }) {
+                            Text(NSLocalizedString("delete_vehicle_button", comment: ""))
                                 .foregroundColor(.red)
                         }
                     }
                 }
                 .confirmationDialog(
-                    NSLocalizedString("reset_confirmation_title", comment: "Are you sure?"),
+                    NSLocalizedString("delete_vehicle_confirmation_title", comment: ""),
+                    isPresented: $showDeleteConfirmation,
+                    titleVisibility: .visible
+                ) {
+                    Button(NSLocalizedString("delete_confirmation_delete", comment: ""), role: .destructive) {
+                        viewModel.deleteActiveVehicle(context: context)
+                    }
+                    Button(NSLocalizedString("cancel", comment: ""), role: .cancel) {}
+                }
+                .confirmationDialog(
+                    NSLocalizedString("reset_confirmation_title", comment: ""),
                     isPresented: $showResetConfirmation,
                     titleVisibility: .visible
                 ) {
-                    Button(NSLocalizedString("reset_confirmation_confirm", comment: "Confirm reset"), role: .destructive) {
+                    Button(NSLocalizedString("reset_confirmation_confirm", comment: ""), role: .destructive) {
                         handleReset()
                     }
-                    Button(NSLocalizedString("cancel", comment: "Cancel"), role: .cancel) {}
+                    Button(NSLocalizedString("cancel", comment: ""), role: .cancel) {}
                 }
             }
         }
-        .navigationTitle(NSLocalizedString("settings_title", comment: "Settings"))
+        .background(Color(UIColor.systemBackground))
+        .navigationTitle(NSLocalizedString("settings_title", comment: ""))
         .navigationBarTitleDisplayMode(.inline)
         .alert(isPresented: $showAlert) {
-            Alert(title: Text(alertTitle), message: Text(alertMessage), dismissButton: .default(Text(NSLocalizedString("ok", comment: "OK"))))
+            Alert(title: Text(alertTitle), message: Text(alertMessage), dismissButton: .default(Text(NSLocalizedString("ok", comment: ""))))
         }
     }
 
@@ -169,15 +184,15 @@ struct SettingsPageView: View {
         switch resetType {
         case .maintenance:
             if viewModel.resetAllMaintenance(context: context) {
-                showSuccessMessage(NSLocalizedString("reset_maintenance_success", comment: "Maintenance data reset successfully"))
+                showSuccessMessage(NSLocalizedString("reset_maintenance_success", comment: ""))
             } else {
-                showErrorMessage(NSLocalizedString("reset_maintenance_error", comment: "Error resetting maintenance data"))
+                showErrorMessage(NSLocalizedString("reset_maintenance_error", comment: ""))
             }
         case .fuelUsage:
             if viewModel.resetAllFuelUsage(context: context) {
-                showSuccessMessage(NSLocalizedString("reset_fuel_success", comment: "Fuel usage data reset successfully"))
+                showSuccessMessage(NSLocalizedString("reset_fuel_success", comment: ""))
             } else {
-                showErrorMessage(NSLocalizedString("reset_fuel_error", comment: "Error resetting fuel usage data"))
+                showErrorMessage(NSLocalizedString("reset_fuel_error", comment: ""))
             }
         case .none:
             break
@@ -221,14 +236,13 @@ struct SettingsPageView: View {
         center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
             DispatchQueue.main.async {
                 if let error = error {
-                    print("Error requesting notifications: \(error.localizedDescription)")
-                    showErrorMessage(NSLocalizedString("notification_permission_error", comment: "Error requesting notification permission"))
+                    showErrorMessage(NSLocalizedString("notification_permission_error", comment: ""))
                 } else {
                     isNotificationsEnabled = granted
                     repository.setNotificationsEnabled(granted)
                     if !granted {
-                        alertTitle = NSLocalizedString("notifications_disabled_title", comment: "Notifications Disabled")
-                        alertMessage = NSLocalizedString("notifications_disabled_message", comment: "Enable notifications in settings for reminders.")
+                        alertTitle = NSLocalizedString("notifications_disabled_title", comment: "")
+                        alertMessage = NSLocalizedString("notifications_disabled_message", comment: "")
                         showAlert = true
                     }
                 }

@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-// MARK: - Custom InputField View
 struct InputField: View {
     let title: String
     let placeholder: String
@@ -18,13 +17,14 @@ struct InputField: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(.primary)
 
             TextField(placeholder, text: $text)
                 .padding()
-                .background(Color(.systemBackground))
+                .background(Color(UIColor.secondarySystemBackground))
                 .cornerRadius(8)
                 .keyboardType(keyboardType)
+                .foregroundColor(.primary)
         }
     }
 }

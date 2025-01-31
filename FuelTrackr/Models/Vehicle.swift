@@ -14,8 +14,8 @@ class Vehicle: Hashable {
     var manufacturingDate: Date
     var mileage: Int
     var photo: Data?
-    var isPurchased: Bool
-
+    var isPurchased: Bool = false
+    
     @Relationship(deleteRule: .cascade) var fuelUsages: [FuelUsage] = []
     @Relationship(deleteRule: .cascade) var maintenances: [Maintenance] = []
 

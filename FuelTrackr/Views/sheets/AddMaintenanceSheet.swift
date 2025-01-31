@@ -1,8 +1,3 @@
-//
-//  AddMaintenanceSheet.swift
-//  FuelTrackr
-//
-
 import SwiftUI
 
 struct AddMaintenanceSheet: View {
@@ -22,83 +17,73 @@ struct AddMaintenanceSheet: View {
 
     var body: some View {
         NavigationView {
-            ScrollView { // Use ScrollView to ensure all content fits on smaller screens
+            ScrollView {
                 VStack(spacing: 20) {
-                    // Title Section
-                    Text(NSLocalizedString("add_maintenance_title", comment: "Add Maintenance Title"))
+                    Text(NSLocalizedString("add_maintenance_title", comment: ""))
                         .font(.title2)
                         .fontWeight(.bold)
                         .multilineTextAlignment(.center)
                         .padding(.top, 20)
 
-                    // Description Section
-                    Text(NSLocalizedString("add_maintenance_description", comment: "Description for adding past maintenances"))
+                    Text(NSLocalizedString("add_maintenance_description", comment: ""))
                         .font(.body)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 32)
 
-                    // Form Section
                     VStack(spacing: 16) {
-                        // Maintenance Type Picker
                         VStack(alignment: .leading, spacing: 8) {
-                            Text(NSLocalizedString("maintenance_type", comment: "Maintenance Type"))
+                            Text(NSLocalizedString("maintenance_type", comment: ""))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
 
-                            Picker(NSLocalizedString("maintenance_type", comment: "Maintenance Type"), selection: $selectedType) {
+                            Picker(NSLocalizedString("maintenance_type", comment: ""), selection: $selectedType) {
                                 ForEach(MaintenanceType.allCases, id: \.self) { type in
                                     Text(type.localized.capitalized)
                                         .tag(type)
                                 }
                             }
                             .pickerStyle(SegmentedPickerStyle())
-                            .cornerRadius(8)
                         }
 
-                        // Notes Input (Visible Only for "Other")
                         if selectedType == .other {
                             InputField(
-                                title: NSLocalizedString("other_notes", comment: "Other Notes"),
-                                placeholder: NSLocalizedString("other_notes_placeholder", comment: "Placeholder for other notes"),
+                                title: NSLocalizedString("other_notes", comment: ""),
+                                placeholder: NSLocalizedString("other_notes_placeholder", comment: ""),
                                 text: $notes
                             )
                         }
 
-                        // Cost Input
                         InputField(
-                            title: NSLocalizedString("cost_label", comment: "Cost"),
-                            placeholder: NSLocalizedString("cost_placeholder", comment: "Placeholder for cost"),
+                            title: NSLocalizedString("cost_label", comment: ""),
+                            placeholder: NSLocalizedString("cost_placeholder", comment: ""),
                             text: $cost,
                             keyboardType: .decimalPad
                         )
 
-                        // Mileage Input
                         InputField(
-                            title: NSLocalizedString("mileage_label", comment: "Mileage"),
-                            placeholder: NSLocalizedString("mileage_placeholder", comment: "Placeholder for mileage"),
+                            title: NSLocalizedString("mileage_label", comment: ""),
+                            placeholder: NSLocalizedString("mileage_placeholder", comment: ""),
                             text: $mileage,
                             keyboardType: .numberPad
                         )
 
-                        // Date Picker
                         VStack(alignment: .leading, spacing: 8) {
-                            Text(NSLocalizedString("date_label", comment: "Date"))
+                            Text(NSLocalizedString("date_label", comment: ""))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
 
                             DatePicker(
-                                NSLocalizedString("select_date", comment: "Select Maintenance Date"),
+                                NSLocalizedString("select_date", comment: ""),
                                 selection: $date,
                                 displayedComponents: [.date]
                             )
-                            .padding()
                             .datePickerStyle(GraphicalDatePickerStyle())
-                            .background(Color(.systemGray5))
+                            .padding()
+                            .background(Color(UIColor.secondarySystemBackground))
                             .cornerRadius(8)
                         }
                         
-                        // Error Section
                         if let errorMessage = errorMessage {
                             Text(errorMessage)
                                 .foregroundColor(.red)
@@ -107,15 +92,12 @@ struct AddMaintenanceSheet: View {
                                 .padding(.horizontal)
                         }
 
-                        // Buttons Section
                         HStack(spacing: 16) {
-                            Button(action: {
-                                dismiss()
-                            }) {
-                                Text(NSLocalizedString("cancel", comment: "Cancel button"))
+                            Button(action: { dismiss() }) {
+                                Text(NSLocalizedString("cancel", comment: ""))
                                     .frame(maxWidth: .infinity)
                                     .padding()
-                                    .background(Color(.systemGray5))
+                                    .background(Color(UIColor.secondarySystemBackground))
                                     .foregroundColor(.primary)
                                     .cornerRadius(8)
                             }
@@ -135,11 +117,11 @@ struct AddMaintenanceSheet: View {
                                     ) {
                                         dismiss()
                                     } else {
-                                        errorMessage = NSLocalizedString("maintenance_save_error", comment: "Error saving maintenance")
+                                        errorMessage = NSLocalizedString("maintenance_save_error", comment: "")
                                     }
                                 }
                             }) {
-                                Text(NSLocalizedString("save", comment: "Save button"))
+                                Text(NSLocalizedString("save", comment: ""))
                                     .frame(maxWidth: .infinity)
                                     .padding()
                                     .background(Color.blue)
@@ -150,18 +132,16 @@ struct AddMaintenanceSheet: View {
                         .padding(.bottom, 20)
                     }
                     .padding()
-                    .background(Color(.systemGray6))
+                    .background(Color(UIColor.secondarySystemBackground))
                     .cornerRadius(12)
                     .padding(.horizontal)
                 }
-                .padding(.bottom) // Add padding to ensure buttons are not cut off
+                .padding(.bottom)
             }
-            .background(Color(.systemGroupedBackground))
+            .background(Color(UIColor.systemBackground))
             .edgesIgnoringSafeArea(.bottom)
         }
     }
-
-    // MARK: - Helper Methods
 
     private func parseInput(_ input: String) -> Double? {
         let normalized = input.replacingOccurrences(of: decimalSeparator, with: ".")
@@ -170,17 +150,17 @@ struct AddMaintenanceSheet: View {
 
     private func validateAllFields() -> Bool {
         guard let costValue = parseInput(cost), costValue > 0 else {
-            errorMessage = NSLocalizedString("invalid_cost_error", comment: "Error for invalid cost")
+            errorMessage = NSLocalizedString("invalid_cost_error", comment: "")
             return false
         }
 
         guard let mileageValue = Int(mileage), mileageValue > 0 else {
-            errorMessage = NSLocalizedString("invalid_mileage_error", comment: "Error for invalid mileage")
+            errorMessage = NSLocalizedString("invalid_mileage_error", comment: "")
             return false
         }
 
         if selectedType == .other && notes.isEmpty {
-            errorMessage = NSLocalizedString("invalid_notes_error", comment: "Error for empty notes")
+            errorMessage = NSLocalizedString("invalid_notes_error", comment: "")
             return false
         }
 

@@ -10,8 +10,8 @@ import SwiftUI
 struct AllFuelUsageView: View {
     @ObservedObject var viewModel: VehicleViewModel
     @Environment(\.modelContext) private var context
-    @State private var fuelToDelete: FuelUsage? = nil // Track item to delete
-    @State private var showDeleteConfirmation = false // Control confirmation dialog
+    @State private var fuelToDelete: FuelUsage? = nil
+    @State private var showDeleteConfirmation = false
 
     var body: some View {
         NavigationView {
@@ -24,13 +24,15 @@ struct AllFuelUsageView: View {
                                 .foregroundColor(.secondary)
                             Text("\(usage.liters, specifier: "%.2f") liters, €\(usage.cost, specifier: "%.2f")")
                                 .font(.body)
+                                .foregroundColor(.primary)
                             if usage.liters > 0 {
-                                Text("\(NSLocalizedString("price_per_liter", comment: "Price per liter")): €\(usage.cost / usage.liters, specifier: "%.2f")")
+                                Text("\(NSLocalizedString("price_per_liter", comment: "")): €\(usage.cost / usage.liters, specifier: "%.2f")")
                                     .font(.footnote)
                                     .foregroundColor(.secondary)
                             }
                         }
                         .padding(.vertical, 4)
+                        .listRowBackground(Color(UIColor.secondarySystemBackground))
                     }
                     .onDelete { indexSet in
                         if let index = indexSet.first {
@@ -39,24 +41,28 @@ struct AllFuelUsageView: View {
                         }
                     }
                 } else {
-                    Text(NSLocalizedString("fuel_usage_no_content", comment: "Fuel usage information has no content"))
+                    Text(NSLocalizedString("fuel_usage_no_content", comment: ""))
                         .foregroundColor(.secondary)
                         .font(.subheadline)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding()
                 }
             }
-            .navigationTitle(NSLocalizedString("fuel_usage_list_title", comment: "Fuel usage list title"))
+            .background(Color(UIColor.systemBackground))
+            .navigationTitle(NSLocalizedString("fuel_usage_list_title", comment: ""))
             .listStyle(PlainListStyle())
             .confirmationDialog(
-                NSLocalizedString("delete_confirmation_title", comment: "Delete Confirmation"),
+                NSLocalizedString("delete_confirmation_title", comment: ""),
                 isPresented: $showDeleteConfirmation,
                 titleVisibility: .visible
             ) {
-                Button(NSLocalizedString("delete_confirmation_delete", comment: "Delete"), role: .destructive) {
+                Button(NSLocalizedString("delete_confirmation_delete", comment: ""), role: .destructive) {
                     if let fuelUsage = fuelToDelete {
                         viewModel.deleteFuelUsage(context: context, fuelUsage: fuelUsage)
                     }
                 }
-                Button(NSLocalizedString("cancel", comment: "Cancel"), role: .cancel) {}
+                Button(NSLocalizedString("cancel", comment: ""), role: .cancel) {}
             }
         }
     }

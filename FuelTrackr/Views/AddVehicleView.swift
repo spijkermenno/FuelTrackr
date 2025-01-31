@@ -13,13 +13,13 @@ struct AddVehicleView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var vehicleName: String = ""
     @State private var licensePlate: String = ""
-    @State private var purchaseDate: Date = Date()
+    @State private var purchaseDate: Date = Calendar.current.startOfDay(for: Date())
     @State private var manufacturingDate: Date = Date()
     @State private var mileage: Int? = nil
     @State private var image: UIImage?
     @State private var isImagePickerPresented = false
     
-    let onSave: () -> Void // Callback to notify parent view
+    let onSave: () -> Void
     
     var body: some View {
         NavigationView {
@@ -30,55 +30,53 @@ struct AddVehicleView: View {
                         .frame(width: 150, height: 150)
                         .cornerRadius(35)
                     
-                    Text(NSLocalizedString("welcome_subtitle", comment: "Welcome subtitle"))
+                    Text(NSLocalizedString("welcome_subtitle", comment: ""))
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
                     
-                    // Vehicle Name
                     TextFieldSection(
-                        title: NSLocalizedString("vehicle_name_title", comment: "Vehicle name title"),
+                        title: NSLocalizedString("vehicle_name_title", comment: ""),
                         text: $vehicleName,
-                        placeholder: NSLocalizedString("vehicle_name_placeholder", comment: "Vehicle name placeholder")
+                        placeholder: NSLocalizedString("vehicle_name_placeholder", comment: "")
                     )
                     
-                    // License Plate
                     TextFieldSection(
-                        title: NSLocalizedString("license_plate_title", comment: "License plate title"),
+                        title: NSLocalizedString("license_plate_title", comment: ""),
                         text: $licensePlate,
-                        placeholder: NSLocalizedString("license_plate_placeholder", comment: "License plate placeholder")
+                        placeholder: NSLocalizedString("license_plate_placeholder", comment: "")
                     )
                     
-                    // Purchase and Manufacturing Dates
                     DatePickerSection(
-                        title: NSLocalizedString("purchase_date_title", comment: "Purchase date title"),
+                        title: NSLocalizedString("purchase_date_title", comment: ""),
                         selection: $purchaseDate
                     )
                     
                     DatePickerSection(
-                        title: NSLocalizedString("manufacturing_date_title", comment: "Manufacturing date title"),
+                        title: NSLocalizedString("manufacturing_date_title", comment: ""),
                         selection: $manufacturingDate
                     )
                     
-                    // Mileage
                     VStack(alignment: .leading) {
-                        Text(NSLocalizedString("mileage_title", comment: "Mileage title"))
+                        Text(NSLocalizedString("mileage_title", comment: ""))
                             .font(.headline)
+                            .foregroundColor(.primary)
                         TextField(
-                            NSLocalizedString("mileage_placeholder", comment: "Mileage placeholder"),
+                            NSLocalizedString("mileage_placeholder", comment: ""),
                             value: $mileage,
                             format: .number
                         )
                         .keyboardType(.numberPad)
                         .padding()
-                        .background(Color(.systemGray6))
+                        .background(Color(UIColor.secondarySystemBackground))
                         .cornerRadius(8)
+                        .foregroundColor(.primary)
                     }
                     
-                    // Photo Section
                     VStack(alignment: .leading) {
-                        Text(NSLocalizedString("photo_title", comment: "Photo title"))
+                        Text(NSLocalizedString("photo_title", comment: ""))
                             .font(.headline)
+                            .foregroundColor(.primary)
                         if let uiImage = image {
                             Image(uiImage: uiImage)
                                 .resizable()
@@ -94,23 +92,22 @@ struct AddVehicleView: View {
                                     Image(systemName: "camera.fill")
                                         .font(.largeTitle)
                                         .foregroundColor(.blue)
-                                    Text(NSLocalizedString("add_photo_button", comment: "Add photo button"))
+                                    Text(NSLocalizedString("add_photo_button", comment: ""))
                                         .foregroundColor(.blue)
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding()
-                                .background(Color(.systemGray6))
+                                .background(Color(UIColor.secondarySystemBackground))
                                 .cornerRadius(10)
                             }
                         }
                     }
                     
-                    // Save Button
                     Button(action: {
                         saveVehicle()
                         onSave()
                     }) {
-                        Text(NSLocalizedString("save_vehicle_button", comment: "Save vehicle button"))
+                        Text(NSLocalizedString("save_vehicle_button", comment: ""))
                             .bold()
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -121,10 +118,11 @@ struct AddVehicleView: View {
                     .disabled(vehicleName.isEmpty || licensePlate.isEmpty || mileage == nil)
                 }
                 .padding()
-                .navigationTitle(NSLocalizedString("welcome_title", comment: "Welcome title"))
+                .navigationTitle(NSLocalizedString("welcome_title", comment: ""))
                 .navigationBarTitleDisplayMode(.inline)
             }
         }
+        .background(Color(UIColor.systemBackground))
         .sheet(isPresented: $isImagePickerPresented) {
             ImagePicker(image: $image)
         }
@@ -142,7 +140,22 @@ struct AddVehicleView: View {
         context.insert(newVehicle)
         do {
             try context.save()
-            print("Vehicle saved successfully: \(newVehicle.name)")
+            
+            if purchaseDate <= Date() {
+                let calendar = Calendar.current
+                let today = calendar.startOfDay(for: Date())
+                let purchaseDay = calendar.startOfDay(for: purchaseDate)
+
+                let daysUntilPurchase = calendar.dateComponents([.day], from: today, to: purchaseDay).day ?? 0
+                
+                NotificationManager.shared.scheduleNotification(
+                    title: NSLocalizedString("notification_purchase_date_passed_title", comment: ""),
+                    body: NSLocalizedString("notification_purchase_date_passed_description", comment: ""),
+                    inDays: daysUntilPurchase,
+                    atHour: 18,
+                    atMinute: 00
+                )
+            }
         } catch {
             print("Failed to save vehicle: \(error.localizedDescription)")
         }
@@ -158,10 +171,12 @@ struct TextFieldSection: View {
         VStack(alignment: .leading) {
             Text(title)
                 .font(.headline)
+                .foregroundColor(.primary)
             TextField(placeholder, text: $text)
                 .padding()
-                .background(Color(.systemGray6))
+                .background(Color(UIColor.secondarySystemBackground))
                 .cornerRadius(8)
+                .foregroundColor(.primary)
         }
     }
 }
@@ -174,18 +189,19 @@ struct DatePickerSection: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.headline)
+                .foregroundColor(.primary)
             
             HStack {
                 DatePicker("", selection: $selection, displayedComponents: .date)
-                    .labelsHidden() // Hides the default label
-                    .datePickerStyle(.compact) // Uses a compact style
+                    .labelsHidden()
+                    .datePickerStyle(.compact)
                 Spacer()
                 Image(systemName: "calendar")
                     .foregroundColor(.gray)
             }
             .frame(maxWidth: .infinity)
             .padding()
-            .background(Color(.systemGray6))
+            .background(Color(UIColor.secondarySystemBackground))
             .cornerRadius(8)
         }
     }

@@ -1,12 +1,15 @@
 //
 //  Localizable.strings
-//  Balance
+//  FuelTrackr
 //
 //  Created by Menno Spijker on 24/01/2025.
 //
 
 "welcome_title" = "Welcome to FuelTrackr!";
 "welcome_subtitle" = "To get started, please fill in the details of your vehicle, and then click the \"Add\" button to start tracking.";
+"edit_vehicle_title" = "Edit Vehicle";
+"tap_to_select_photo" = "Tap to select a photo";
+"select_photo" = "Select Photo";
 "vehicle_name_title" = "Vehicle Name";
 "vehicle_name_placeholder" = "Enter vehicle name";
 "license_plate_title" = "License Plate";
@@ -18,6 +21,7 @@
 "photo_title" = "Photo";
 "add_photo_button" = "Add Photo";
 "save_vehicle_button" = "Save Vehicle";
+"vehicle_is_purchased" = "Vehicle Purchased";
 
 "license_plate_label" = "License Plate";
 "mileage_label" = "Mileage";
@@ -79,7 +83,6 @@
 
 "add_fuel_usage_description" = "Track every fuel stop for a complete record. Keeping accurate fuel history helps monitor consumption trends and costs.";
 "add_maintenance_description" = "You can add both past and recent maintenance records. Keeping a full maintenance history helps you get the most out of the app.";
-"mileage_placeholder" = "Enter mileage (e.g., 120000)";
 "fuel_saved_error" = "Failed to save fuel data.";
 "maintenance_saved_success" = "Maintenance saved successfully.";
 "maintenance_saved_error" = "Failed to save maintenance.";
@@ -119,3 +122,8 @@
 "vehicle_purchase_question" = "Have you purchased this vehicle yet?";
 "vehicle_purchase_success" = "Vehicle marked as purchased!";
 "vehicle_purchase_error" = "An error occurred while updating the vehicle status.";
+
+"no_graph" = "A graph will appear here once more fuel data is added.";
+
+"notification_purchase_date_passed_title" = "Did you purchase your vehicle?";
+"notification_purchase_date_passed_description" = "If you have purchased your vehicle today, make sure to confirm it in the app.";

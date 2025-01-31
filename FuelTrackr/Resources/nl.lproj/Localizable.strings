@@ -1,5 +1,15 @@
+//
+//  Localizable.strings
+//  FuelTrackr
+//
+//  Created door Menno Spijker op 24/01/2025.
+//
+
 "welcome_title" = "Welkom bij FuelTrackr!";
 "welcome_subtitle" = "Om te beginnen, vul de gegevens van je voertuig in en klik op de knop 'Toevoegen' om te starten.";
+"edit_vehicle_title" = "Voertuig bewerken";
+"tap_to_select_photo" = "Tik om een foto te selecteren";
+"select_photo" = "Selecteer foto";
 "vehicle_name_title" = "Voertuignaam";
 "vehicle_name_placeholder" = "Voer de naam van het voertuig in";
 "license_plate_title" = "Kenteken";
@@ -11,6 +21,7 @@
 "photo_title" = "Foto";
 "add_photo_button" = "Foto toevoegen";
 "save_vehicle_button" = "Voertuig opslaan";
+"vehicle_is_purchased" = "Voertuig gekocht";
 
 "license_plate_label" = "Kenteken";
 "mileage_label" = "Kilometerstand";
@@ -52,7 +63,6 @@
 "maintenance_type" = "Type onderhoud";
 "add_maintenance_title" = "Onderhoud toevoegen";
 "other_notes" = "Specificeer alsjeblieft";
-"maintenance_title" = "Onderhoudsrecords";
 
 "delete_confirmation_title" = "Weet je het zeker?";
 "delete_confirmation_delete" = "Verwijderen";
@@ -111,3 +121,8 @@
 "vehicle_purchase_question" = "Heb je dit voertuig inmiddels gekocht?";
 "vehicle_purchase_success" = "Voertuig is gemarkeerd als gekocht!";
 "vehicle_purchase_error" = "Er is een fout opgetreden bij het bijwerken van de voertuigstatus.";
+
+"no_graph" = "Hier verschijnt een grafiek zodra er meer brandstofgegevens zijn toegevoegd.";
+
+"notification_purchase_date_passed_title" = "Heb je je voertuig gekocht?";
+"notification_purchase_date_passed_description" = "Als je je voertuig vandaag hebt gekocht, bevestig dit dan in de app.";

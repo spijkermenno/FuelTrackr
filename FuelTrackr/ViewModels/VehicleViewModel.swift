@@ -17,16 +17,48 @@ class VehicleViewModel: ObservableObject {
     func loadActiveVehicle(context: ModelContext) {
         do {
             let result = try context.fetch(FetchDescriptor<Vehicle>())
-            if !result.isEmpty {
-                activeVehicle = result.first
+            if let existingVehicle = result.first {
+                activeVehicle = existingVehicle
                 updateFuelHistory()
+                updateMaintenanceHistory()
             }
         } catch {
             print("Error fetching vehicles: \(error.localizedDescription)")
         }
     }
     
-    func saveVehicle(context: ModelContext, vehicleName: String, licensePlate: String, purchaseDate: Date, manufacturingDate: Date, mileage: Int, image: UIImage?) -> Bool {
+    func updateVehicle(
+        context: ModelContext,
+        name: String,
+        licensePlate: String,
+        purchaseDate: Date,
+        manufacturingDate: Date,
+        mileage: Int,
+        photo: Data?,
+        isPurchased: Bool
+    ) {
+        guard let vehicle = activeVehicle else { return }
+        
+        vehicle.name = name
+        vehicle.licensePlate = licensePlate
+        vehicle.purchaseDate = purchaseDate
+        vehicle.manufacturingDate = manufacturingDate
+        vehicle.mileage = mileage
+        vehicle.photo = photo
+        vehicle.isPurchased = isPurchased
+        
+        saveContext(context: context)
+    }
+
+    func saveVehicle(
+        context: ModelContext,
+        vehicleName: String,
+        licensePlate: String,
+        purchaseDate: Date,
+        manufacturingDate: Date,
+        mileage: Int,
+        image: UIImage?
+    ) -> Bool {
         let newVehicle = Vehicle(
             name: vehicleName,
             licensePlate: licensePlate,
@@ -40,6 +72,7 @@ class VehicleViewModel: ObservableObject {
             try context.save()
             activeVehicle = newVehicle
             fuelHistory = []
+            maintenanceHistory = []
             return true
         } catch {
             print("Error saving vehicle: \(error.localizedDescription)")
@@ -82,13 +115,7 @@ class VehicleViewModel: ObservableObject {
         vehicle.fuelUsages.append(newFuelUsage)
         vehicle.mileage = mileage
         
-        do {
-            try context.save()
-            updateFuelHistory()
-            return true
-        } catch {
-            return false
-        }
+        return saveContext(context: context)
     }
     
     func updateFuelHistory() {
@@ -111,12 +138,7 @@ class VehicleViewModel: ObservableObject {
         
         context.delete(fuelUsage)
         
-        do {
-            try context.save()
-            updateFuelHistory()
-        } catch {
-            print("Error deleting fuel usage: \(error.localizedDescription)")
-        }
+        saveContext(context: context)
     }
     
     func saveMaintenance(
@@ -142,20 +164,12 @@ class VehicleViewModel: ObservableObject {
         
         vehicle.maintenances.append(newMaintenance)
         
-        // Only up the mileage if it is higher than the current.
-        // This way we can add past maintenances.
+        // Only update mileage if it's higher than the current mileage
         if mileage > vehicle.mileage {
             vehicle.mileage = mileage
         }
         
-        do {
-            try context.save()
-            updateMaintenanceHistory()
-            return true
-        } catch {
-            print("Error saving maintenance: \(error.localizedDescription)")
-            return false
-        }
+        return saveContext(context: context)
     }
     
     func updateMaintenanceHistory() {
@@ -177,12 +191,7 @@ class VehicleViewModel: ObservableObject {
         
         context.delete(maintenance)
         
-        do {
-            try context.save()
-            updateMaintenanceHistory()
-        } catch {
-            print("Error deleting maintenance: \(error.localizedDescription)")
-        }
+        saveContext(context: context)
     }
     
     func resetAllMaintenance(context: ModelContext) -> Bool {
@@ -198,7 +207,7 @@ class VehicleViewModel: ObservableObject {
     private func saveContext(context: ModelContext) -> Bool {
         do {
             try context.save()
-            print("Data reset successfully.")
+            print("Data saved successfully.")
             return true
         } catch {
             print("Failed to save context: \(error.localizedDescription)")

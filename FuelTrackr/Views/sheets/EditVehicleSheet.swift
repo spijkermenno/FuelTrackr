@@ -1,0 +1,179 @@
+//
+//  EditVehicleSheet.swift
+//  FuelTrackr
+//
+//  Created by Menno Spijker on 30/01/2025.
+//
+
+import SwiftUI
+
+struct EditVehicleSheet: View {
+    @ObservedObject var viewModel: VehicleViewModel
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var context
+    
+    @State private var name: String
+    @State private var licensePlate: String
+    @State private var purchaseDate: Date
+    @State private var manufacturingDate: Date
+    @State private var mileage: String
+    @State private var photo: UIImage?
+    @State private var isPurchased: Bool
+    @State private var errorMessage: String?
+    @State private var showImagePicker: Bool = false
+    
+    init(viewModel: VehicleViewModel) {
+        self.viewModel = viewModel
+        let vehicle = viewModel.activeVehicle ?? Vehicle(name: "", licensePlate: "", purchaseDate: Date(), manufacturingDate: Date(), mileage: 0)
+        
+        _name = State(initialValue: vehicle.name)
+        _licensePlate = State(initialValue: vehicle.licensePlate)
+        _purchaseDate = State(initialValue: vehicle.purchaseDate)
+        _manufacturingDate = State(initialValue: vehicle.manufacturingDate)
+        _mileage = State(initialValue: "\(vehicle.mileage)")
+        _photo = State(initialValue: vehicle.photo.flatMap { UIImage(data: $0) })
+        _isPurchased = State(initialValue: vehicle.isPurchased)
+    }
+    
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                VStack(spacing: 12) {
+//                    Text(NSLocalizedString("edit_vehicle_title", comment: ""))
+//                        .font(.title2)
+//                        .fontWeight(.bold)
+//                        .multilineTextAlignment(.center)
+//                        .padding(.top, 20)
+                    
+                    if let photo = photo {
+                        Image(uiImage: photo)
+                            .resizable()
+                            .aspectRatio(1.0, contentMode: .fill)
+                            .frame(maxHeight: 250)
+                            .background(Color.secondary)
+                            .cornerRadius(15)
+                            .clipped()
+                            .onTapGesture {
+                                showImagePicker = true
+                            }
+                    } else {
+                        Rectangle()
+                            .fill(Color(UIColor.secondarySystemBackground))
+                            .frame(height: 200)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .overlay(
+                                Text(NSLocalizedString("tap_to_select_photo", comment: ""))
+                                    .foregroundColor(.secondary)
+                            )
+                            .padding()
+                            .onTapGesture {
+                                showImagePicker = true
+                            }
+                    }
+                    
+                    InputField(
+                        title: NSLocalizedString("vehicle_name_title", comment: ""),
+                        placeholder: NSLocalizedString("vehicle_name_placeholder", comment: ""),
+                        text: $name
+                    )
+                    
+                    InputField(
+                        title: NSLocalizedString("license_plate_title", comment: ""),
+                        placeholder: NSLocalizedString("license_plate_placeholder", comment: ""),
+                        text: $licensePlate
+                    )
+                    
+                    DatePicker(NSLocalizedString("purchase_date_title", comment: ""), selection: $purchaseDate, displayedComponents: [.date])
+                        .onChange(of: purchaseDate) { newDate in
+                            let timeZoneOffset = TimeZone.current.secondsFromGMT(for: newDate)
+                            purchaseDate = Calendar.current.startOfDay(for: newDate).addingTimeInterval(TimeInterval(timeZoneOffset))                        }
+                        .datePickerStyle(.compact)
+                        .padding()
+                        .background(Color(UIColor.secondarySystemBackground))
+                        .cornerRadius(8)
+                    
+                    DatePicker(NSLocalizedString("manufacturing_date_title", comment: ""), selection: $manufacturingDate, displayedComponents: [.date])
+                        .datePickerStyle(.compact)
+                        .padding()
+                        .background(Color(UIColor.secondarySystemBackground))
+                        .cornerRadius(8)
+                    
+                    InputField(
+                        title: NSLocalizedString("mileage_title", comment: ""),
+                        placeholder: NSLocalizedString("mileage_placeholder", comment: ""),
+                        text: $mileage,
+                        keyboardType: .numberPad
+                    )
+                    
+                    if let errorMessage = errorMessage {
+                        Text(errorMessage)
+                            .foregroundColor(.red)
+                            .font(.footnote)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }
+                    
+                    Button(action: saveVehicle) {
+                        Text(NSLocalizedString("save", comment: ""))
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                    }
+                    .padding(.bottom, 20)
+                    
+                    Spacer()
+                }
+                .padding()
+                .background(Color(UIColor.systemBackground))
+                .cornerRadius(12)
+                .padding(.horizontal)
+            }
+            .navigationTitle(NSLocalizedString("edit_vehicle_title", comment: ""))
+            .navigationBarTitleDisplayMode(.inline)
+            .padding(.bottom)
+        }
+        .background(Color(UIColor.systemBackground))
+        .edgesIgnoringSafeArea(.bottom)
+        .sheet(isPresented: $showImagePicker) {
+            ImagePicker(image: $photo)
+        }
+    }
+    
+    private func saveVehicle() {
+        guard !name.isEmpty, !licensePlate.isEmpty, let mileageValue = Int(mileage), mileageValue >= 0 else {
+            errorMessage = NSLocalizedString("all_fields_required_error", comment: "")
+            return
+        }
+        
+        if purchaseDate <= Date() {
+            let calendar = Calendar.current
+            let today = calendar.startOfDay(for: Date())
+            let purchaseDay = calendar.startOfDay(for: purchaseDate)
+
+            let daysUntilPurchase = calendar.dateComponents([.day], from: today, to: purchaseDay).day ?? 0
+            
+            NotificationManager.shared.scheduleNotification(
+                title: NSLocalizedString("notification_purchase_date_passed_title", comment: ""),
+                body: NSLocalizedString("notification_purchase_date_passed_description", comment: ""),
+                inDays: daysUntilPurchase,
+                atHour: 18,
+                atMinute: 00
+            )
+        }
+        
+        viewModel.updateVehicle(
+            context: context,
+            name: name,
+            licensePlate: licensePlate,
+            purchaseDate: purchaseDate,
+            manufacturingDate: manufacturingDate,
+            mileage: mileageValue,
+            photo: photo?.jpegData(compressionQuality: 0.8),
+            isPurchased: (purchaseDate <= Date())
+        )
+        
+        dismiss()
+    }
+}
