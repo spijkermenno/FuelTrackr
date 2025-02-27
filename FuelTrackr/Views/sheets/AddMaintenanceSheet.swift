@@ -10,6 +10,7 @@ struct AddMaintenanceSheet: View {
     @State private var mileage = ""
     @State private var date = Date()
     @State private var errorMessage: String?
+    @State private var keyboardHeight: CGFloat = 0
 
     private var decimalSeparator: String {
         Locale.current.decimalSeparator ?? "."
@@ -80,7 +81,7 @@ struct AddMaintenanceSheet: View {
                             )
                             .datePickerStyle(GraphicalDatePickerStyle())
                             .padding()
-                            .background(Color(UIColor.secondarySystemBackground))
+                            .background(Color(UIColor.systemGray5))
                             .cornerRadius(8)
                         }
                         
@@ -112,7 +113,7 @@ struct AddMaintenanceSheet: View {
                                         maintenanceType: selectedType,
                                         cost: costValue,
                                         date: date,
-                                        mileage: mileageValue,
+                                        mileageValue: mileageValue,
                                         notes: selectedType == .other ? notes : nil
                                     ) {
                                         dismiss()
@@ -136,10 +137,20 @@ struct AddMaintenanceSheet: View {
                     .cornerRadius(12)
                     .padding(.horizontal)
                 }
-                .padding(.bottom)
+                .padding(.bottom, keyboardHeight)
+                .animation(.easeOut(duration: 0.3), value: keyboardHeight)
             }
             .background(Color(UIColor.systemBackground))
             .edgesIgnoringSafeArea(.bottom)
+            .onTapGesture {
+                hideKeyboard()
+            }
+            .onAppear {
+                startKeyboardObserver()
+            }
+            .onDisappear {
+                stopKeyboardObserver()
+            }
         }
     }
 
@@ -166,5 +177,26 @@ struct AddMaintenanceSheet: View {
 
         errorMessage = nil
         return true
+    }
+
+    private func startKeyboardObserver() {
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { notification in
+            if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                keyboardHeight = keyboardFrame.height
+            }
+        }
+
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
+            keyboardHeight = 0
+        }
+    }
+
+    private func stopKeyboardObserver() {
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+
+    private func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }

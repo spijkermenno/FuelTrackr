@@ -62,7 +62,7 @@
 "maintenance_details" = "Onderhoudsgegevens";
 "maintenance_type" = "Type onderhoud";
 "add_maintenance_title" = "Onderhoud toevoegen";
-"other_notes" = "Specificeer alsjeblieft";
+"other_notes" = "Beschrijving";
 
 "delete_confirmation_title" = "Weet je het zeker?";
 "delete_confirmation_delete" = "Verwijderen";
@@ -122,7 +122,14 @@
 "vehicle_purchase_success" = "Voertuig is gemarkeerd als gekocht!";
 "vehicle_purchase_error" = "Er is een fout opgetreden bij het bijwerken van de voertuigstatus.";
 
-"no_graph" = "Hier verschijnt een grafiek zodra er meer brandstofgegevens zijn toegevoegd.";
+"no_graph_fuel" = "Hier verschijnt een grafiek zodra er meer brandstofgegevens zijn toegevoegd.";
+"no_graph_maintenance" = "Hier verschijnt een grafiek zodra er meer onderhoudgegevens zijn toegevoegd.";
+"no_graph_mileage" = "Hier verschijnt een grafiek zodra er meer kilometerstanden zijn geregistreerd.";
 
 "notification_purchase_date_passed_title" = "Heb je je voertuig gekocht?";
 "notification_purchase_date_passed_description" = "Als je je voertuig vandaag hebt gekocht, bevestig dit dan in de app.";
+
+"vehicle_details_title" = "Voertuigdetails";
+
+"fuel_usage_empty_title" = "Meer gegevens nodig";
+"fuel_usage_empty_description" = "Voeg meer tankbeurten toe voor een beter overzicht.";

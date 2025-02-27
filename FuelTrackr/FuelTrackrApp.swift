@@ -8,6 +8,7 @@
 import SwiftUI
 import SwiftData
 import FirebaseCore
+import FirebaseAnalytics
 
 
 class AppDelegate: NSObject, UIApplicationDelegate {
@@ -23,10 +24,16 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 struct FuelTrackrApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
+    init() {
+            Analytics.logEvent(AnalyticsEventAppOpen, parameters: [
+                AnalyticsParameterItemID: UUID().uuidString,
+            ])
+        }
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .modelContainer(for: [Vehicle.self, FuelUsage.self, Maintenance.self]) // Attach persistent container
+                .modelContainer(for: [Vehicle.self, FuelUsage.self, Maintenance.self, Mileage.self])
         }
     }
 }

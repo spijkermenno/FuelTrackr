@@ -21,7 +21,7 @@ struct InputField: View {
 
             TextField(placeholder, text: $text)
                 .padding()
-                .background(Color(UIColor.secondarySystemBackground))
+                .background(Color(UIColor.systemGray5))
                 .cornerRadius(8)
                 .keyboardType(keyboardType)
                 .foregroundColor(.primary)

@@ -20,13 +20,12 @@ struct ContentView: View {
                 if viewModel.activeVehicle != nil {
                     ActiveVehicleView(viewModel: viewModel)
                 } else {
-                    AddVehicleView {
+                    AddVehicleView(viewModel: viewModel) {
                         checkForActiveVehicles()
                     }
                 }
             }
             .onAppear {
-                viewModel.migrateVehicles(context: context)
                 checkForActiveVehicles()
             }
         }

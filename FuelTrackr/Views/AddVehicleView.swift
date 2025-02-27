@@ -11,14 +11,16 @@ import SwiftData
 struct AddVehicleView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject var viewModel: VehicleViewModel
     @State private var vehicleName: String = ""
     @State private var licensePlate: String = ""
     @State private var purchaseDate: Date = Calendar.current.startOfDay(for: Date())
     @State private var manufacturingDate: Date = Date()
-    @State private var mileage: Int? = nil
+    @State private var mileage: String = ""
     @State private var image: UIImage?
     @State private var isImagePickerPresented = false
-    
+    @State private var errorMessage: String?
+
     let onSave: () -> Void
     
     var body: some View {
@@ -63,8 +65,7 @@ struct AddVehicleView: View {
                             .foregroundColor(.primary)
                         TextField(
                             NSLocalizedString("mileage_placeholder", comment: ""),
-                            value: $mileage,
-                            format: .number
+                            text: $mileage
                         )
                         .keyboardType(.numberPad)
                         .padding()
@@ -103,19 +104,26 @@ struct AddVehicleView: View {
                         }
                     }
                     
+                    if let errorMessage = errorMessage {
+                        Text(errorMessage)
+                            .foregroundColor(.red)
+                            .font(.footnote)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }
+                    
                     Button(action: {
                         saveVehicle()
-                        onSave()
                     }) {
                         Text(NSLocalizedString("save_vehicle_button", comment: ""))
                             .bold()
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(vehicleName.isEmpty || licensePlate.isEmpty ? Color.gray : Color.blue)
+                            .background(vehicleName.isEmpty || licensePlate.isEmpty || mileage.isEmpty ? Color.gray : Color.blue)
                             .foregroundColor(.white)
                             .cornerRadius(10)
                     }
-                    .disabled(vehicleName.isEmpty || licensePlate.isEmpty || mileage == nil)
+                    .disabled(vehicleName.isEmpty || licensePlate.isEmpty || mileage.isEmpty)
                 }
                 .padding()
                 .navigationTitle(NSLocalizedString("welcome_title", comment: ""))
@@ -129,35 +137,26 @@ struct AddVehicleView: View {
     }
     
     private func saveVehicle() {
-        let newVehicle = Vehicle(
-            name: vehicleName,
+        guard let mileageValue = Int(mileage), mileageValue >= 0 else {
+            errorMessage = NSLocalizedString("invalid_mileage_error", comment: "")
+            return
+        }
+        
+        let success = viewModel.saveVehicle(
+            context: context,
+            vehicleName: vehicleName,
             licensePlate: licensePlate,
             purchaseDate: purchaseDate,
             manufacturingDate: manufacturingDate,
-            mileage: mileage!,
-            photo: image?.jpegData(compressionQuality: 0.8)
+            initialMileage: mileageValue,
+            image: image
         )
-        context.insert(newVehicle)
-        do {
-            try context.save()
-            
-            if purchaseDate <= Date() {
-                let calendar = Calendar.current
-                let today = calendar.startOfDay(for: Date())
-                let purchaseDay = calendar.startOfDay(for: purchaseDate)
-
-                let daysUntilPurchase = calendar.dateComponents([.day], from: today, to: purchaseDay).day ?? 0
-                
-                NotificationManager.shared.scheduleNotification(
-                    title: NSLocalizedString("notification_purchase_date_passed_title", comment: ""),
-                    body: NSLocalizedString("notification_purchase_date_passed_description", comment: ""),
-                    inDays: daysUntilPurchase,
-                    atHour: 18,
-                    atMinute: 00
-                )
-            }
-        } catch {
-            print("Failed to save vehicle: \(error.localizedDescription)")
+        
+        if success {
+            onSave()
+            dismiss()
+        } else {
+            errorMessage = NSLocalizedString("save_vehicle_error", comment: "")
         }
     }
 }

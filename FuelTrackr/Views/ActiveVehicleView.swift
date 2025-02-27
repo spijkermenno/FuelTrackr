@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAnalytics
 
 struct ActiveVehicleView: View {
     @ObservedObject var viewModel: VehicleViewModel
@@ -19,10 +20,17 @@ struct ActiveVehicleView: View {
     
     var body: some View {
         guard let vehicle = viewModel.activeVehicle else {
+            Analytics.logEvent("no_active_vehicle", parameters: nil)
             return AnyView(Text("No active vehicle found.").foregroundColor(.primary))
         }
-        
+
+        Analytics.logEvent("active_vehicle_found", parameters: [
+            "vehicle_name": vehicle.name,
+            "license_plate": vehicle.licensePlate
+        ])
+
         let isMetric = repository.isUsingMetric()
+        let latestMileage = vehicle.mileages.first?.value ?? 0
         
         return AnyView(
             ScrollView {
@@ -45,30 +53,17 @@ struct ActiveVehicleView: View {
                             .background(Color(UIColor.secondarySystemBackground))
                             .cornerRadius(10)
                     }
-                    
+
                     VehiclePurchaseBanner(
                         isPurchased: vehicle.isPurchased,
                         purchaseDate: vehicle.purchaseDate,
                         onConfirmPurchase: {
-//                            vehicle.isPurchased = true
-//                            viewModel.updateVehiclePurchaseStatus(isPurchased: true, context: context)
                             showEditVehicleSheet = true
                         }
                     )
-                    
-                    VStack(alignment: .leading, spacing: 12) {
-                        detailRow(label: NSLocalizedString("license_plate_label", comment: ""), value: vehicle.licensePlate)
-                        detailRow(
-                            label: NSLocalizedString("mileage_label", comment: ""),
-                            value: "\(convertMileage(vehicle.mileage, isMetric: isMetric)) \(isMetric ? "km" : "mi")"
-                        )
-                        detailRow(label: NSLocalizedString("purchase_date_label", comment: ""), value: vehicle.purchaseDate.formatted(date: .abbreviated, time: .omitted))
-                        detailRow(label: NSLocalizedString("manufacturing_date_label", comment: ""), value: vehicle.manufacturingDate.formatted(date: .abbreviated, time: .omitted))
-                    }
-                    .padding()
-                    .background(Color(UIColor.secondarySystemBackground))
-                    .cornerRadius(10)
-                    
+
+                    VehicleInfoView(viewModel: viewModel)
+
                     FuelUsageView(viewModel: viewModel, showAddFuelSheet: $showAddFuelSheet, isVehicleActive: vehicle.isPurchased)
                     
                     MaintenanceView(viewModel: viewModel, showAddMaintenanceSheet: $showAddMaintenanceSheet, isVehicleActive: vehicle.isPurchased)
@@ -87,7 +82,7 @@ struct ActiveVehicleView: View {
                             .foregroundColor(.primary)
                     }
                 }
-                
+
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink(destination: SettingsPageView(viewModel: viewModel)) {
                         Image(systemName: "gear")
@@ -106,7 +101,7 @@ struct ActiveVehicleView: View {
             }
         )
     }
-    
+
     private func detailRow(label: String, value: String) -> some View {
         HStack {
             Text(label + ":")
@@ -117,8 +112,14 @@ struct ActiveVehicleView: View {
                 .foregroundColor(.primary)
         }
     }
-    
+
     private func convertMileage(_ mileage: Int, isMetric: Bool) -> Int {
         isMetric ? mileage : Int(Double(mileage) / 1.609)
+    }
+}
+
+extension View {
+    func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }

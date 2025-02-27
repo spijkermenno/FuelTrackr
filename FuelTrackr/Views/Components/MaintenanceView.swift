@@ -45,7 +45,7 @@ struct MaintenanceView: View {
                     MaintenanceListView(viewModel: viewModel, showAddMaintenanceSheet: $showAddMaintenanceSheet)
                         .tag(0)
 
-                    Text(NSLocalizedString("no_graph", comment: ""))
+                    Text(NSLocalizedString("no_graph_maintenance", comment: ""))
                         .foregroundColor(.secondary)
                         .font(.subheadline)
                         .padding(.vertical, 12)

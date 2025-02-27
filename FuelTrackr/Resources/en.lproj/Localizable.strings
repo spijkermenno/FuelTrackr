@@ -123,7 +123,14 @@
 "vehicle_purchase_success" = "Vehicle marked as purchased!";
 "vehicle_purchase_error" = "An error occurred while updating the vehicle status.";
 
-"no_graph" = "A graph will appear here once more fuel data is added.";
+"no_graph_fuel” = “A graph will appear here once more fuel data has been added.";
+"no_graph_maintenance” = “A graph will appear here once more maintenance data has been added.";
+"no_graph_mileage” = “A graph will appear here once more mileage records have been registered.";
 
 "notification_purchase_date_passed_title" = "Did you purchase your vehicle?";
 "notification_purchase_date_passed_description" = "If you have purchased your vehicle today, make sure to confirm it in the app.";
+
+"vehicle_details_title" = "Vehicle Details";
+
+"fuel_usage_empty_title" = "More data needed";
+"fuel_usage_empty_description" = "Add more fuel entries for a better overview.";

@@ -16,21 +16,23 @@ struct EditVehicleSheet: View {
     @State private var licensePlate: String
     @State private var purchaseDate: Date
     @State private var manufacturingDate: Date
-    @State private var mileage: String
+    @State private var newMileage: String = ""
     @State private var photo: UIImage?
     @State private var isPurchased: Bool
     @State private var errorMessage: String?
-    @State private var showImagePicker: Bool = false
+    @State private var showImagePicker = false
+    @State private var showMileageHistory = false
     
     init(viewModel: VehicleViewModel) {
         self.viewModel = viewModel
-        let vehicle = viewModel.activeVehicle ?? Vehicle(name: "", licensePlate: "", purchaseDate: Date(), manufacturingDate: Date(), mileage: 0)
-        
+        let vehicle = viewModel.activeVehicle ?? Vehicle(
+            name: "", licensePlate: "", purchaseDate: Date(), manufacturingDate: Date()
+        )
+
         _name = State(initialValue: vehicle.name)
         _licensePlate = State(initialValue: vehicle.licensePlate)
         _purchaseDate = State(initialValue: vehicle.purchaseDate)
         _manufacturingDate = State(initialValue: vehicle.manufacturingDate)
-        _mileage = State(initialValue: "\(vehicle.mileage)")
         _photo = State(initialValue: vehicle.photo.flatMap { UIImage(data: $0) })
         _isPurchased = State(initialValue: vehicle.isPurchased)
     }
@@ -39,12 +41,6 @@ struct EditVehicleSheet: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 12) {
-//                    Text(NSLocalizedString("edit_vehicle_title", comment: ""))
-//                        .font(.title2)
-//                        .fontWeight(.bold)
-//                        .multilineTextAlignment(.center)
-//                        .padding(.top, 20)
-                    
                     if let photo = photo {
                         Image(uiImage: photo)
                             .resizable()
@@ -85,8 +81,8 @@ struct EditVehicleSheet: View {
                     
                     DatePicker(NSLocalizedString("purchase_date_title", comment: ""), selection: $purchaseDate, displayedComponents: [.date])
                         .onChange(of: purchaseDate) { newDate in
-                            let timeZoneOffset = TimeZone.current.secondsFromGMT(for: newDate)
-                            purchaseDate = Calendar.current.startOfDay(for: newDate).addingTimeInterval(TimeInterval(timeZoneOffset))                        }
+                            purchaseDate = Calendar.current.startOfDay(for: newDate)
+                        }
                         .datePickerStyle(.compact)
                         .padding()
                         .background(Color(UIColor.secondarySystemBackground))
@@ -97,14 +93,20 @@ struct EditVehicleSheet: View {
                         .padding()
                         .background(Color(UIColor.secondarySystemBackground))
                         .cornerRadius(8)
-                    
-                    InputField(
-                        title: NSLocalizedString("mileage_title", comment: ""),
-                        placeholder: NSLocalizedString("mileage_placeholder", comment: ""),
-                        text: $mileage,
-                        keyboardType: .numberPad
-                    )
-                    
+
+                    // Latest mileage
+                    if let latestMileage = viewModel.activeVehicle?.mileages.sorted(by: { $0.date > $1.date }).first {
+                        detailRow(
+                            label: NSLocalizedString("latest_mileage", comment: ""),
+                            value: "\(latestMileage.value) km"
+                        )
+                    } else {
+                        detailRow(
+                            label: NSLocalizedString("latest_mileage", comment: ""),
+                            value: NSLocalizedString("no_mileage_recorded", comment: "")
+                        )
+                    }
+
                     if let errorMessage = errorMessage {
                         Text(errorMessage)
                             .foregroundColor(.red)
@@ -142,16 +144,16 @@ struct EditVehicleSheet: View {
     }
     
     private func saveVehicle() {
-        guard !name.isEmpty, !licensePlate.isEmpty, let mileageValue = Int(mileage), mileageValue >= 0 else {
+        guard !name.isEmpty, !licensePlate.isEmpty else {
             errorMessage = NSLocalizedString("all_fields_required_error", comment: "")
             return
         }
-        
-        if purchaseDate <= Date() {
-            let calendar = Calendar.current
-            let today = calendar.startOfDay(for: Date())
-            let purchaseDay = calendar.startOfDay(for: purchaseDate)
 
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let purchaseDay = calendar.startOfDay(for: purchaseDate)
+
+        if purchaseDay > today {
             let daysUntilPurchase = calendar.dateComponents([.day], from: today, to: purchaseDay).day ?? 0
             
             NotificationManager.shared.scheduleNotification(
@@ -162,18 +164,31 @@ struct EditVehicleSheet: View {
                 atMinute: 00
             )
         }
-        
+
         viewModel.updateVehicle(
             context: context,
             name: name,
             licensePlate: licensePlate,
             purchaseDate: purchaseDate,
             manufacturingDate: manufacturingDate,
-            mileage: mileageValue,
             photo: photo?.jpegData(compressionQuality: 0.8),
-            isPurchased: (purchaseDate <= Date())
+            isPurchased: purchaseDate <= Date()
         )
-        
+
         dismiss()
+    }
+
+    private func detailRow(label: String, value: String) -> some View {
+        HStack {
+            Text(label + ":")
+                .fontWeight(.semibold)
+                .foregroundColor(.primary)
+            Spacer()
+            Text(value)
+                .foregroundColor(.primary)
+        }
+        .padding()
+        .background(Color(UIColor.secondarySystemBackground))
+        .cornerRadius(8)
     }
 }

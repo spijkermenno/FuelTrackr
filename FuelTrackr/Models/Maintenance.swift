@@ -11,11 +11,11 @@ class Maintenance: Hashable {
     var type: MaintenanceType
     var cost: Double
     var date: Date
-    var mileage: Int?
     var notes: String?
+    @Relationship(deleteRule: .nullify) var mileage: Mileage?
     @Relationship(deleteRule: .cascade, inverse: \Vehicle.maintenances) var vehicle: Vehicle?
 
-    init(type: MaintenanceType, cost: Double, date: Date, mileage: Int, notes: String? = nil, vehicle: Vehicle? = nil) {
+    init(type: MaintenanceType, cost: Double, date: Date, mileage: Mileage? = nil, notes: String? = nil, vehicle: Vehicle? = nil) {
         self.type = type
         self.cost = cost
         self.date = date

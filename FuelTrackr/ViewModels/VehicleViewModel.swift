@@ -11,42 +11,38 @@ import UIKit
 
 class VehicleViewModel: ObservableObject {
     @Published var activeVehicle: Vehicle?
-    @Published var fuelHistory: [FuelUsage] = []
-    @Published var maintenanceHistory: [Maintenance] = []
     
     func loadActiveVehicle(context: ModelContext) {
         do {
             let result = try context.fetch(FetchDescriptor<Vehicle>())
             if let existingVehicle = result.first {
                 activeVehicle = existingVehicle
-                updateFuelHistory()
-                updateMaintenanceHistory()
+                
+                print(activeVehicle?.mileages)
             }
         } catch {
             print("Error fetching vehicles: \(error.localizedDescription)")
         }
     }
-    
+
     func updateVehicle(
         context: ModelContext,
         name: String,
         licensePlate: String,
         purchaseDate: Date,
         manufacturingDate: Date,
-        mileage: Int,
         photo: Data?,
         isPurchased: Bool
     ) {
         guard let vehicle = activeVehicle else { return }
-        
+
         vehicle.name = name
         vehicle.licensePlate = licensePlate
         vehicle.purchaseDate = purchaseDate
         vehicle.manufacturingDate = manufacturingDate
-        vehicle.mileage = mileage
         vehicle.photo = photo
         vehicle.isPurchased = isPurchased
-        
+
         saveContext(context: context)
     }
 
@@ -56,7 +52,7 @@ class VehicleViewModel: ObservableObject {
         licensePlate: String,
         purchaseDate: Date,
         manufacturingDate: Date,
-        mileage: Int,
+        initialMileage: Int,
         image: UIImage?
     ) -> Bool {
         let newVehicle = Vehicle(
@@ -64,95 +60,97 @@ class VehicleViewModel: ObservableObject {
             licensePlate: licensePlate,
             purchaseDate: purchaseDate,
             manufacturingDate: manufacturingDate,
-            mileage: mileage,
             photo: image?.jpegData(compressionQuality: 0.8)
         )
+
+        // Create the initial mileage entry
+        let initialMileageEntry = Mileage(value: initialMileage, date: Date(), vehicle: newVehicle)
+
+        // Explicitly insert the mileage entry into the context
+        context.insert(initialMileageEntry)
+
+        // Ensure the relationship is established before inserting the vehicle
+        newVehicle.mileages.append(initialMileageEntry)
+
+        // Insert the vehicle into the context after all properties are set
         context.insert(newVehicle)
+
         do {
+            print("Before Save: \(newVehicle.mileages)")
             try context.save()
+            print("After Save: \(activeVehicle?.mileages ?? [])")
+
             activeVehicle = newVehicle
-            fuelHistory = []
-            maintenanceHistory = []
+
             return true
         } catch {
             print("Error saving vehicle: \(error.localizedDescription)")
             return false
         }
     }
-    
+
     func deleteActiveVehicle(context: ModelContext) {
+        print("Deleting vehicle started")
+
         guard let vehicle = activeVehicle else {
+            print("No active vehicle to delete")
             return
         }
-        
+
+        print("Vehicle found: \(vehicle)")
+
+        // Remove relationships manually (if needed)
+        vehicle.mileages.forEach { context.delete($0) }
+        vehicle.fuelUsages.forEach { context.delete($0) }
+        vehicle.maintenances.forEach { context.delete($0) }
+
+        print("Deleted related records")
+
+        // Nullify the reference before deletion to prevent EXC_BAD_ACCESS
+        activeVehicle = nil
+
+        print("Deleting vehicle...")
         context.delete(vehicle)
-        
+
         do {
+            print("Saving context...")
             try context.save()
-            activeVehicle = nil
+            print("Vehicle successfully deleted")
         } catch {
             print("Error deleting active vehicle: \(error.localizedDescription)")
         }
     }
-    
-    func saveFuelUsage(context: ModelContext, liters: Double, cost: Double, mileage: Int) -> Bool {
-        guard let vehicle = activeVehicle else {
-            return false
-        }
+
+    func saveFuelUsage(context: ModelContext, liters: Double, cost: Double, mileageValue: Int) -> Bool {
+        guard let vehicle = activeVehicle else { return false }
         
-        if mileage <= vehicle.mileage {
-            return false
-        }
+        let mileage = getOrCreateMileage(context: context, mileageValue: mileageValue)
         
         let newFuelUsage = FuelUsage(
             liters: liters,
             cost: cost,
-            mileage: mileage,
             date: Date(),
+            mileage: mileage,
             vehicle: vehicle
         )
-        
+
         vehicle.fuelUsages.append(newFuelUsage)
-        vehicle.mileage = mileage
         
         return saveContext(context: context)
     }
-    
-    func updateFuelHistory() {
-        guard let vehicle = activeVehicle else {
-            fuelHistory = []
-            return
-        }
-        fuelHistory = vehicle.fuelUsages.sorted { $0.date > $1.date }
-    }
-    
-    func deleteFuelUsage(context: ModelContext, fuelUsage: FuelUsage) {
-        guard let vehicle = activeVehicle else {
-            print("No active vehicle to delete fuel usage from.")
-            return
-        }
-        
-        if let index = vehicle.fuelUsages.firstIndex(of: fuelUsage) {
-            vehicle.fuelUsages.remove(at: index)
-        }
-        
-        context.delete(fuelUsage)
-        
-        saveContext(context: context)
-    }
-    
+
     func saveMaintenance(
         context: ModelContext,
         maintenanceType: MaintenanceType,
         cost: Double,
         date: Date,
-        mileage: Int,
+        mileageValue: Int,
         notes: String?
     ) -> Bool {
-        guard let vehicle = activeVehicle else {
-            return false
-        }
+        guard let vehicle = activeVehicle else { return false }
         
+        let mileage = getOrCreateMileage(context: context, mileageValue: mileageValue)
+
         let newMaintenance = Maintenance(
             type: maintenanceType,
             cost: cost,
@@ -161,39 +159,48 @@ class VehicleViewModel: ObservableObject {
             notes: notes,
             vehicle: vehicle
         )
-        
+
         vehicle.maintenances.append(newMaintenance)
-        
-        // Only update mileage if it's higher than the current mileage
-        if mileage > vehicle.mileage {
-            vehicle.mileage = mileage
-        }
-        
+
         return saveContext(context: context)
     }
-    
-    func updateMaintenanceHistory() {
-        guard let vehicle = activeVehicle else {
-            maintenanceHistory = []
-            return
+
+    private func getOrCreateMileage(context: ModelContext, mileageValue: Int) -> Mileage {
+        guard let vehicle = activeVehicle else { fatalError("No active vehicle") }
+        
+        if let existingMileage = vehicle.mileages.first(where: { $0.value == mileageValue }) {
+            return existingMileage
         }
-        maintenanceHistory = vehicle.maintenances.sorted(by: { $0.date > $1.date })
+        
+        let newMileage = Mileage(value: mileageValue, date: Date(), vehicle: vehicle)
+        vehicle.mileages.append(newMileage)
+        return newMileage
     }
-    
-    func deleteMaintenance(context: ModelContext, maintenance: Maintenance) {
-        guard let vehicle = activeVehicle else {
-            return
+
+    func deleteFuelUsage(context: ModelContext, fuelUsage: FuelUsage) {
+        guard let vehicle = activeVehicle else { return }
+        
+        if let index = vehicle.fuelUsages.firstIndex(of: fuelUsage) {
+            vehicle.fuelUsages.remove(at: index)
         }
+
+        context.delete(fuelUsage)
+        
+        saveContext(context: context)
+    }
+
+    func deleteMaintenance(context: ModelContext, maintenance: Maintenance) {
+        guard let vehicle = activeVehicle else { return }
         
         if let index = vehicle.maintenances.firstIndex(of: maintenance) {
             vehicle.maintenances.remove(at: index)
         }
-        
+
         context.delete(maintenance)
         
         saveContext(context: context)
     }
-    
+
     func resetAllMaintenance(context: ModelContext) -> Bool {
         activeVehicle?.maintenances.removeAll()
         return saveContext(context: context)
@@ -214,19 +221,16 @@ class VehicleViewModel: ObservableObject {
             return false
         }
     }
-    
+
     func updateVehiclePurchaseStatus(isPurchased: Bool, context: ModelContext) {
         activeVehicle?.isPurchased = isPurchased
         saveContext(context: context)
     }
-    
-    // MARK: Migrations
-    
+
     func migrateVehicles(context: ModelContext) {
         let allVehicles = try? context.fetch(FetchDescriptor<Vehicle>())
         allVehicles?.forEach { vehicle in
             if vehicle.isPurchased == nil {
-                print(vehicle)
                 vehicle.isPurchased = vehicle.purchaseDate <= Date()
             }
         }

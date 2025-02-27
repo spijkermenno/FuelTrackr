@@ -13,6 +13,7 @@ struct AddFuelUsageSheet: View {
     @State private var cost = ""
     @State private var mileage = ""
     @State private var errorMessage: String?
+    @State private var keyboardHeight: CGFloat = 0
 
     private var decimalSeparator: String {
         Locale.current.decimalSeparator ?? "."
@@ -49,14 +50,14 @@ struct AddFuelUsageSheet: View {
                             keyboardType: .decimalPad
                         )
 
-                        let currentMileage = viewModel.activeVehicle?.mileage ?? 10000
+                        let currentMileage = viewModel.activeVehicle?.mileages.last?.value ?? 10000
                         InputField(
                             title: NSLocalizedString("mileage_label", comment: ""),
                             placeholder: "\(currentMileage) km",
                             text: $mileage,
                             keyboardType: .numberPad
                         )
-                        
+
                         if let errorMessage = errorMessage {
                             Text(errorMessage)
                                 .foregroundColor(.red)
@@ -81,7 +82,7 @@ struct AddFuelUsageSheet: View {
                                           let costValue = parseInput(cost),
                                           let mileageValue = Int(mileage) else { return }
 
-                                    if viewModel.saveFuelUsage(context: context, liters: litersValue, cost: costValue, mileage: mileageValue) {
+                                    if viewModel.saveFuelUsage(context: context, liters: litersValue, cost: costValue, mileageValue: mileageValue) {
                                         dismiss()
                                     } else {
                                         errorMessage = NSLocalizedString("fuel_usage_saved_error", comment: "")
@@ -103,10 +104,20 @@ struct AddFuelUsageSheet: View {
                     .cornerRadius(12)
                     .padding(.horizontal)
                 }
-                .padding(.bottom)
+                .padding(.bottom, keyboardHeight)
+                .animation(.easeOut(duration: 0.3), value: keyboardHeight)
             }
             .background(Color(.systemGroupedBackground))
             .edgesIgnoringSafeArea(.bottom)
+            .onTapGesture {
+                hideKeyboard()
+            }
+            .onAppear {
+                startKeyboardObserver()
+            }
+            .onDisappear {
+                stopKeyboardObserver()
+            }
         }
     }
 
@@ -133,5 +144,35 @@ struct AddFuelUsageSheet: View {
 
         errorMessage = nil
         return true
+    }
+
+    private func startKeyboardObserver() {
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { notification in
+            if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                let safeAreaBottom = UIApplication.shared.windows.first?.safeAreaInsets.bottom ?? 0
+                let newHeight = keyboardFrame.height - safeAreaBottom
+                
+                if keyboardHeight != newHeight {
+                    withAnimation {
+                        keyboardHeight = newHeight
+                    }
+                }
+            }
+        }
+
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
+            withAnimation {
+                keyboardHeight = 0
+            }
+        }
+    }
+
+    private func stopKeyboardObserver() {
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+
+    private func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }

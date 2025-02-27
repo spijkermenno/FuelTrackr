@@ -12,21 +12,24 @@ class Vehicle: Hashable {
     var licensePlate: String
     var purchaseDate: Date
     var manufacturingDate: Date
-    var mileage: Int
     var photo: Data?
     var isPurchased: Bool = false
     
     @Relationship(deleteRule: .cascade) var fuelUsages: [FuelUsage] = []
     @Relationship(deleteRule: .cascade) var maintenances: [Maintenance] = []
+    @Relationship(deleteRule: .cascade) var mileages: [Mileage] = []
 
-    init(name: String, licensePlate: String, purchaseDate: Date, manufacturingDate: Date, mileage: Int, photo: Data? = nil, isPurchased: Bool? = nil) {
+    init(name: String, licensePlate: String, purchaseDate: Date, manufacturingDate: Date, photo: Data? = nil, isPurchased: Bool? = nil) {
         self.name = name
         self.licensePlate = licensePlate
         self.purchaseDate = purchaseDate
         self.manufacturingDate = manufacturingDate
-        self.mileage = mileage
         self.photo = photo
         self.isPurchased = isPurchased ?? (purchaseDate <= Date())
+    }
+
+    var latestMileage: Mileage? {
+        mileages.sorted { $0.date > $1.date }.first
     }
 
     static func == (lhs: Vehicle, rhs: Vehicle) -> Bool {
@@ -34,7 +37,6 @@ class Vehicle: Hashable {
             lhs.licensePlate == rhs.licensePlate &&
             lhs.purchaseDate == rhs.purchaseDate &&
             lhs.manufacturingDate == rhs.manufacturingDate &&
-            lhs.mileage == rhs.mileage &&
             lhs.isPurchased == rhs.isPurchased
     }
 
@@ -43,7 +45,6 @@ class Vehicle: Hashable {
         hasher.combine(licensePlate)
         hasher.combine(purchaseDate)
         hasher.combine(manufacturingDate)
-        hasher.combine(mileage)
         hasher.combine(isPurchased)
     }
 }

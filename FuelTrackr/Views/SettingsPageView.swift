@@ -13,6 +13,7 @@ struct SettingsPageView: View {
 
     @ObservedObject private var viewModel: VehicleViewModel
     @Environment(\.modelContext) private var context
+    @Environment(\.dismiss) private var dismiss
 
     @State private var isNotificationsEnabled: Bool
     @State private var isUsingMetric: Bool
@@ -157,6 +158,7 @@ struct SettingsPageView: View {
                 ) {
                     Button(NSLocalizedString("delete_confirmation_delete", comment: ""), role: .destructive) {
                         viewModel.deleteActiveVehicle(context: context)
+                        dismiss()
                     }
                     Button(NSLocalizedString("cancel", comment: ""), role: .cancel) {}
                 }
