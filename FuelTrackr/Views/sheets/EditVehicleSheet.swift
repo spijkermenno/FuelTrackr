@@ -1,10 +1,3 @@
-//
-//  EditVehicleSheet.swift
-//  FuelTrackr
-//
-//  Created by Menno Spijker on 30/01/2025.
-//
-
 import SwiftUI
 
 struct EditVehicleSheet: View {
@@ -22,6 +15,11 @@ struct EditVehicleSheet: View {
     @State private var errorMessage: String?
     @State private var showImagePicker = false
     @State private var showMileageHistory = false
+
+    // Computed property for whether we are in metric mode.
+    private var isMetric: Bool {
+        SettingsRepository().isUsingMetric()
+    }
     
     init(viewModel: VehicleViewModel) {
         self.viewModel = viewModel
@@ -94,17 +92,39 @@ struct EditVehicleSheet: View {
                         .background(Color(UIColor.secondarySystemBackground))
                         .cornerRadius(8)
 
-                    // Latest mileage
+                    // Latest mileage display using isMetric to convert if needed.
                     if let latestMileage = viewModel.activeVehicle?.mileages.sorted(by: { $0.date > $1.date }).first {
-                        detailRow(
-                            label: NSLocalizedString("latest_mileage", comment: ""),
-                            value: "\(latestMileage.value) km"
-                        )
+                        let displayedMileage: String = {
+                            if isMetric {
+                                return "\(latestMileage.value) km"
+                            } else {
+                                let miles = Int(Double(latestMileage.value) / 1.60934)
+                                return "\(miles) mi"
+                            }
+                        }()
+                        HStack {
+                            Text(NSLocalizedString("latest_mileage", comment: ""))
+                                .fontWeight(.semibold)
+                                .foregroundColor(.primary)
+                            Spacer()
+                            Text(displayedMileage)
+                                .foregroundColor(.primary)
+                        }
+                        .padding()
+                        .background(Color(UIColor.secondarySystemBackground))
+                        .cornerRadius(8)
                     } else {
-                        detailRow(
-                            label: NSLocalizedString("latest_mileage", comment: ""),
-                            value: NSLocalizedString("no_mileage_recorded", comment: "")
-                        )
+                        HStack {
+                            Text(NSLocalizedString("latest_mileage", comment: ""))
+                                .fontWeight(.semibold)
+                                .foregroundColor(.primary)
+                            Spacer()
+                            Text(NSLocalizedString("no_mileage_recorded", comment: ""))
+                                .foregroundColor(.primary)
+                        }
+                        .padding()
+                        .background(Color(UIColor.secondarySystemBackground))
+                        .cornerRadius(8)
                     }
 
                     if let errorMessage = errorMessage {
@@ -119,7 +139,7 @@ struct EditVehicleSheet: View {
                         Text(NSLocalizedString("save", comment: ""))
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color.blue)
+                            .background(Color.orange)
                             .foregroundColor(.white)
                             .cornerRadius(8)
                     }
@@ -136,7 +156,6 @@ struct EditVehicleSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .padding(.bottom)
         }
-        .background(Color(UIColor.systemBackground))
         .edgesIgnoringSafeArea(.bottom)
         .sheet(isPresented: $showImagePicker) {
             ImagePicker(image: $photo)
@@ -177,7 +196,7 @@ struct EditVehicleSheet: View {
 
         dismiss()
     }
-
+    
     private func detailRow(label: String, value: String) -> some View {
         HStack {
             Text(label + ":")

@@ -15,25 +15,47 @@ struct AddFuelUsageSheet: View {
     @State private var errorMessage: String?
     @State private var keyboardHeight: CGFloat = 0
 
+    // Create a repository to check the unit system.
+    private let repository = SettingsRepository()
+    
+    // A computed property for whether we are in metric mode.
+    private var isMetric: Bool {
+        repository.isUsingMetric()
+    }
+    
     private var decimalSeparator: String {
         Locale.current.decimalSeparator ?? "."
     }
-
+    
+    // Compute the placeholder for the mileage field based on the active vehicle and unit system.
+    private var mileagePlaceholder: String {
+        // Get the current mileage from the active vehicle (assumed to be in kilometers)
+        let currentMileageKm = viewModel.activeVehicle?.mileages.last?.value ?? 10000
+        if isMetric {
+            return "\(currentMileageKm) km"
+        } else {
+            // Convert km to miles for display (rounded down)
+            let displayMileage = Int(Double(currentMileageKm) / 1.60934)
+            return "\(displayMileage) mi"
+        }
+    }
+    
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(alignment: .leading) {
                     Text(NSLocalizedString("add_fuel_usage_title", comment: ""))
                         .font(.title2)
                         .fontWeight(.bold)
-                        .multilineTextAlignment(.center)
-                        .padding(.top, 20)
+                        .padding(.top, 30)
+                        .padding(.horizontal, 32)
+                        .multilineTextAlignment(.leading)
 
                     Text(NSLocalizedString("add_fuel_usage_description", comment: ""))
-                        .font(.body)
+                        .font(.caption)
                         .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
                         .padding(.horizontal, 32)
+                        .multilineTextAlignment(.leading)
 
                     VStack(spacing: 16) {
                         InputField(
@@ -49,11 +71,10 @@ struct AddFuelUsageSheet: View {
                             text: $cost,
                             keyboardType: .decimalPad
                         )
-
-                        let currentMileage = viewModel.activeVehicle?.mileages.last?.value ?? 10000
+                        
                         InputField(
                             title: NSLocalizedString("mileage_label", comment: ""),
-                            placeholder: "\(currentMileage) km",
+                            placeholder: mileagePlaceholder,
                             text: $mileage,
                             keyboardType: .numberPad
                         )
@@ -65,7 +86,7 @@ struct AddFuelUsageSheet: View {
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal)
                         }
-
+                        
                         HStack(spacing: 16) {
                             Button(action: { dismiss() }) {
                                 Text(NSLocalizedString("cancel", comment: ""))
@@ -81,8 +102,11 @@ struct AddFuelUsageSheet: View {
                                     guard let litersValue = parseInput(liters),
                                           let costValue = parseInput(cost),
                                           let mileageValue = Int(mileage) else { return }
-
-                                    if viewModel.saveFuelUsage(context: context, liters: litersValue, cost: costValue, mileageValue: mileageValue) {
+                                    
+                                    // If in imperial, convert entered mileage (in miles) to kilometers.
+                                    let adjustedMileage = isMetric ? mileageValue : convertMilesToKm(miles: mileageValue)
+                                    
+                                    if viewModel.saveFuelUsage(context: context, liters: litersValue, cost: costValue, mileageValue: adjustedMileage) {
                                         dismiss()
                                     } else {
                                         errorMessage = NSLocalizedString("fuel_usage_saved_error", comment: "")
@@ -92,7 +116,7 @@ struct AddFuelUsageSheet: View {
                                 Text(NSLocalizedString("save", comment: ""))
                                     .frame(maxWidth: .infinity)
                                     .padding()
-                                    .background(Color.blue)
+                                    .background(Color.orange)
                                     .foregroundColor(.white)
                                     .cornerRadius(8)
                             }
@@ -100,14 +124,13 @@ struct AddFuelUsageSheet: View {
                         .padding(.bottom, 20)
                     }
                     .padding()
-                    .background(Color(.systemGray6))
                     .cornerRadius(12)
                     .padding(.horizontal)
                 }
                 .padding(.bottom, keyboardHeight)
                 .animation(.easeOut(duration: 0.3), value: keyboardHeight)
             }
-            .background(Color(.systemGroupedBackground))
+            .background(Color(.systemBackground))
             .edgesIgnoringSafeArea(.bottom)
             .onTapGesture {
                 hideKeyboard()
@@ -144,6 +167,12 @@ struct AddFuelUsageSheet: View {
 
         errorMessage = nil
         return true
+    }
+
+    // Conversion function: Convert miles to kilometers, rounding up.
+    private func convertMilesToKm(miles: Int) -> Int {
+        let kmValue = Double(miles) * 1.60934
+        return Int(ceil(kmValue))
     }
 
     private func startKeyboardObserver() {

@@ -10,18 +10,20 @@ import Foundation
 class Maintenance: Hashable {
     var type: MaintenanceType
     var cost: Double
+    var isFree: Bool
     var date: Date
     var notes: String?
-    @Relationship(deleteRule: .nullify) var mileage: Mileage?
+    var mileage: Mileage?
     @Relationship(deleteRule: .cascade, inverse: \Vehicle.maintenances) var vehicle: Vehicle?
 
-    init(type: MaintenanceType, cost: Double, date: Date, mileage: Mileage? = nil, notes: String? = nil, vehicle: Vehicle? = nil) {
+    init(type: MaintenanceType, cost: Double, isFree: Bool, date: Date, mileage: Mileage? = nil, notes: String? = nil, vehicle: Vehicle? = nil) {
         self.type = type
         self.cost = cost
         self.date = date
         self.notes = notes
         self.mileage = mileage
         self.vehicle = vehicle
+        self.isFree = isFree
     }
 
     static func == (lhs: Maintenance, rhs: Maintenance) -> Bool {

@@ -24,11 +24,14 @@ struct VehicleInfoView: View {
             VStack(spacing: 8) {
                 TabView(selection: $selectedTab) {
                     if let vehicle = viewModel.activeVehicle {
+                        // Pass the unit setting to the details view
                         VehicleDetailsView(vehicle: vehicle, isMetric: repository.isUsingMetric())
                             .tag(0)
 
+                        // Check if there is enough mileage data for a graph
                         if vehicle.mileages.count > 1 {
-                            MileageGraphView(mileageHistory: vehicle.mileages)
+                            // Pass the unit setting to the graph view
+                            MileageGraphView(mileageHistory: vehicle.mileages, isMetric: repository.isUsingMetric())
                                 .tag(1)
                         } else {
                             Text(NSLocalizedString("no_graph_mileage", comment: ""))
@@ -42,17 +45,17 @@ struct VehicleInfoView: View {
                     }
                 }
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                .frame(height: tabHeight) // Bind to the state variable
-                .animation(.easeInOut(duration: 0.3), value: tabHeight) // Add animation
+                .frame(height: tabHeight)
+                .animation(.easeInOut(duration: 0.3), value: tabHeight)
 
                 HStack(spacing: 8) {
                     Circle()
                         .frame(width: 8, height: 8)
-                        .foregroundColor(selectedTab == 0 ? .blue : .gray)
+                        .foregroundColor(selectedTab == 0 ? .orange : .gray)
 
                     Circle()
                         .frame(width: 8, height: 8)
-                        .foregroundColor(selectedTab == 1 ? .blue : .gray)
+                        .foregroundColor(selectedTab == 1 ? .orange : .gray)
                 }
             }
         }
@@ -70,91 +73,92 @@ struct VehicleInfoView: View {
 
 struct MileageGraphView: View {
     let mileageHistory: [Mileage]
+    let isMetric: Bool  // New parameter to decide whether to convert for display
 
     var body: some View {
-        // Preprocess the mileage data for daily max values
+        // Preprocess the data grouped by day (in km)
         let dailyMaxMileages = preprocessDailyMaxMileages(mileageHistory: mileageHistory)
-
+        
+        // Convert the mileage values if needed
+        let convertedData: [(key: Date, value: Double)] = dailyMaxMileages.map { (date, mileage) in
+            let displayValue = isMetric ? Double(mileage.value) : convertKmToMiles(km: Double(mileage.value))
+            return (key: date, value: displayValue)
+        }
+        
+        // Calculate bounds for the chart using the converted values
+        let lowestMileage = convertedData.map { $0.value }.min() ?? 0
+        let highestMileage = convertedData.map { $0.value }.max() ?? 0
+        let chartLowerBound = lowestMileage - 10  // adjust padding as needed
+        
         Chart {
-            // Line with symbols for each data point
-            ForEach(dailyMaxMileages, id: \.key) { (date, mileage) in
+            ForEach(convertedData, id: \.key) { (date, mileageValue) in
                 LineMark(
                     x: .value("Date", date),
-                    y: .value("Mileage", mileage.value)
+                    y: .value("Mileage", mileageValue)
                 )
                 .interpolationMethod(.catmullRom)
-                .foregroundStyle(Color.blue.gradient)
+                .foregroundStyle(Color.orange.gradient)
 
                 PointMark(
                     x: .value("Date", date),
-                    y: .value("Mileage", mileage.value)
+                    y: .value("Mileage", mileageValue)
                 )
-                .foregroundStyle(Color.blue)
-                .symbolSize(10)
+                .foregroundStyle(Color.orange)
+                .symbolSize(20)
 
-                // Add area under the line for each point
                 AreaMark(
                     x: .value("Date", date),
-                    yStart: .value("Mileage", 0),
-                    yEnd: .value("Mileage", mileage.value)
+                    yStart: .value("Mileage", chartLowerBound),
+                    yEnd: .value("Mileage", mileageValue)
                 )
-                .foregroundStyle(LinearGradient(
-                    gradient: Gradient(colors: [Color.blue.opacity(0.3), Color.clear]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                ))
-            }
-        }
-        .chartXAxis {
-            AxisMarks(values: dailyMaxMileages.map { $0.key }) { value in
-                if let dateValue = value.as(Date.self) {
-                    AxisValueLabel {
-                        Text(dateValue, format: .dateTime.day().month(.abbreviated))
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
+                .foregroundStyle(
+                    LinearGradient(
+                        gradient: Gradient(colors: [Color.orange.opacity(0.3), Color.clear]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
             }
         }
         .chartYAxis {
             AxisMarks { value in
                 AxisValueLabel {
-                    Text("\(Int(value.as(Double.self) ?? 0)) km")
+                    // Format label based on the unit system.
+                    let displayedValue = value.as(Double.self) ?? 0
+                    let unitSuffix = isMetric ? "km" : "mi"
+                    Text("\(Int(displayedValue)) \(unitSuffix)")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
             }
         }
-        .chartYScale(domain: {
-            let minMileage = mileageHistory.map { $0.value }.min() ?? 0
-            let maxMileage = mileageHistory.map { $0.value }.max() ?? (minMileage + 1000)
-            let adjustedMinMileage = max(0, minMileage - 1000)
-            return adjustedMinMileage...maxMileage
-        }())
-        .chartYAxisLabel(NSLocalizedString("mileage_title", comment: ""), position: .leading)
+        .chartYScale(domain: (chartLowerBound)...(highestMileage + 10))
+        .chartYAxisLabel(
+            isMetric ? NSLocalizedString("mileage_title", comment: "Mileage in kilometers") :
+                       NSLocalizedString("mileage_title_miles", comment: "Mileage in miles"),
+            position: .leading
+        )
         .chartXAxisLabel(NSLocalizedString("date_label", comment: ""), position: .bottom)
         .chartLegend(.hidden)
-        .padding()
-        .frame(minHeight: 250)
+        .frame(height: 200)
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color(UIColor.secondarySystemBackground))
                 .shadow(radius: 4)
         )
         .cornerRadius(12)
+        .clipped()
     }
-
-    // Helper function to preprocess daily max mileage data
+    
+    // Helper function to process mileage data by day.
     private func preprocessDailyMaxMileages(mileageHistory: [Mileage]) -> [(key: Date, value: Mileage)] {
         Dictionary(grouping: mileageHistory, by: { Calendar.current.startOfDay(for: $0.date) })
             .mapValues { $0.max(by: { $0.value < $1.value })! }
             .sorted(by: { $0.key < $1.key })
     }
-}
-
-extension Array where Element: Hashable {
-    func unique() -> [Element] {
-        var seen = Set<Element>()
-        return filter { seen.insert($0).inserted }
+    
+    // Conversion function: Convert kilometers to miles.
+    private func convertKmToMiles(km: Double) -> Double {
+        return km / 1.60934
     }
 }

@@ -1,10 +1,3 @@
-//
-//  SettingsPageView.swift
-//  FuelTrackr
-//
-//  Created by Menno Spijker on 28/01/2025.
-//
-
 import SwiftUI
 import UserNotifications
 
@@ -53,7 +46,7 @@ struct SettingsPageView: View {
                         .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color.green)
+                        .background(Color.gray.opacity(0.7))
                         .cornerRadius(8)
                         .padding([.leading, .trailing, .top])
                         .transition(.slide)
@@ -74,33 +67,76 @@ struct SettingsPageView: View {
                             .onAppear {
                                 checkNotificationStatus()
                             }
+                        
+                        // Notifications disclaimer message.
+                        Text(NSLocalizedString("notifications_disclaimer", comment: "Disclaimer for notifications"))
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
+                            .padding(.vertical, 8)
+                        
+                        // Test notification button.
+                        Button(action: {
+                            let date = Date().addingTimeInterval(60)
+                            NotificationManager.shared.scheduleMonthlyRecapNotification(for: date)
+                            // Set a toast message to let the user know the test notification has been scheduled.
+                            resetMessage = NSLocalizedString("test_notification_success", comment: "Notification scheduled message")
+                            showNotification = true
+                            hideNotificationAfterDelay()
+                            
+                            let formatter = DateFormatter()
+                            formatter.timeZone = TimeZone.current
+                            formatter.dateStyle = .full
+                            formatter.timeStyle = .short
+                            print("test notification scheduled for \(formatter.string(from: date))")
+                        }) {
+                            Text(NSLocalizedString("test_notification", comment: "Trigger test notification"))
+                                .foregroundColor(.blue)
+                        }
+                        .padding(.vertical, 4)
                     }
-
+                    
                     Section(header: Text(NSLocalizedString("units_section", comment: ""))) {
-                        Picker(NSLocalizedString("measurement_system", comment: ""), selection: $isUsingMetric) {
-                            Text(NSLocalizedString("metric", comment: "")).tag(true)
-                            Text(NSLocalizedString("imperial", comment: "")).tag(false)
-                        }
-                        .pickerStyle(SegmentedPickerStyle())
-                        .onChange(of: isUsingMetric) { newValue in
-                            let conversionFactor = 1.60934
-                            if newValue {
-                                defaultTireInterval = 100 + Int((Double(defaultTireInterval) * conversionFactor).rounded(.toNearestOrEven) / 100) * 100
-                                defaultOilChangeInterval = 100 + Int((Double(defaultOilChangeInterval) * conversionFactor).rounded(.toNearestOrEven) / 100) * 100
-                                defaultBrakeCheckInterval = 100 + Int((Double(defaultBrakeCheckInterval) * conversionFactor).rounded(.toNearestOrEven) / 100) * 100
-                            } else {
-                                defaultTireInterval = Int((Double(defaultTireInterval) / conversionFactor).rounded(.toNearestOrEven) / 100) * 100
-                                defaultOilChangeInterval = Int((Double(defaultOilChangeInterval) / conversionFactor).rounded(.toNearestOrEven) / 100) * 100
-                                defaultBrakeCheckInterval = Int((Double(defaultBrakeCheckInterval) / conversionFactor).rounded(.toNearestOrEven) / 100) * 100
+                        Toggle(NSLocalizedString("use_metric_units", comment: "Toggle for using metric units"), isOn: $isUsingMetric)
+                            .onChange(of: isUsingMetric) { newValue in
+                                SettingsRepository().setUsingMetric(newValue)
                             }
-                            repository.setUsingMetric(newValue)
-                            repository.setDefaultTireInterval(defaultTireInterval)
-                            repository.setDefaultOilChangeInterval(defaultOilChangeInterval)
-                            repository.setDefaultBrakeCheckInterval(defaultBrakeCheckInterval)
+                        
+                        Toggle(NSLocalizedString("use_imperial_units", comment: "Toggle for using imperial units"), isOn: Binding(
+                            get: { !isUsingMetric },
+                            set: { newValue in
+                                isUsingMetric = !newValue
+                                SettingsRepository().setUsingMetric(isUsingMetric)
+                            }
+                        ))
+                    }
+                    .onChange(of: isUsingMetric) { newValue in
+                        let conversionFactor = 1.60934
+                        if newValue {
+                            defaultTireInterval = 100 + Int((Double(defaultTireInterval) * conversionFactor).rounded(.toNearestOrEven) / 100) * 100
+                            defaultOilChangeInterval = 100 + Int((Double(defaultOilChangeInterval) * conversionFactor).rounded(.toNearestOrEven) / 100) * 100
+                            defaultBrakeCheckInterval = 100 + Int((Double(defaultBrakeCheckInterval) * conversionFactor).rounded(.toNearestOrEven) / 100) * 100
+                        } else {
+                            defaultTireInterval = Int((Double(defaultTireInterval) / conversionFactor).rounded(.toNearestOrEven) / 100) * 100
+                            defaultOilChangeInterval = Int((Double(defaultOilChangeInterval) / conversionFactor).rounded(.toNearestOrEven) / 100) * 100
+                            defaultBrakeCheckInterval = Int((Double(defaultBrakeCheckInterval) / conversionFactor).rounded(.toNearestOrEven) / 100) * 100
                         }
+                        repository.setUsingMetric(newValue)
+                        repository.setDefaultTireInterval(defaultTireInterval)
+                        repository.setDefaultOilChangeInterval(defaultOilChangeInterval)
+                        repository.setDefaultBrakeCheckInterval(defaultBrakeCheckInterval)
                     }
 
                     Section(header: Text(NSLocalizedString("default_maintenance_intervals", comment: ""))) {
+                        Text(NSLocalizedString("maintenance_interval_description", comment: "Maintenance interval description"))
+                            .font(.footnote)
+                            .foregroundColor(.primary)
+                            .padding(.vertical, 8)
+                        
+                        Text(NSLocalizedString("notifications_disclaimer", comment: "Disclaimer for notifications"))
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
+                            .padding(.vertical, 8)
+                        
                         MaintenanceIntervalRow(
                             title: NSLocalizedString("tires", comment: ""),
                             value: $defaultTireInterval,

@@ -1,10 +1,3 @@
-//
-//  AddVehicleView.swift
-//  FuelTrackr
-//
-//  Created by Menno Spijker on 24/01/2025.
-//
-
 import SwiftUI
 import SwiftData
 
@@ -20,7 +13,10 @@ struct AddVehicleView: View {
     @State private var image: UIImage?
     @State private var isImagePickerPresented = false
     @State private var errorMessage: String?
-
+    
+    // Single state variable representing metric vs. imperial.
+    @State private var isUsingMetric: Bool = SettingsRepository().isUsingMetric()
+    
     let onSave: () -> Void
     
     var body: some View {
@@ -36,6 +32,20 @@ struct AddVehicleView: View {
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
+                    
+                    // Two toggles for metric and imperial:
+                    Toggle(NSLocalizedString("use_metric_units", comment: "Toggle for using metric units"), isOn: $isUsingMetric)
+                        .onChange(of: isUsingMetric) { newValue in
+                            SettingsRepository().setUsingMetric(newValue)
+                        }
+                    
+                    Toggle(NSLocalizedString("use_imperial_units", comment: "Toggle for using imperial units"), isOn: Binding(
+                        get: { !isUsingMetric },
+                        set: { newValue in
+                            isUsingMetric = !newValue
+                            SettingsRepository().setUsingMetric(isUsingMetric)
+                        }
+                    ))
                     
                     TextFieldSection(
                         title: NSLocalizedString("vehicle_name_title", comment: ""),
@@ -60,11 +70,12 @@ struct AddVehicleView: View {
                     )
                     
                     VStack(alignment: .leading) {
-                        Text(NSLocalizedString("mileage_title", comment: ""))
+                        // Adjust the label based on the unit system.
+                        Text(isUsingMetric ? NSLocalizedString("mileage_title_km", comment: "Mileage in kilometers") : NSLocalizedString("mileage_title_miles", comment: "Mileage in miles"))
                             .font(.headline)
                             .foregroundColor(.primary)
                         TextField(
-                            NSLocalizedString("mileage_placeholder", comment: ""),
+                            NSLocalizedString("mileage_placeholder", comment: "Placeholder for mileage"),
                             text: $mileage
                         )
                         .keyboardType(.numberPad)
@@ -75,7 +86,7 @@ struct AddVehicleView: View {
                     }
                     
                     VStack(alignment: .leading) {
-                        Text(NSLocalizedString("photo_title", comment: ""))
+                        Text(NSLocalizedString("photo_title", comment: "Title for photo section"))
                             .font(.headline)
                             .foregroundColor(.primary)
                         if let uiImage = image {
@@ -84,7 +95,7 @@ struct AddVehicleView: View {
                                 .scaledToFit()
                                 .frame(height: 200)
                                 .cornerRadius(10)
-                                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.blue, lineWidth: 2))
+                                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.orange, lineWidth: 2))
                         } else {
                             Button(action: {
                                 isImagePickerPresented = true
@@ -92,9 +103,9 @@ struct AddVehicleView: View {
                                 VStack {
                                     Image(systemName: "camera.fill")
                                         .font(.largeTitle)
-                                        .foregroundColor(.blue)
-                                    Text(NSLocalizedString("add_photo_button", comment: ""))
-                                        .foregroundColor(.blue)
+                                        .foregroundColor(.orange)
+                                    Text(NSLocalizedString("add_photo_button", comment: "Button title for adding a photo"))
+                                        .foregroundColor(.orange)
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding()
@@ -115,18 +126,18 @@ struct AddVehicleView: View {
                     Button(action: {
                         saveVehicle()
                     }) {
-                        Text(NSLocalizedString("save_vehicle_button", comment: ""))
+                        Text(NSLocalizedString("save_vehicle_button", comment: "Button title for saving vehicle"))
                             .bold()
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(vehicleName.isEmpty || licensePlate.isEmpty || mileage.isEmpty ? Color.gray : Color.blue)
+                            .background(vehicleName.isEmpty || licensePlate.isEmpty || mileage.isEmpty ? Color.gray : Color.orange)
                             .foregroundColor(.white)
                             .cornerRadius(10)
                     }
                     .disabled(vehicleName.isEmpty || licensePlate.isEmpty || mileage.isEmpty)
                 }
                 .padding()
-                .navigationTitle(NSLocalizedString("welcome_title", comment: ""))
+                .navigationTitle(NSLocalizedString("welcome_title", comment: "Title for welcome view"))
                 .navigationBarTitleDisplayMode(.inline)
             }
         }
@@ -138,9 +149,13 @@ struct AddVehicleView: View {
     
     private func saveVehicle() {
         guard let mileageValue = Int(mileage), mileageValue >= 0 else {
-            errorMessage = NSLocalizedString("invalid_mileage_error", comment: "")
+            errorMessage = NSLocalizedString("invalid_mileage_error", comment: "Error message when mileage is invalid")
             return
         }
+        
+        // Always store mileage in kilometers.
+        // If using imperial, convert miles to kilometers (rounding up).
+        let adjustedMileage = isUsingMetric ? mileageValue : convertMilesToKm(miles: mileageValue)
         
         let success = viewModel.saveVehicle(
             context: context,
@@ -148,7 +163,7 @@ struct AddVehicleView: View {
             licensePlate: licensePlate,
             purchaseDate: purchaseDate,
             manufacturingDate: manufacturingDate,
-            initialMileage: mileageValue,
+            initialMileage: adjustedMileage,
             image: image
         )
         
@@ -156,8 +171,19 @@ struct AddVehicleView: View {
             onSave()
             dismiss()
         } else {
-            errorMessage = NSLocalizedString("save_vehicle_error", comment: "")
+            errorMessage = NSLocalizedString("save_vehicle_error", comment: "Error message when saving vehicle fails")
         }
+    }
+
+    // Conversion function: Convert miles to kilometers, rounding up.
+    private func convertMilesToKm(miles: Int) -> Int {
+        let kmValue = Double(miles) * 1.60934
+        return Int(ceil(kmValue))
+    }
+    
+    // Conversion function: Convert kilometers to miles.
+    private func convertKmToMiles(km: Int) -> Int {
+        return Int(Double(km) / 1.60934)
     }
 }
 

@@ -23,17 +23,25 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct FuelTrackrApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    
+    @StateObject var notificationHandler = NotificationHandler()
+
     init() {
-            Analytics.logEvent(AnalyticsEventAppOpen, parameters: [
-                AnalyticsParameterItemID: UUID().uuidString,
-            ])
-        }
-    
+        Analytics.logEvent(AnalyticsEventAppOpen, parameters: [
+            AnalyticsParameterItemID: UUID().uuidString,
+        ])
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .modelContainer(for: [Vehicle.self, FuelUsage.self, Maintenance.self, Mileage.self])
+                .environmentObject(notificationHandler)
+                // Using .onOpenURL if your notification uses the custom URL scheme.
+                .onOpenURL { url in
+                    if url.absoluteString == "fueltrackr://monthlyRecap" {
+                        notificationHandler.shouldShowMonthlyRecapSheet = true
+                    }
+                }
         }
     }
 }

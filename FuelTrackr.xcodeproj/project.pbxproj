@@ -22,16 +22,28 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				"Views/View+Extensions.swift",
 			);
 			target = A96F625D2D43C5D500872385 /* FuelTrackr */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		A94C59002DB6A1DD005BDEB2 /* Exceptions for "FuelTrackr" folder in "Copy Bundle Resources" phase from "FuelTrackr" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = A96F625C2D43C5D500872385 /* Resources */;
+			membershipExceptions = (
+				"Views/View+Extensions.swift",
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A96F62602D43C5D500872385 /* FuelTrackr */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				A9A91A792D47E9AA00153BE0 /* Exceptions for "FuelTrackr" folder in "FuelTrackr" target */,
+				A94C59002DB6A1DD005BDEB2 /* Exceptions for "FuelTrackr" folder in "Copy Bundle Resources" phase from "FuelTrackr" target */,
 			);
 			path = FuelTrackr;
 			sourceTree = "<group>";
@@ -280,7 +292,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = FuelTrackr/FuelTrackr.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "\"FuelTrackr/Preview Content\"";
 				DEVELOPMENT_TEAM = 327PJMKH2C;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -323,7 +335,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = FuelTrackr/FuelTrackr.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "\"FuelTrackr/Preview Content\"";
 				DEVELOPMENT_TEAM = 327PJMKH2C;
 				ENABLE_HARDENED_RUNTIME = YES;

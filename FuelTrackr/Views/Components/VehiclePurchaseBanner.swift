@@ -22,7 +22,7 @@ struct VehiclePurchaseBanner: View {
                 if !shouldShowButtons {
                     Text(NSLocalizedString("vehicle_not_purchased_banner", comment: ""))
                         .font(.callout)
-                        .foregroundColor(Color.blue.opacity(0.65))
+                        .foregroundColor(Color.orange.opacity(0.65))
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
                 } else {
@@ -36,7 +36,7 @@ struct VehiclePurchaseBanner: View {
                         Text(NSLocalizedString("vehicle_purchase_confirm", comment: ""))
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color.blue.opacity(0.8))
+                            .background(Color.orange.opacity(0.8))
                             .foregroundColor(.white)
                             .cornerRadius(8)
                     }
@@ -45,7 +45,7 @@ struct VehiclePurchaseBanner: View {
             }
             .padding()
             .frame(maxWidth: .infinity)
-            .background(Color.blue.opacity(0.15))
+            .background(Color.orange.opacity(0.15))
             .cornerRadius(10)
         }
     }

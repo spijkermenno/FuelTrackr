@@ -12,6 +12,9 @@ struct AddMaintenanceSheet: View {
     @State private var errorMessage: String?
     @State private var keyboardHeight: CGFloat = 0
 
+    // New state variable for "Free / Warranty" checkbox.
+    @State private var isFree: Bool = false
+
     private var decimalSeparator: String {
         Locale.current.decimalSeparator ?? "."
     }
@@ -19,25 +22,27 @@ struct AddMaintenanceSheet: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(alignment: .leading) {
+                    // Title and description with consistent styling.
                     Text(NSLocalizedString("add_maintenance_title", comment: ""))
                         .font(.title2)
                         .fontWeight(.bold)
-                        .multilineTextAlignment(.center)
-                        .padding(.top, 20)
+                        .padding(.top, 30)
+                        .padding(.horizontal, 32)
+                        .multilineTextAlignment(.leading)
 
                     Text(NSLocalizedString("add_maintenance_description", comment: ""))
                         .font(.body)
                         .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
                         .padding(.horizontal, 32)
+                        .multilineTextAlignment(.leading)
 
                     VStack(spacing: 16) {
                         VStack(alignment: .leading, spacing: 8) {
                             Text(NSLocalizedString("maintenance_type", comment: ""))
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-
+                            
                             Picker(NSLocalizedString("maintenance_type", comment: ""), selection: $selectedType) {
                                 ForEach(MaintenanceType.allCases, id: \.self) { type in
                                     Text(type.localized.capitalized)
@@ -54,13 +59,30 @@ struct AddMaintenanceSheet: View {
                                 text: $notes
                             )
                         }
-
+                        
                         InputField(
                             title: NSLocalizedString("cost_label", comment: ""),
                             placeholder: NSLocalizedString("cost_placeholder", comment: ""),
                             text: $cost,
                             keyboardType: .decimalPad
                         )
+                        .disabled(isFree)
+                        .opacity(isFree ? 0.6 : 1.0)
+                        
+                        Toggle(isOn: $isFree) {
+                            Text(NSLocalizedString("free_or_warranty", comment: "Label for free or warranty maintenance"))
+                                .font(.body)
+                                .foregroundColor(.primary)
+                        }
+                        .toggleStyle(SwitchToggleStyle(tint: .orange))
+                        .padding(.horizontal)
+                        .onChange(of: isFree) {
+                            if isFree {
+                                cost = "0"
+                            } else {
+                                cost = ""
+                            }
+                        }
 
                         InputField(
                             title: NSLocalizedString("mileage_label", comment: ""),
@@ -74,15 +96,12 @@ struct AddMaintenanceSheet: View {
                                 .font(.caption)
                                 .foregroundColor(.secondary)
 
-                            DatePicker(
-                                NSLocalizedString("select_date", comment: ""),
-                                selection: $date,
-                                displayedComponents: [.date]
-                            )
-                            .datePickerStyle(GraphicalDatePickerStyle())
-                            .padding()
-                            .background(Color(UIColor.systemGray5))
-                            .cornerRadius(8)
+                            // Remove the title parameter and let the picker stand alone.
+                            DatePicker("", selection: $date, displayedComponents: [.date])
+                                .datePickerStyle(WheelDatePickerStyle())
+                                .padding()
+                                .background(Color(.secondarySystemBackground))
+                                .cornerRadius(8)
                         }
                         
                         if let errorMessage = errorMessage {
@@ -93,6 +112,7 @@ struct AddMaintenanceSheet: View {
                                 .padding(.horizontal)
                         }
 
+                        // Buttons using the same color scheme.
                         HStack(spacing: 16) {
                             Button(action: { dismiss() }) {
                                 Text(NSLocalizedString("cancel", comment: ""))
@@ -105,13 +125,16 @@ struct AddMaintenanceSheet: View {
 
                             Button(action: {
                                 if validateAllFields() {
-                                    guard let costValue = parseInput(cost),
-                                          let mileageValue = Int(mileage) else { return }
-
+                                    guard let mileageValue = Int(mileage) else { return }
+                                    
+                                    // When free/warranty is selected, cost is set to 0.
+                                    let costValue: Double = isFree ? 0 : (parseInput(cost) ?? 0)
+                                    
                                     if viewModel.saveMaintenance(
                                         context: context,
                                         maintenanceType: selectedType,
                                         cost: costValue,
+                                        isFree: isFree,
                                         date: date,
                                         mileageValue: mileageValue,
                                         notes: selectedType == .other ? notes : nil
@@ -125,7 +148,7 @@ struct AddMaintenanceSheet: View {
                                 Text(NSLocalizedString("save", comment: ""))
                                     .frame(maxWidth: .infinity)
                                     .padding()
-                                    .background(Color.blue)
+                                    .background(Color.orange)
                                     .foregroundColor(.white)
                                     .cornerRadius(8)
                             }
@@ -133,8 +156,6 @@ struct AddMaintenanceSheet: View {
                         .padding(.bottom, 20)
                     }
                     .padding()
-                    .background(Color(UIColor.secondarySystemBackground))
-                    .cornerRadius(12)
                     .padding(.horizontal)
                 }
                 .padding(.bottom, keyboardHeight)
@@ -142,15 +163,9 @@ struct AddMaintenanceSheet: View {
             }
             .background(Color(UIColor.systemBackground))
             .edgesIgnoringSafeArea(.bottom)
-            .onTapGesture {
-                hideKeyboard()
-            }
-            .onAppear {
-                startKeyboardObserver()
-            }
-            .onDisappear {
-                stopKeyboardObserver()
-            }
+            .onTapGesture { hideKeyboard() }
+            .onAppear { startKeyboardObserver() }
+            .onDisappear { stopKeyboardObserver() }
         }
     }
 
@@ -160,21 +175,23 @@ struct AddMaintenanceSheet: View {
     }
 
     private func validateAllFields() -> Bool {
-        guard let costValue = parseInput(cost), costValue > 0 else {
-            errorMessage = NSLocalizedString("invalid_cost_error", comment: "")
-            return false
+        if !isFree {
+            guard let costValue = parseInput(cost), costValue > 0 else {
+                errorMessage = NSLocalizedString("invalid_cost_error", comment: "")
+                return false
+            }
         }
-
+        
         guard let mileageValue = Int(mileage), mileageValue > 0 else {
             errorMessage = NSLocalizedString("invalid_mileage_error", comment: "")
             return false
         }
-
+        
         if selectedType == .other && notes.isEmpty {
             errorMessage = NSLocalizedString("invalid_notes_error", comment: "")
             return false
         }
-
+        
         errorMessage = nil
         return true
     }

@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct VehicleDetailsView: View {
-    let vehicle: Vehicle
+    @State var vehicle: Vehicle
     let isMetric: Bool
+    
+    @State var latestMileage: Int = 0
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -21,13 +23,13 @@ struct VehicleDetailsView: View {
             detailRow(label: NSLocalizedString("purchase_date_label", comment: ""), value: vehicle.purchaseDate.formatted(date: .abbreviated, time: .omitted))
             detailRow(label: NSLocalizedString("manufacturing_date_label", comment: ""), value: vehicle.manufacturingDate.formatted(date: .abbreviated, time: .omitted))
         }
+        .onAppear {
+            print("On appear")
+            latestMileage = vehicle.mileages.last?.value ?? 0
+        }
         .padding()
         .background(Color(UIColor.secondarySystemBackground))
         .cornerRadius(10)
-    }
-
-    private var latestMileage: Int {
-        vehicle.mileages.last?.value ?? 0
     }
 
     private func detailRow(label: String, value: String) -> some View {
@@ -42,6 +44,9 @@ struct VehicleDetailsView: View {
     }
 
     private func convertMileage(_ mileage: Int, isMetric: Bool) -> Int {
-        isMetric ? mileage : Int(Double(mileage) / 1.609)
+        print("====================")
+        print(mileage)
+        print(Int(Double(mileage) / 1.609))
+        return isMetric ? mileage : Int(Double(mileage) / 1.609)
     }
 }

@@ -1,28 +1,26 @@
-//
-//  VehicleViewModel.swift
-//  FuelTrackr
-//
-//  Created by Menno Spijker on 24/01/2025.
-//
-
 import SwiftUI
 import SwiftData
 import UIKit
 
 class VehicleViewModel: ObservableObject {
     @Published var activeVehicle: Vehicle?
+    @Published var refreshID = UUID()
     
     func loadActiveVehicle(context: ModelContext) {
         do {
             let result = try context.fetch(FetchDescriptor<Vehicle>())
             if let existingVehicle = result.first {
+                if existingVehicle == activeVehicle { return }
                 activeVehicle = existingVehicle
-                
-                print(activeVehicle?.mileages)
+                refreshID = UUID()
             }
         } catch {
             print("Error fetching vehicles: \(error.localizedDescription)")
         }
+    }
+
+    func refresh(context: ModelContext) {
+        loadActiveVehicle(context: context)
     }
 
     func updateVehicle(
@@ -63,16 +61,16 @@ class VehicleViewModel: ObservableObject {
             photo: image?.jpegData(compressionQuality: 0.8)
         )
 
-        // Create the initial mileage entry
+        // Create the initial mileage entry.
         let initialMileageEntry = Mileage(value: initialMileage, date: Date(), vehicle: newVehicle)
 
-        // Explicitly insert the mileage entry into the context
+        // Explicitly insert the mileage entry into the context.
         context.insert(initialMileageEntry)
 
-        // Ensure the relationship is established before inserting the vehicle
+        // Ensure the relationship is established before inserting the vehicle.
         newVehicle.mileages.append(initialMileageEntry)
 
-        // Insert the vehicle into the context after all properties are set
+        // Insert the vehicle into the context after all properties are set.
         context.insert(newVehicle)
 
         do {
@@ -100,19 +98,19 @@ class VehicleViewModel: ObservableObject {
         print("Vehicle found: \(vehicle)")
 
         // Remove relationships manually (if needed)
-        vehicle.mileages.forEach { context.delete($0) }
-        vehicle.fuelUsages.forEach { context.delete($0) }
-        vehicle.maintenances.forEach { context.delete($0) }
-
-        print("Deleted related records")
-
-        // Nullify the reference before deletion to prevent EXC_BAD_ACCESS
-        activeVehicle = nil
-
-        print("Deleting vehicle...")
-        context.delete(vehicle)
-
         do {
+            try context.delete(model: Mileage.self)
+            try context.delete(model: FuelUsage.self)
+            try context.delete(model: Maintenance.self)
+            
+            print("Deleted related records")
+
+            // Nullify the reference before deletion to prevent EXC_BAD_ACCESS
+            activeVehicle = nil
+
+            print("Deleting vehicle...")
+            try context.delete(model: Vehicle.self)
+            
             print("Saving context...")
             try context.save()
             print("Vehicle successfully deleted")
@@ -136,43 +134,49 @@ class VehicleViewModel: ObservableObject {
 
         vehicle.fuelUsages.append(newFuelUsage)
         
-        return saveContext(context: context)
+        let result = saveContext(context: context)
+        loadActiveVehicle(context: context)
+        
+        return result
     }
 
     func saveMaintenance(
         context: ModelContext,
         maintenanceType: MaintenanceType,
         cost: Double,
+        isFree: Bool,
         date: Date,
         mileageValue: Int,
         notes: String?
     ) -> Bool {
         guard let vehicle = activeVehicle else { return false }
         
-        let mileage = getOrCreateMileage(context: context, mileageValue: mileageValue)
-
         let newMaintenance = Maintenance(
             type: maintenanceType,
             cost: cost,
+            isFree: isFree,
             date: date,
-            mileage: mileage,
+            mileage: Mileage(value: mileageValue, date: date, vehicle: nil),
             notes: notes,
             vehicle: vehicle
         )
 
         vehicle.maintenances.append(newMaintenance)
 
-        return saveContext(context: context)
+        let result = saveContext(context: context)
+        loadActiveVehicle(context: context)
+        
+        return result
     }
 
-    private func getOrCreateMileage(context: ModelContext, mileageValue: Int) -> Mileage {
+    private func getOrCreateMileage(context: ModelContext, mileageValue: Int, date: Date = Date()) -> Mileage {
         guard let vehicle = activeVehicle else { fatalError("No active vehicle") }
         
         if let existingMileage = vehicle.mileages.first(where: { $0.value == mileageValue }) {
             return existingMileage
         }
         
-        let newMileage = Mileage(value: mileageValue, date: Date(), vehicle: vehicle)
+        let newMileage = Mileage(value: mileageValue, date: date, vehicle: vehicle)
         vehicle.mileages.append(newMileage)
         return newMileage
     }
@@ -235,5 +239,65 @@ class VehicleViewModel: ObservableObject {
             }
         }
         try? context.save()
+    }
+}
+
+// MARK: - Monthly Recap with Parameterized Month
+
+extension VehicleViewModel {
+    
+    /// Returns the start and end date for the given month and year.
+    /// - Parameters:
+    ///   - month: The month number (1 for January, 2 for February, etc.)
+    ///   - year: The year to use. If not provided, the current year is used.
+    /// - Returns: A tuple with the start and end Date of the month.
+    private func dateRange(forMonth month: Int, year: Int? = nil) -> (start: Date, end: Date)? {
+        let calendar = Calendar.current
+        let now = Date()
+        let targetYear = year ?? calendar.component(.year, from: now)
+        var components = DateComponents(year: targetYear, month: month, day: 1)
+        guard let monthStart = calendar.date(from: components) else { return nil }
+        var comps = DateComponents()
+        comps.month = 1
+        comps.second = -1
+        guard let monthEnd = calendar.date(byAdding: comps, to: monthStart) else { return nil }
+        return (start: monthStart, end: monthEnd)
+    }
+    
+    /// Computes the total fuel used (in liters) during the specified month.
+    func fuelUsed(forMonth month: Int, year: Int? = nil) -> Double {
+        guard let vehicle = activeVehicle,
+              let range = dateRange(forMonth: month, year: year) else { return 0 }
+        let usages = vehicle.fuelUsages.filter { $0.date >= range.start && $0.date <= range.end }
+        return usages.reduce(0) { $0 + $1.liters }
+    }
+    
+    /// Computes the total fuel cost incurred during the specified month.
+    func fuelCost(forMonth month: Int, year: Int? = nil) -> Double {
+        guard let vehicle = activeVehicle,
+              let range = dateRange(forMonth: month, year: year) else { return 0 }
+        let usages = vehicle.fuelUsages.filter { $0.date >= range.start && $0.date <= range.end }
+        return usages.reduce(0) { $0 + $1.cost }
+    }
+    
+    /// Computes the kilometers driven during the specified month from mileage records.
+    func kmDriven(forMonth month: Int, year: Int? = nil) -> Int {
+        guard let vehicle = activeVehicle,
+              let range = dateRange(forMonth: month, year: year),
+              !vehicle.mileages.isEmpty else { return 0 }
+        
+        // Filter mileages for the specified month and sort in ascending date order.
+        let mileages = vehicle.mileages.filter { $0.date >= range.start && $0.date <= range.end }
+                                    .sorted(by: { $0.date < $1.date })
+        guard let first = mileages.first, let last = mileages.last else { return 0 }
+        return last.value - first.value
+    }
+    
+    /// Computes the average fuel usage (km per liter) during the specified month.
+    func averageFuelUsage(forMonth month: Int, year: Int? = nil) -> Double {
+        let km = Double(kmDriven(forMonth: month, year: year))
+        let fuelUsed = fuelUsed(forMonth: month, year: year)
+        guard fuelUsed > 0 else { return 0 }
+        return km / fuelUsed
     }
 }

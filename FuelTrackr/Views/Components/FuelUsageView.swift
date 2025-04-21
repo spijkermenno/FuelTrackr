@@ -56,52 +56,15 @@ struct FuelUsageView: View {
                 .disabled(!isVehicleActive)
             }
 
-            // Main content (tabbed view)
             VStack(spacing: 8) {
-                TabView(selection: $selectedTab) {
-                    FuelUsageListView(viewModel: viewModel, showAllFuelEntries: $showAllFuelEntries)
-                        .tag(0)
-
-                    if let vehicle = viewModel.activeVehicle, vehicle.fuelUsages.count > 1 {
-                        FuelUsageGraphView(fuelHistory: vehicle.fuelUsages)
-                            .tag(1)
-                            .onAppear {
-                                let counter = if vehicle.fuelUsages.count > 3 { vehicle.fuelUsages.count } else { vehicle.fuelUsages.count }
-                                tabHeight = CGFloat(counter * 75)
-                            }
-                    } else {
-                        Text(NSLocalizedString("no_graph_fuel", comment: ""))
-                            .foregroundColor(.secondary)
-                            .font(.subheadline)
-                            .padding(.vertical, 12)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .multilineTextAlignment(.center)
-                            .tag(1)
-                    }
-                }
-                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                .frame(height: tabHeight)
-
-                // Tab indicators
-                HStack(spacing: 8) {
-                    Circle()
-                        .frame(width: 8, height: 8)
-                        .foregroundColor(selectedTab == 0 ? .blue : .gray)
-
-                    Circle()
-                        .frame(width: 8, height: 8)
-                        .foregroundColor(selectedTab == 1 ? .blue : .gray)
-                }
+                FuelUsageListView(viewModel: viewModel, showAllFuelEntries: $showAllFuelEntries)
             }
         }
         .padding()
         .background(Color(.systemGray6))
         .cornerRadius(10)
         .sheet(isPresented: $showAllFuelEntries) {
-            AllFuelUsageView(viewModel: viewModel)
-        }
-        .onAppear {
-            print("FuelUsageView appeared. Initial tab height: \(tabHeight)")
+            FuelDetailsSheet(viewModel: viewModel)
         }
     }
 }
@@ -114,13 +77,15 @@ struct FuelUsageListView: View {
         if let fuelUsages = viewModel.activeVehicle?.fuelUsages.sorted(by: { $0.date > $1.date }),
            !fuelUsages.isEmpty {
             // Limit to a maximum of 3 entries
-            let latestEntries = Array(fuelUsages.prefix(3))
+            let latestEntries = Array(fuelUsages.prefix(4))
             
             VStack(alignment: .leading) {
                 ForEach(Array(latestEntries.enumerated()), id: \.element) { index, usage in
-                    // In descending order, the "next" usage (if available) represents the previous fueling.
-                    let nextUsage: FuelUsage? = (index < latestEntries.count - 1) ? latestEntries[index + 1] : nil
-                    FuelUsageRow(usage: usage, nextUsage: nextUsage, colorIndex: index)
+                    if index < 3 {
+                        // In descending order, the "next" usage (if available) represents the previous fueling.
+                        let nextUsage: FuelUsage? = (index < latestEntries.count - 1) ? latestEntries[index + 1] : nil
+                        FuelUsageRow(usage: usage, nextUsage: nextUsage, colorIndex: index)
+                    }
                 }
                 
                 // If there are fewer than 3 entries, add skeleton rows to fill the space.
@@ -219,80 +184,6 @@ struct EmptyFuelUsageRow: View {
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(colorIndex.isMultiple(of: 2) ? Color(UIColor.systemGray5) : Color(UIColor.systemGray6))
-    }
-}
-
-struct FuelUsageGraphView: View {
-    let fuelHistory: [FuelUsage]
-
-    var body: some View {
-        let dailyMaxFuelUsages = preprocessDailyMaxFuelUsages(fuelHistory: fuelHistory)
-
-        Chart {
-            ForEach(dailyMaxFuelUsages, id: \.key) { (date, fuelUsage) in
-                LineMark(
-                    x: .value("Date", date),
-                    y: .value("Liters", fuelUsage.liters)
-                )
-                .interpolationMethod(.catmullRom)
-                .foregroundStyle(Color.green.gradient)
-
-                PointMark(
-                    x: .value("Date", date),
-                    y: .value("Liters", fuelUsage.liters)
-                )
-                .foregroundStyle(Color.green)
-                .symbolSize(10)
-
-                AreaMark(
-                    x: .value("Date", date),
-                    yStart: .value("Liters", 0),
-                    yEnd: .value("Liters", fuelUsage.liters)
-                )
-                .foregroundStyle(LinearGradient(
-                    gradient: Gradient(colors: [Color.green.opacity(0.3), Color.clear]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                ))
-            }
-        }
-        .chartXAxis {
-            AxisMarks(values: dailyMaxFuelUsages.map { $0.key }) { value in
-                if let dateValue = value.as(Date.self) {
-                    AxisValueLabel {
-                        Text(dateValue, format: .dateTime.day().month(.abbreviated))
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
-            }
-        }
-        .chartYAxis {
-            AxisMarks { value in
-                AxisValueLabel {
-                    Text("\(Int(value.as(Double.self) ?? 0)) L")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-            }
-        }
-        .chartYAxisLabel(NSLocalizedString("fuel_liters_title", comment: ""), position: .leading)
-        .chartXAxisLabel(NSLocalizedString("date_label", comment: ""), position: .bottom)
-        .chartLegend(.hidden)
-        .padding()
-        .frame(minHeight: 250)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(UIColor.secondarySystemBackground))
-                .shadow(radius: 4)
-        )
-        .cornerRadius(12)
-    }
-
-    private func preprocessDailyMaxFuelUsages(fuelHistory: [FuelUsage]) -> [(key: Date, value: FuelUsage)] {
-        Dictionary(grouping: fuelHistory, by: { Calendar.current.startOfDay(for: $0.date) })
-            .mapValues { $0.max(by: { $0.liters < $1.liters })! }
-            .sorted(by: { $0.key < $1.key })
     }
 }
 
