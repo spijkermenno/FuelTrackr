@@ -41,9 +41,9 @@ struct CurrentMonthRecapView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("\(DateFormatter().monthSymbols[selectedMonth - 1]) Recap")
-                .font(.title3)
-                .fontWeight(.semibold)
+            Text(getDateString())
+                .font(.title2)
+                .fontWeight(.bold)
                 .foregroundColor(.primary)
 
             VStack(alignment: .leading, spacing: 16) {
@@ -52,10 +52,25 @@ struct CurrentMonthRecapView: View {
                 RecapRow(title: NSLocalizedString("total_fuel_cost", comment: ""), value: String(format: "€%.2f", totalFuelCost))
                 RecapRow(title: NSLocalizedString("average_fuel_usage", comment: ""), value: displayedAverage)
             }
+            
+            Spacer()
         }
-        .frame(maxWidth: .infinity, maxHeight: 260)
+        .frame(height: 230)
         .padding()
-        .background(Color(UIColor.secondarySystemFill))
+        .background(Color(UIColor.secondarySystemBackground))
         .cornerRadius(15)
+    }
+    
+    func getDateString() -> String {
+        let calendar = Calendar.current
+        let components = DateComponents(year: selectedYear, month: selectedMonth)
+        let date = calendar.date(from: components) ?? Date()
+
+        let formatter = DateFormatter()
+        formatter.locale = Locale.current // or specify a locale explicitly
+        formatter.dateFormat = "LLLL yyyy"
+
+        let formattedDate = formatter.string(from: date)
+        return formattedDate.prefix(1).capitalized + formattedDate.dropFirst()
     }
 }

@@ -11,6 +11,7 @@ import SwiftData
 struct ContentView: View {
     @Environment(\.modelContext) private var context
     @StateObject private var viewModel = VehicleViewModel()
+    @StateObject private var settingsViewModel = SettingsViewModelFactory.make()
 
     private let settingsRepository = SettingsRepository()
 
@@ -18,7 +19,7 @@ struct ContentView: View {
         NavigationView {
             VStack {
                 if viewModel.activeVehicle != nil {
-                    ActiveVehicleView(viewModel: viewModel)
+                    ActiveVehicleView(viewModel: viewModel, settingsViewModel: settingsViewModel)
                 } else {
                     AddVehicleView(viewModel: viewModel) {
                         checkForActiveVehicles()

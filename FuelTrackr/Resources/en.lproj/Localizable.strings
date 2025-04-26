@@ -27,6 +27,9 @@
 "mileage_title_km" = "Current mileage (Km)";
 "mileage_title_miles" = "Current mileage (Mi)";
 
+"mileage_history_km" = "mileage (Km) history";
+"mileage_history_miles" = "mileage (Mi) history";
+
 /* Additional Labels */
 "license_plate_label" = "License Plate";
 "purchase_date_label" = "Purchase Date";
@@ -169,3 +172,10 @@
 "test_notification_body" = "This is a test notification from FuelTrackr.";
 "test_notification" = "Test Notification";
 "test_notification_success" = "Test notification scheduled.";
+
+"mileage_title" = "Mileage";
+"purchase_date" = "Purchase Date";
+"manufacturing_date" = "Manufacturing Date";
+
+"currency_section" = "Currency";
+"select_currency" = "Select your currency";

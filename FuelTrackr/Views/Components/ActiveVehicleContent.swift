@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct ActiveVehicleContent: View {
-    var viewModel: VehicleViewModel
+    var vehicleViewModel: VehicleViewModel
+    var settingsViewModel: SettingsViewModel
     var vehicle: Vehicle
 
     @Binding var showAddFuelSheet: Bool
     @Binding var showAddMaintenanceSheet: Bool
     @Binding var showEditVehicleSheet: Bool
-    @Binding var showMonthlyRecapSheet: Bool
 
     @Environment(\.modelContext) private var context
     @EnvironmentObject var notificationHandler: NotificationHandler
@@ -22,29 +22,48 @@ struct ActiveVehicleContent: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                VehicleCarousel(viewModel: viewModel, photoData: vehicle.photo)
+                
+                GenericCarousel {
+                    VehicleImageView(photoData: vehicleViewModel.activeVehicle?.photo)
+                    CompactTripOverviewCard(viewModel: vehicleViewModel)
+                }
+                
                 VehiclePurchaseBanner(
                     isPurchased: vehicle.isPurchased,
                     purchaseDate: vehicle.purchaseDate,
                     onConfirmPurchase: { showEditVehicleSheet = true }
                 )
-                VehicleInfoView(viewModel: viewModel)
-                FuelUsageView(viewModel: viewModel, showAddFuelSheet: $showAddFuelSheet, isVehicleActive: vehicle.isPurchased)
-                MaintenanceView(viewModel: viewModel, showAddMaintenanceSheet: $showAddMaintenanceSheet, isVehicleActive: vehicle.isPurchased)
+                .padding(.horizontal)
+                
+                GenericCarousel(height: 290) {
+                    VehicleInfoCard(viewModel: vehicleViewModel)
+                    
+                    if let vehicle = vehicleViewModel.activeVehicle, vehicle.mileages.count > 1 {
+                            MileageGraphView(
+                                mileageHistory: vehicle.mileages,
+                                isMetric: SettingsRepository().isUsingMetric()
+                            )
+                        }
+                }
+                
+                
+//                VehicleInfoView(viewModel: viewModel)
+//                    .padding(.horizontal)
+
+                FuelUsageView(viewModel: vehicleViewModel, showAddFuelSheet: $showAddFuelSheet, isVehicleActive: vehicle.isPurchased)
+                    .padding(.horizontal)
+
+                
+                MaintenanceView(viewModel: vehicleViewModel, showAddMaintenanceSheet: $showAddMaintenanceSheet, isVehicleActive: vehicle.isPurchased)
+                    .padding(.horizontal)
+
             }
-            .padding()
         }
-        .id(viewModel.refreshID)
+        .id(vehicleViewModel.refreshID)
         .background(Color(UIColor.systemBackground))
         .navigationTitle(vehicle.name)
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: { showMonthlyRecapSheet = true }) {
-                    Image(systemName: "chart.bar.doc.horizontal")
-                        .foregroundColor(.primary)
-                }
-            }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: { showEditVehicleSheet = true }) {
                     Image(systemName: "pencil")
@@ -52,35 +71,25 @@ struct ActiveVehicleContent: View {
                 }
             }
             ToolbarItem(placement: .navigationBarTrailing) {
-                NavigationLink(destination: SettingsPageView(viewModel: viewModel)) {
+                NavigationLink(destination: SettingsPageView(viewModel: settingsViewModel)) {
                     Image(systemName: "gear")
                         .foregroundColor(.primary)
                 }
             }
         }
-        .sheet(isPresented: $showAddFuelSheet, onDismiss: { viewModel.refresh(context: context) }) {
-            AddFuelUsageSheet(viewModel: viewModel)
+        .sheet(isPresented: $showAddFuelSheet, onDismiss: { vehicleViewModel.refresh(context: context) }) {
+            AddFuelUsageSheet(viewModel: vehicleViewModel)
                 .presentationDetents([.medium])
                 .presentationDragIndicator(.visible)
         }
-        .sheet(isPresented: $showAddMaintenanceSheet, onDismiss: { viewModel.refresh(context: context) }) {
-            AddMaintenanceSheet(viewModel: viewModel)
+        .sheet(isPresented: $showAddMaintenanceSheet, onDismiss: { vehicleViewModel.refresh(context: context) }) {
+            AddMaintenanceSheet(viewModel: vehicleViewModel)
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
         }
-        .sheet(isPresented: $showEditVehicleSheet, onDismiss: { viewModel.refresh(context: context) }) {
-            EditVehicleSheet(viewModel: viewModel)
+        .sheet(isPresented: $showEditVehicleSheet, onDismiss: { vehicleViewModel.refresh(context: context) }) {
+            EditVehicleSheet(viewModel: vehicleViewModel)
                 .presentationDetents([.large])
-                .presentationDragIndicator(.visible)
-        }
-        .sheet(isPresented: $showMonthlyRecapSheet) {
-            MonthlyRecapSheet(viewModel: viewModel)
-                .presentationDetents([.medium])
-                .presentationDragIndicator(.visible)
-        }
-        .sheet(isPresented: $notificationHandler.shouldShowMonthlyRecapSheet) {
-            MonthlyRecapSheet(viewModel: viewModel, showPreviousMonth: true)
-                .presentationDetents([.medium])
                 .presentationDragIndicator(.visible)
         }
     }

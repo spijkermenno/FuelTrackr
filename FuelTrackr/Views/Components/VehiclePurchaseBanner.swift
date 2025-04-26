@@ -46,7 +46,7 @@ struct VehiclePurchaseBanner: View {
             .padding()
             .frame(maxWidth: .infinity)
             .background(Color.orange.opacity(0.15))
-            .cornerRadius(10)
+            .cornerRadius(25)
         }
     }
 }

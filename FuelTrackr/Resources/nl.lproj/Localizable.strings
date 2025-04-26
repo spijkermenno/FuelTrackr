@@ -26,6 +26,8 @@
 "mileage_label" = "Kilometerstand";
 "mileage_title_km" = "Huidige kilometerstand";
 "mileage_title_miles" = "Huidige miles-stand";
+"mileage_history_km" = "Kilometerstand geschiedenis";
+"mileage_history_miles" = "Miles-stand geschiedenis";
 
 /* Extra Labels */
 "license_plate_label" = "Kenteken";
@@ -157,9 +159,9 @@
 "monthly_recap_nav_title" = "Hier is een overzicht van de gegevens die je vorige maand hebt ingevoerd:";
 "monthly_recap_title" = "Maandelijkse Samenvatting";
 "km_driven" = "Rijkilometers";
-"total_fuel_used" = "Totaal verbruikte brandstof";
-"total_fuel_cost" = "Totale brandstofkosten";
-"average_fuel_usage" = "Gemiddeld brandstofverbruik";
+"total_fuel_used" = "Brandstof";
+"total_fuel_cost" = "Kosten";
+"average_fuel_usage" = "Gem. verbruik";
 "comparison" = "Verandering in gereden kilometers vergeleken met vorige maand:";
 "comparison_result" = "Vergeleken met vorige maand: %+.0f%%";
 "no_data_available" = "Geen gegevens beschikbaar voor deze maand.";
@@ -170,3 +172,10 @@
 "test_notification_body" = "Dit is een testmelding van FuelTrackr.";
 "test_notification" = "Testmelding";
 "test_notification_success" = "Testmelding ingepland.";
+
+"mileage_title" = "Kilometerstand";
+"purchase_date" = "Aankoopdatum";
+"manufacturing_date" = "Productiedatum";
+
+"currency_section" = "Valuta";
+"select_currency" = "Selecteer je valuta";

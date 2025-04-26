@@ -3,6 +3,7 @@ import FirebaseAnalytics
 
 struct ActiveVehicleView: View {
     @ObservedObject var viewModel: VehicleViewModel
+    @ObservedObject var settingsViewModel: SettingsViewModel
     @Environment(\.modelContext) private var context
     @EnvironmentObject var notificationHandler: NotificationHandler
 
@@ -11,7 +12,6 @@ struct ActiveVehicleView: View {
     @State private var showAddMaintenanceSheet = false
     @State private var showEditVehicleSheet = false
     @State private var isRefreshing = false
-    @State private var showMonthlyRecapSheet = false
 
     private let repository = SettingsRepository()
 
@@ -22,12 +22,12 @@ struct ActiveVehicleView: View {
             } else {
                 if let vehicle = viewModel.activeVehicle {
                     ActiveVehicleContent(
-                        viewModel: viewModel,
+                        vehicleViewModel: viewModel,
+                        settingsViewModel: settingsViewModel,
                         vehicle: vehicle,
                         showAddFuelSheet: $showAddFuelSheet,
                         showAddMaintenanceSheet: $showAddMaintenanceSheet,
-                        showEditVehicleSheet: $showEditVehicleSheet,
-                        showMonthlyRecapSheet: $showMonthlyRecapSheet
+                        showEditVehicleSheet: $showEditVehicleSheet
                     )
                     .onAppear {
                         Analytics.logEvent("active_vehicle_found", parameters: [

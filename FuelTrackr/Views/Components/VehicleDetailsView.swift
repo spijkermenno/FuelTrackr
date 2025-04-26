@@ -28,8 +28,6 @@ struct VehicleDetailsView: View {
             latestMileage = vehicle.mileages.last?.value ?? 0
         }
         .padding()
-        .background(Color(UIColor.secondarySystemBackground))
-        .cornerRadius(10)
     }
 
     private func detailRow(label: String, value: String) -> some View {
