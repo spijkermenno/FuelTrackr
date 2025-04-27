@@ -9,20 +9,21 @@ import Foundation
 
 struct SettingsViewModelFactory {
     static func make() -> SettingsViewModel {
-        
+        let settingsRepository = SettingsRepositoryImpl()
+
         return SettingsViewModel(
-            getIsNotificationsEnabled: GetNotificationsEnabledUseCase(),
-            setIsNotificationsEnabled: SetNotificationsEnabledUseCase(),
-            getIsUsingMetric: GetUsingMetricUseCase(),
-            setIsUsingMetric: SetUsingMetricUseCase(),
-            getDefaultTireInterval: GetDefaultTireIntervalUseCase(),
-            setDefaultTireInterval: SetDefaultTireIntervalUseCase(),
-            getDefaultOilChangeInterval: GetDefaultOilChangeIntervalUseCase(),
-            setDefaultOilChangeInterval: SetDefaultOilChangeIntervalUseCase(),
-            getDefaultBrakeCheckInterval: GetDefaultBrakeCheckIntervalUseCase(),
-            setDefaultBrakeCheckInterval: SetDefaultBrakeCheckIntervalUseCase(),
-            getSelectedCurrency: GetSelectedCurrencyUseCase(),
-            setSelectedCurrency: SetSelectedCurrencyUseCase()
+            getIsNotificationsEnabled: GetNotificationsEnabledUseCase(repository: settingsRepository),
+            setIsNotificationsEnabled: SetNotificationsEnabledUseCase(repository: settingsRepository),
+            getIsUsingMetric: GetUsingMetricUseCase(repository: settingsRepository),
+            setIsUsingMetric: SetUsingMetricUseCase(repository: settingsRepository),
+            getDefaultTireInterval: GetDefaultTireIntervalUseCase(repository: settingsRepository),
+            setDefaultTireInterval: SetDefaultTireIntervalUseCase(repository: settingsRepository),
+            getDefaultOilChangeInterval: GetDefaultOilChangeIntervalUseCase(repository: settingsRepository),
+            setDefaultOilChangeInterval: SetDefaultOilChangeIntervalUseCase(repository: settingsRepository),
+            getDefaultBrakeCheckInterval: GetDefaultBrakeCheckIntervalUseCase(repository: settingsRepository),
+            setDefaultBrakeCheckInterval: SetDefaultBrakeCheckIntervalUseCase(repository: settingsRepository),
+            getSelectedCurrency: GetSelectedCurrencyUseCase(repository: settingsRepository),
+            setSelectedCurrency: SetSelectedCurrencyUseCase(repository: settingsRepository)
         )
     }
 }

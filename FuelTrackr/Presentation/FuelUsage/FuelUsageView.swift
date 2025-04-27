@@ -1,0 +1,203 @@
+//
+//  FuelUsageView.swift
+//  FuelTrackr
+//
+//  Created by Menno Spijker on 27/04/2025.
+//
+
+import SwiftUI
+import Charts
+
+struct FuelUsageView: View {
+    @ObservedObject var viewModel: VehicleViewModel
+    @Binding var showAddFuelSheet: Bool
+    var isVehicleActive: Bool
+    @State private var showAllFuelEntries = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            // Header
+            HStack {
+                Text(NSLocalizedString("fuel_usage_title", comment: ""))
+                    .font(.headline)
+                    .foregroundColor(.primary)
+
+                Spacer()
+
+                Button(action: { showAddFuelSheet = true }) {
+                    Label(NSLocalizedString("add", comment: ""), systemImage: "plus")
+                        .labelStyle(.titleAndIcon)
+                        .font(.body)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(isVehicleActive ? Color.orange : Color.gray.opacity(0.5))
+                        .cornerRadius(8)
+                }
+                .disabled(!isVehicleActive)
+
+                Button(action: { showAllFuelEntries = true }) {
+                    Image(systemName: "chevron.right")
+                        .font(.body)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(isVehicleActive ? Color.orange : Color.gray.opacity(0.5))
+                        .cornerRadius(8)
+                }
+                .disabled(!isVehicleActive)
+            }
+
+            FuelUsageListView(viewModel: viewModel)
+        }
+        .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(10)
+        .sheet(isPresented: $showAllFuelEntries) {
+            FuelDetailsSheet(viewModel: viewModel)
+        }
+    }
+}
+
+// MARK: - FuelUsageListView
+
+struct FuelUsageListView: View {
+    @ObservedObject var viewModel: VehicleViewModel
+
+    var body: some View {
+        if let fuelUsages = viewModel.activeVehicle?.fuelUsages.sorted(by: { $0.date > $1.date }), !fuelUsages.isEmpty {
+            let latestEntries = Array(fuelUsages.prefix(3))
+
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(Array(latestEntries.enumerated()), id: \.element.id) { index, usage in
+                    let nextUsage = index < latestEntries.count - 1 ? latestEntries[index + 1] : nil
+                    FuelUsageRow(usage: usage, nextUsage: nextUsage, colorIndex: index)
+                }
+                if latestEntries.count < 3 {
+                    ForEach(latestEntries.count..<3, id: \.self) { index in
+                        SkeletonFuelUsageRow(colorIndex: index)
+                    }
+                }
+            }
+        } else {
+            Text(NSLocalizedString("fuel_usage_no_content", comment: ""))
+                .foregroundColor(.secondary)
+                .font(.subheadline)
+                .padding(.vertical, 12)
+                .frame(maxWidth: .infinity, alignment: .center)
+        }
+    }
+}
+
+// MARK: - FuelUsageRow
+
+struct FuelUsageRow: View {
+    let usage: FuelUsage
+    let nextUsage: FuelUsage?
+    let colorIndex: Int
+
+    var kmPerLiter: Double? {
+        if let current = usage.mileage?.value, let previous = nextUsage?.mileage?.value, usage.liters > 0 {
+            let distance = Double(current - previous)
+            return distance > 0 ? distance / usage.liters : nil
+        }
+        return nil
+    }
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(usage.date.formatted(date: .abbreviated, time: .omitted))
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+                Text("\(usage.liters, specifier: "%.2f") L, €\(usage.cost, specifier: "%.2f")")
+                    .font(.body)
+                    .foregroundColor(.primary)
+            }
+            Spacer()
+            VStack(alignment: .trailing, spacing: 6) {
+                if usage.liters > 0 {
+                    Text("€\(usage.cost / usage.liters, specifier: "%.2f")/L")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.primary)
+                }
+                if let kmPerLiter = kmPerLiter {
+                    Text("\(kmPerLiter, specifier: "%.2f") km/L")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.primary)
+                }
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: 75, alignment: .leading)
+        .background(colorIndex.isMultiple(of: 2) ? Color(UIColor.systemGray5) : Color(UIColor.systemGray6))
+    }
+}
+
+// MARK: - SkeletonFuelUsageRow
+
+struct SkeletonFuelUsageRow: View {
+    let colorIndex: Int
+    @State private var isAnimating = false
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 6) {
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(width: 100, height: 10)
+                    .shimmerEffect(isAnimating: isAnimating)
+
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(width: 150, height: 12)
+                    .shimmerEffect(isAnimating: isAnimating)
+            }
+            Spacer()
+            RoundedRectangle(cornerRadius: 4)
+                .fill(Color.gray.opacity(0.3))
+                .frame(width: 60, height: 12)
+                .shimmerEffect(isAnimating: isAnimating)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: 75, alignment: .leading)
+        .background(colorIndex.isMultiple(of: 2) ? Color(UIColor.systemGray5) : Color(UIColor.systemGray6))
+        .onAppear {
+            isAnimating = true
+        }
+    }
+}
+
+// MARK: - Shimmer Effect
+
+struct ShimmerEffectModifier: ViewModifier {
+    let isAnimating: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .opacity(isAnimating ? 0.6 : 1.0)
+            .overlay(
+                GeometryReader { geometry in
+                    Color.white
+                        .opacity(0.4)
+                        .mask(
+                            LinearGradient(
+                                gradient: Gradient(colors: [.clear, .white.opacity(0.6), .clear]),
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .offset(x: isAnimating ? geometry.size.width : -geometry.size.width)
+                        .animation(.linear(duration: 1.5).repeatForever(autoreverses: false), value: isAnimating)
+                }
+            )
+    }
+}
+
+extension View {
+    func shimmerEffect(isAnimating: Bool) -> some View {
+        modifier(ShimmerEffectModifier(isAnimating: isAnimating))
+    }
+}

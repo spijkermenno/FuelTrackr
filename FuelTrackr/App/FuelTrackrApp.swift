@@ -2,41 +2,38 @@
 //  FuelTrackrApp.swift
 //  FuelTrackr
 //
-//  Created by Menno Spijker on 24/01/2025.
-//
 
 import SwiftUI
 import SwiftData
 import FirebaseCore
 import FirebaseAnalytics
 
-
-class AppDelegate: NSObject, UIApplicationDelegate {
-  func application(_ application: UIApplication,
-                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-    FirebaseApp.configure()
-
-    return true
-  }
-}
-
 @main
 struct FuelTrackrApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject var notificationHandler = NotificationHandler()
 
+    private let container: ModelContainer
+
     init() {
+        // Initialize Firebase Analytics
         Analytics.logEvent(AnalyticsEventAppOpen, parameters: [
             AnalyticsParameterItemID: UUID().uuidString,
         ])
+
+        // Initialize SwiftData ModelContainer manually
+        do {
+            container = try ModelContainer(for: Vehicle.self, FuelUsage.self, Maintenance.self, Mileage.self)
+        } catch {
+            fatalError("Failed to create ModelContainer: \(error.localizedDescription)")
+        }
     }
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .modelContainer(for: [Vehicle.self, FuelUsage.self, Maintenance.self, Mileage.self])
-                .environmentObject(notificationHandler)
-                // Using .onOpenURL if your notification uses the custom URL scheme.
+            ContentView(context: container.mainContext)
+                .modelContainer(container) // inject the ModelContainer into the environment
+                .environmentObject(notificationHandler) // keep your notification handler!
                 .onOpenURL { url in
                     if url.absoluteString == "fueltrackr://monthlyRecap" {
                         notificationHandler.shouldShowMonthlyRecapSheet = true
