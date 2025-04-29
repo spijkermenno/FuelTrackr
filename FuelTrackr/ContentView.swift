@@ -1,5 +1,9 @@
+
 import SwiftUI
 import SwiftData
+import Domain
+import Data
+import Presentation
 
 struct ContentView: View {
     @Environment(\.modelContext) private var context
