@@ -15,6 +15,8 @@
 		A9A91A8F2D4C02B000153BE0 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = A9A91A8E2D4C02B000153BE0 /* FirebaseCrashlytics */; };
 		A9A91A912D4C02B000153BE0 /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = A9A91A902D4C02B000153BE0 /* FirebasePerformance */; };
 		A9B3A5F32DC16F9100D219FF /* Presentation in Frameworks */ = {isa = PBXBuildFile; productRef = A9B3A5F22DC16F9100D219FF /* Presentation */; };
+		A9B3A5F52DC265AA00D219FF /* Data in Frameworks */ = {isa = PBXBuildFile; productRef = A9B3A5F42DC265AA00D219FF /* Data */; };
+		A9B3A5F82DC266EB00D219FF /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = A9B3A5F72DC266EB00D219FF /* Factory */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +50,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A9B3A5F32DC16F9100D219FF /* Presentation in Frameworks */,
+				A9B3A5F82DC266EB00D219FF /* Factory in Frameworks */,
 				A9A91A8F2D4C02B000153BE0 /* FirebaseCrashlytics in Frameworks */,
 				A98BBF132DC1670300F561BF /* Domain in Frameworks */,
 				A9A91A8D2D4C02B000153BE0 /* FirebaseCore in Frameworks */,
@@ -55,6 +58,7 @@
 				A9A91A912D4C02B000153BE0 /* FirebasePerformance in Frameworks */,
 				A9A91A8B2D4C02B000153BE0 /* FirebaseAnalytics in Frameworks */,
 				A98BBF0F2DC166F800F561BF /* Presentation in Frameworks */,
+				A9B3A5F52DC265AA00D219FF /* Data in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -113,6 +117,8 @@
 				A98BBF102DC1670000F561BF /* Data */,
 				A98BBF122DC1670300F561BF /* Domain */,
 				A9B3A5F22DC16F9100D219FF /* Presentation */,
+				A9B3A5F42DC265AA00D219FF /* Data */,
+				A9B3A5F72DC266EB00D219FF /* Factory */,
 			);
 			productName = DriveWise;
 			productReference = A96F625E2D43C5D500872385 /* FuelTrackr.app */;
@@ -148,6 +154,7 @@
 				A98BBF052DC1660000F561BF /* XCLocalSwiftPackageReference "FuelTrackr/Data" */,
 				A98BBF082DC1661000F561BF /* XCLocalSwiftPackageReference "FuelTrackr/Domain" */,
 				A9B3A5F12DC16F9100D219FF /* XCLocalSwiftPackageReference "FuelTrackr/Presentation" */,
+				A9B3A5F62DC266EB00D219FF /* XCRemoteSwiftPackageReference "Factory" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A96F625F2D43C5D500872385 /* Products */;
@@ -301,7 +308,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = FuelTrackr/App/FuelTrackr.entitlements;
+				CODE_SIGN_ENTITLEMENTS = FuelTrackr/FuelTrackr.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "\"FuelTrackr/Preview Content\"";
@@ -344,7 +351,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = FuelTrackr/App/FuelTrackr.entitlements;
+				CODE_SIGN_ENTITLEMENTS = FuelTrackr/FuelTrackr.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "\"FuelTrackr/Preview Content\"";
@@ -429,6 +436,14 @@
 				minimumVersion = 11.7.0;
 			};
 		};
+		A9B3A5F62DC266EB00D219FF /* XCRemoteSwiftPackageReference "Factory" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hmlongco/Factory";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.4.3;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -467,6 +482,15 @@
 		A9B3A5F22DC16F9100D219FF /* Presentation */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Presentation;
+		};
+		A9B3A5F42DC265AA00D219FF /* Data */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Data;
+		};
+		A9B3A5F72DC266EB00D219FF /* Factory */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A9B3A5F62DC266EB00D219FF /* XCRemoteSwiftPackageReference "Factory" */;
+			productName = Factory;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

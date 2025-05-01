@@ -7,6 +7,10 @@ import SwiftUI
 import SwiftData
 import FirebaseCore
 import FirebaseAnalytics
+import Factory
+import Domain
+import Data
+import Presentation
 
 @main
 struct FuelTrackrApp: App {
@@ -16,12 +20,10 @@ struct FuelTrackrApp: App {
     private let container: ModelContainer
 
     init() {
-        // Initialize Firebase Analytics
         Analytics.logEvent(AnalyticsEventAppOpen, parameters: [
             AnalyticsParameterItemID: UUID().uuidString,
         ])
 
-        // Initialize SwiftData ModelContainer manually
         do {
             container = try ModelContainer(for: Vehicle.self, FuelUsage.self, Maintenance.self, Mileage.self)
         } catch {
@@ -31,9 +33,9 @@ struct FuelTrackrApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView(context: container.mainContext)
-                .modelContainer(container) // inject the ModelContainer into the environment
-                .environmentObject(notificationHandler) // keep your notification handler!
+            ContentView()
+                .modelContainer(container)
+                .environmentObject(notificationHandler)
                 .onOpenURL { url in
                     if url.absoluteString == "fueltrackr://monthlyRecap" {
                         notificationHandler.shouldShowMonthlyRecapSheet = true
