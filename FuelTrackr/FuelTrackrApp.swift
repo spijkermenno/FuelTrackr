@@ -25,7 +25,11 @@ struct FuelTrackrApp: App {
         ])
 
         do {
-            container = try ModelContainer(for: Vehicle.self, FuelUsage.self, Maintenance.self, Mileage.self)
+            let modelContainer = try ModelContainer(for: Vehicle.self, FuelUsage.self, Maintenance.self, Mileage.self)
+            
+            Container.shared.modelContext.register {
+                container.mainContext
+            }
         } catch {
             fatalError("Failed to create ModelContainer: \(error.localizedDescription)")
         }

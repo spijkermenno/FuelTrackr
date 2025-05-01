@@ -202,7 +202,7 @@ public extension Container {
     
     // MARK: - Managers
     
-    var notificationManager: Factory<NotificationManagerProtocol> {
-        self { NotificationManager(settingsRepository: self.settingsRepository()) }
-    }
+//    var notificationManager: Factory<NotificationManagerProtocol> {
+//        self { NotificationManager(settingsRepository: self.settingsRepository()) }
+//    }
 }
