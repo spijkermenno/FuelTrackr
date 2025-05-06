@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: Build and Test FuelTrackr
-    runs-on: macos-12 # Use the latest macOS version
+    runs-on: macos-15 # Use the latest macOS version
     
     steps:
     - uses: actions/checkout@v4
