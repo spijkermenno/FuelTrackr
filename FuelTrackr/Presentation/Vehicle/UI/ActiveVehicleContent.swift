@@ -15,8 +15,9 @@ import SwiftData
 
 public struct ActiveVehicleContent: View {
     @StateObject public var vehicleViewModel: VehicleViewModel
-    public var settingsViewModel = SettingsViewModel()
-    public var addFuelUsageViewModel = AddFuelUsageViewModel()
+    @StateObject public var settingsViewModel = SettingsViewModel()
+    @StateObject public var addFuelUsageViewModel = AddFuelUsageViewModel()
+    
     @Environment(\.modelContext) private var context
     @EnvironmentObject private var notificationHandler: NotificationHandler
     
@@ -43,42 +44,67 @@ public struct ActiveVehicleContent: View {
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
+                VehicleImageView(photoData: vehicleViewModel.activeVehicle?.photo)
+                    .padding(.horizontal)
                 
-                GenericCarousel {
-                    VehicleImageView(photoData: vehicleViewModel.activeVehicle?.photo)
-                    CompactTripOverviewCard()
-                }
-                
-                VehiclePurchaseBanner(
-                    isPurchased: vehicle.isPurchased ?? false,
+//                VehiclePurchaseBanner(
+//                    isPurchased: true, //vehicle.isPurchased ?? false,
+//                    purchaseDate: vehicle.purchaseDate,
+//                    onConfirmPurchase: { showEditVehicleSheet = true }
+//                )
+//                .padding(.horizontal)
+//                
+                NewVehicleInfoCard(
+                    licensePlate: vehicle.licensePlate,
+                    mileage: vehicle.mileages.sorted(by: { $0.date < $1.date }).last?.value ?? 0,
                     purchaseDate: vehicle.purchaseDate,
-                    onConfirmPurchase: { showEditVehicleSheet = true }
+                    productionDate: vehicle.manufacturingDate
                 )
                 .padding(.horizontal)
+
+                let mock = [
+                    VehicleStatisticsUiModel(period: Period.CurrentMonth, distanceDriven: 1230, fuelUsed: 84.3, totalCost: 123.2),
+                    VehicleStatisticsUiModel(period: Period.LastMonth, distanceDriven: 2130, fuelUsed: 834.3, totalCost: 1233.2),
+                    VehicleStatisticsUiModel(period: Period.YTD, distanceDriven: 12350, fuelUsed: 184.3, totalCost: 523.2),
+                    VehicleStatisticsUiModel(period: Period.AllTime, distanceDriven: 1230, fuelUsed: 84.3, totalCost: 123.2),
+                ]
                 
-                GenericCarousel(height: 290) {
-                    VehicleInfoCard(viewModel: vehicleViewModel)
-                    
-                    if let vehicle = vehicleViewModel.activeVehicle, vehicle.mileages.count > 1 {
-                        MileageGraphView(
-                            mileageHistory: vehicle.mileages,
-                            isMetric: settingsViewModel.isUsingMetric
-                        )
-                    }
-                }
+                VehicleStatisticsCarouselView(items: mock)
                 
-                FuelUsageView(
-                    viewModel: vehicleViewModel,
-                    showAddFuelSheet: $showAddFuelSheet,
-                    isVehicleActive: vehicle.isPurchased ?? false
-                )
-                .padding(.horizontal)
+//                GenericCarousel(height: 248) {
+//                    CompactTripOverviewCard()
+//                    CompactTripOverviewCard()
+//                }
+        
+                // New Fuel usage history card
                 
-                MaintenanceView(
-                    showAddMaintenanceSheet: $showAddMaintenanceSheet,
-                    isVehicleActive: vehicle.isPurchased ?? false
-                )
-                .padding(.horizontal)
+                // New Maintenance history card
+                
+                
+                
+//                GenericCarousel(height: 290) {
+//                    VehicleInfoCard(viewModel: vehicleViewModel)
+//                    
+//                    if let vehicle = vehicleViewModel.activeVehicle, vehicle.mileages.count > 1 {
+//                        MileageGraphView(
+//                            mileageHistory: vehicle.mileages,
+//                            isMetric: settingsViewModel.isUsingMetric
+//                        )
+//                    }
+//                }
+                
+//                FuelUsageView(
+//                    viewModel: vehicleViewModel,
+//                    showAddFuelSheet: $showAddFuelSheet,
+//                    isVehicleActive: vehicle.isPurchased ?? false
+//                )
+//                .padding(.horizontal)
+//                
+//                MaintenanceView(
+//                    showAddMaintenanceSheet: $showAddMaintenanceSheet,
+//                    isVehicleActive: vehicle.isPurchased ?? false
+//                )
+//                .padding(.horizontal)
             }
         }
         .id(vehicleViewModel.refreshID)

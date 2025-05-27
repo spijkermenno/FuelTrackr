@@ -8,7 +8,7 @@ struct ContentView: View {
 
     @StateObject private var vehicleViewModel = VehicleViewModel()
     @StateObject private var settingsViewModel = SettingsViewModel()
-    
+
     var body: some View {
         NavigationStack {
             VStack {

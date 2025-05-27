@@ -10,7 +10,7 @@
 import SwiftUI
 
 public struct Theme {
-    public static let colors = Colors()
+    public static let colors = LightColors()
     public static let dimensions = Dimensions()
     public static let typography = Typography()
 }

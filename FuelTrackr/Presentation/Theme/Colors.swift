@@ -1,5 +1,4 @@
 // MARK: - Package: Presentation
-
 //
 //  Colors.swift
 //  FuelTrackr
@@ -9,49 +8,51 @@
 
 import SwiftUI
 
-public struct Colors: Sendable {
-    // MARK: - Primary Brand Color
-    /// Vibrant Indigo Purple – brand-defining, bold, and energetic
-    /// RGB: (83, 52, 215)
-    public let primary = Color(red: 83 / 255, green: 52 / 255, blue: 215 / 255)
+public struct LightColors: Sendable, ColorsProtocol {
+    public let primary = hexColor("#5334D7") // Primary brand purple
+    public let secondary = hexColor("#977EFF") // Accent purple
+    public let background = hexColor("#F8F8FB") // Light background for screens
+    public let surface = hexColor("#FFFFFF") // White cards, sheets, etc.
+    public let onPrimary = hexColor("#FFFFFF") // White text on primary background
+    public let onBackground = hexColor("#202124") // Dark text on light background
+    public let onSurface = hexColor("#787C82") // Medium gray for labels
+    public let success = hexColor("#2ECC71") // Success green
+    public let error = hexColor("#E74C3C") // Error red
+    public let purple = hexColor("#5832DF") // Alternate purple accent
+    public let transparent: Color = .clear
+}
 
-    // MARK: - Secondary Accent Color
-    /// Soft Lavender Blue – used for subtle accents, outlines, or highlights
-    /// RGB: (151, 126, 255)
-    public let secondary = Color(red: 151 / 255, green: 126 / 255, blue: 255 / 255)
+public protocol ColorsProtocol: Sendable {
+    var primary: Color { get }
+    var secondary: Color { get }
+    var background: Color { get }
+    var surface: Color { get }
+    var onPrimary: Color { get }
+    var onBackground: Color { get }
+    var onSurface: Color { get }
+    var success: Color { get }
+    var error: Color { get }
+    var purple: Color { get }
+    var transparent: Color { get }
+}
 
-    // MARK: - Background Color
-    /// Light Grayish White – clean and neutral background for light mode
-    /// RGB: (248, 248, 251)
-    public let background = Color(red: 248 / 255, green: 248 / 255, blue: 251 / 255)
+public extension ColorsProtocol {
+    static func hexColor(_ hex: String, fallback: Color = .black) -> Color {
+        var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        if hexSanitized.hasPrefix("#") {
+            hexSanitized.removeFirst()
+        }
 
-    // MARK: - Surface Color
-    /// Pure White – for cards and floating components
-    /// RGB: (255, 255, 255)
-    public let surface = Color(red: 255 / 255, green: 255 / 255, blue: 255 / 255)
+        guard hexSanitized.count == 6,
+              let rgbValue = UInt64(hexSanitized, radix: 16) else {
+            assertionFailure("Invalid hex color format: \(hex)")
+            return fallback
+        }
 
-    // MARK: - On Primary Text
-    /// White – highly readable text on purple backgrounds
-    /// RGB: (255, 255, 255)
-    public let onPrimary = Color(red: 255 / 255, green: 255 / 255, blue: 255 / 255)
+        let red = Double((rgbValue & 0xFF0000) >> 16) / 255
+        let green = Double((rgbValue & 0x00FF00) >> 8) / 255
+        let blue = Double(rgbValue & 0x0000FF) / 255
 
-    // MARK: - On Background Text
-    /// Charcoal Gray – readable primary text
-    /// RGB: (32, 33, 36)
-    public let onBackground = Color(red: 32 / 255, green: 33 / 255, blue: 36 / 255)
-
-    // MARK: - On Surface Text
-    /// Muted Gray – secondary text or captions
-    /// RGB: (120, 124, 130)
-    public let onSurface = Color(red: 120 / 255, green: 124 / 255, blue: 130 / 255)
-
-    // MARK: - Success Color
-    /// Fresh Leaf Green – for success badges, indicators
-    /// RGB: (46, 204, 113)
-    public let success = Color(red: 46 / 255, green: 204 / 255, blue: 113 / 255)
-
-    // MARK: - Error Color
-    /// Vivid Red – used for destructive actions or alerts
-    /// RGB: (231, 76, 60)
-    public let error = Color(red: 231 / 255, green: 76 / 255, blue: 60 / 255)
+        return Color(red: red, green: green, blue: blue)
+    }
 }

@@ -2,14 +2,6 @@
 //  VehicleInfoCard.swift
 //  FuelTrackr
 //
-//  Created by Menno Spijker on 27/04/2025.
-//
-
-
-//
-//  VehicleInfoCard.swift
-//  FuelTrackr
-//
 //  Created by Menno Spijker on 22/04/2025.
 //
 

@@ -23,7 +23,6 @@ public struct VehicleImageView: View {
             if let data = photoData, let uiImage = UIImage(data: data) {
                 Image(uiImage: uiImage)
                     .resizable()
-                    .aspectRatio(1.0, contentMode: .fill)
                     .background(Color.secondary)
             } else {
                 Image(systemName: "photo")
@@ -34,7 +33,7 @@ public struct VehicleImageView: View {
                     .background(Color(UIColor.secondarySystemBackground))
             }
         }
-        .frame(height: 260)
+        .frame(height: 220)
         .cornerRadius(15)
         .clipped()
     }

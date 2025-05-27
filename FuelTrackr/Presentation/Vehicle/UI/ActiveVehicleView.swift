@@ -49,16 +49,19 @@ public struct ActiveVehicleView: View {
                         showEditVehicleSheet: $showEditVehicleSheet
                     )
                     .onAppear {
-                        Analytics.logEvent("active_vehicle_found", parameters: [
-                            "vehicle_name": vehicle.name,
-                            "license_plate": vehicle.licensePlate
-                        ])
+                        // TODO ANALYTICS WRAPPER
+//                        Analytics.logEvent("active_vehicle_found", parameters: [
+//                            "vehicle_name": vehicle.name,
+//                            "license_plate": vehicle.licensePlate
+//                        ])
                         scheduleNextRecapNotification()
                     }
                 } else {
                     NoActiveVehicleView()
                         .onAppear {
-                            Analytics.logEvent("no_active_vehicle", parameters: nil)
+                            // TODO ANALYTICS WRAPPER
+
+                            //Analytics.logEvent("no_active_vehicle", parameters: nil)
                         }
                 }
             }
