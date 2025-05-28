@@ -1,121 +1,124 @@
-//
-//  Localizable.strings
-//  FuelTrackr
-//
-//  Created by Menno Spijker on 24/01/2025.
-//
-
+/* Welcome and General */
 "welcome_title" = "Welcome to FuelTrackr!";
-"welcome_subtitle" = "To get started, please fill in the details of your vehicle, and then click the \"Add\" button to start tracking.";
+"welcome_subtitle" = "To get started, please fill in the details of your vehicle, and then click the \"Save Vehicle\" button to start tracking.";
+
+/* Vehicle Editing */
 "edit_vehicle_title" = "Edit Vehicle";
+
+/* Photo */
 "tap_to_select_photo" = "Tap to select a photo";
 "select_photo" = "Select Photo";
+"photo_title" = "Photo";
+"add_photo_button" = "Add Photo";
+
+/* Vehicle Details */
 "vehicle_name_title" = "Vehicle Name";
 "vehicle_name_placeholder" = "Enter vehicle name";
 "license_plate_title" = "License Plate";
 "license_plate_placeholder" = "Enter license plate";
 "purchase_date_title" = "Purchase Date";
 "manufacturing_date_title" = "Manufacturing Date";
+"save_vehicle_button" = "Save Vehicle";
+
+/* Mileage */
 "mileage_title" = "Mileage";
 "mileage_placeholder" = "Enter mileage";
-"photo_title" = "Photo";
-"add_photo_button" = "Add Photo";
-"save_vehicle_button" = "Save Vehicle";
-"vehicle_is_purchased" = "Vehicle Purchased";
-
-"license_plate_label" = "License Plate";
 "mileage_label" = "Mileage";
+"mileage_title_km" = "Current mileage (Km)";
+"mileage_title_miles" = "Current mileage (Mi)";
+
+"mileage_history_km" = "mileage (Km) history";
+"mileage_history_miles" = "mileage (Mi) history";
+
+/* Additional Labels */
+"license_plate_label" = "License Plate";
 "purchase_date_label" = "Purchase Date";
 "manufacturing_date_label" = "Manufacturing Date";
+
+/* Deletion */
 "delete_vehicle_button" = "Delete Vehicle";
 "delete_vehicle_confirmation_title" = "Are you sure you want to delete this vehicle?";
+"delete_confirmation_title" = "Are you sure?";
 "delete_confirmation_delete" = "Delete";
 
-"add" = "Add";
-"fuel_usage_title" = "Fuel Usage";
-"fuel_usage_no_content" = "To gain insights into your fuel usage, add data using the button with the '+' symbol.";
-"maintenance_title" = "Maintenance History";
-"maintenance_no_content" = "No maintenance records available. Add a record using the '+' button.";
-"show_more" = "Show more";
-
+/* Fuel Usage */
 "add_fuel_usage_title" = "Add Fuel Usage";
+"add_fuel_usage_description" = "Record every fuel stop to keep a complete fuel history and monitor consumption trends over time.";
 "fuel_entry_details" = "Fuel Entry Details";
 "liters_label" = "How many liters did you refuel?";
 "cost_label" = "Total cost (€)";
-"mileage_label" = "Current mileage (km)";
-
 "liters_placeholder" = "Enter amount (e.g., 12)";
 "cost_placeholder" = "Enter price (e.g., 100)";
-
 "price_per_liter" = "Price per liter";
 "price_per_gallon" = "Price per gallon";
-
-"cancel" = "Cancel";
-"save" = "Save";
+"fuel_usage_title" = "Fuel Usage";
+"fuel_usage_no_content" = "To gain insights into your fuel usage, add data using the button with the '+' symbol";
 "fuel_usage_saved_success" = "Fuel usage saved successfully.";
 "fuel_usage_saved_error" = "Failed to save fuel usage.";
+"fuel_usage_empty_title" = "More data needed";
+"fuel_usage_empty_description" = "Add more fuel entries for a better overview.";
+"fuel_usage_list_title" = "Fuel Usage Records";
 
+/* Maintenance */
+"maintenance_title" = "Maintenance History";
+"maintenance_no_content" = "No maintenance records available. Add a record using the '+' button.";
+"maintenance_details" = "Maintenance Details";
+"maintenance_type" = "Maintenance Type";
+"add_maintenance_title" = "Add Maintenance";
+"maintenance_saved_success" = "Maintenance saved successfully.";
+"maintenance_saved_error" = "Failed to save maintenance.";
+"maintenance_list_title" = "Maintenance Records";
+"delete_confirmation_maintenance" = "Are you sure you want to delete this maintenance record?";
+"delete_confirmation_fuel" = "Are you sure you want to delete this fuel record?";
+
+/* Other */
+"other" = "Other";
+"other_notes" = "Please specify";
+"other_notes_placeholder" = "Enter description for 'Other'";
 "all_fields_required_error" = "All fields must be filled with valid data.";
 "invalid_liters_error" = "Please enter a valid number of liters greater than 0.";
 "invalid_cost_error" = "Please enter a valid cost greater than 0.";
 "invalid_mileage_error" = "The mileage must be higher than the current mileage.";
+"invalid_cost_error_generic" = "Invalid cost. Please check the input format.";
+"invalid_number_error" = "Invalid number. Ensure the input is numeric.";
+"invalid_notes_error" = "Please provide a description for the maintenance.";
+"general_error" = "Something went wrong. Please try again.";
 
-"maintenance_details" = "Maintenance Details";
-"maintenance_type" = "Maintenance Type";
-"add_maintenance_title" = "Add Maintenance";
-"other_notes" = "Please specify";
-
-"delete_confirmation_title" = "Are you sure?";
-"delete_confirmation_delete" = "Delete";
-
+/* Notifications */
 "notifications_section" = "Notifications";
+"notifications_disclaimer" = "We’re working on notifications so you don’t miss any updates. They aren’t available yet—stay tuned!";
 "enable_notifications" = "Enable Notifications";
+"enable_notifications_description" = "Enable or disable notifications for maintenance reminders.";
+"notification_permission_error" = "Please enable notifications in your device settings.";
+"notifications_disabled_title" = "Notifications Disabled";
+"notifications_disabled_message" = "Enable notifications in settings for reminders.";
+"ok" = "OK";
+
+/* Units and Settings */
 "units_section" = "Units";
 "measurement_system" = "Measurement System";
-"metric" = "Metric (km, L)";
-"imperial" = "Imperial (mi, gal)";
+"measurement_system_description" = "Select the measurement system for distance and fuel.";
+"use_metric_units" = "Use Metric units (L, Km)";
+"use_imperial_units" = "Use Imperial units (G, Mi)";
 "default_maintenance_intervals" = "Default Maintenance Intervals";
 "tires" = "Tires";
+"distribution_belt" = "Distribution Belt";
 "oil_change" = "Oil Change";
 "brakes" = "Brakes";
 "other" = "Other";
 "settings_title" = "Settings";
-
-"add_fuel_usage_description" = "Track every fuel stop for a complete record. Keeping accurate fuel history helps monitor consumption trends and costs.";
-"add_maintenance_description" = "You can add both past and recent maintenance records. Keeping a full maintenance history helps you get the most out of the app.";
-"fuel_saved_error" = "Failed to save fuel data.";
-"maintenance_saved_success" = "Maintenance saved successfully.";
-"maintenance_saved_error" = "Failed to save maintenance.";
-"other_notes_placeholder" = "Enter description for 'Other'";
-"date_label" = "Date";
-"select_date" = "Select Date";
-"invalid_notes_error" = "Please provide a description for the maintenance.";
 "settings_description" = "Customize your app experience by managing settings such as notifications, units, and default maintenance intervals.";
-"enable_notifications_description" = "Enable or disable notifications for maintenance reminders.";
-"measurement_system_description" = "Select the measurement system for distance and fuel.";
-"notification_permission_error" = "Please enable notifications in your device settings.";
-"general_error" = "Something went wrong. Please try again.";
-"show_all_maintenance" = "View all maintenance records";
-"show_all_fuel" = "View all fuel records";
-"fuel_usage_list_title" = "Fuel Usage Records";
-"maintenance_list_title" = "Maintenance Records";
-"invalid_cost_error_generic" = "Invalid cost. Please check the input format.";
-"invalid_number_error" = "Invalid number. Ensure the input is numeric.";
-"delete_confirmation_maintenance" = "Are you sure you want to delete this maintenance record?";
-"delete_confirmation_fuel" = "Are you sure you want to delete this fuel record?";
-"delete_all" = "Delete All";
-"settings_reset" = "Reset Settings";
 
+/* Data Reset */
 "reset_section" = "Reset Data";
 "reset_maintenance_button" = "Reset Maintenance Data";
 "reset_fuel_button" = "Reset Fuel Usage Data";
 "reset_confirmation_title" = "Are you sure?";
 "reset_confirmation_confirm" = "Reset";
+"settings_reset" = "Reset Settings";
 
-"notifications_disabled_title" = "Notifications Disabled";
-"notifications_disabled_message" = "Enable notifications in settings for reminders.";
-"ok" = "OK";
-
+/* Vehicle Purchase */
+"vehicle_is_purchased" = "Vehicle Purchased";
 "vehicle_not_purchased_banner" = "This vehicle has not been purchased yet. Once you have bought it, please confirm below.";
 "vehicle_purchase_confirm" = "Confirm Purchase";
 "vehicle_purchase_cancel" = "Delete Vehicle";
@@ -123,14 +126,59 @@
 "vehicle_purchase_success" = "Vehicle marked as purchased!";
 "vehicle_purchase_error" = "An error occurred while updating the vehicle status.";
 
-"no_graph_fuel” = “A graph will appear here once more fuel data has been added.";
-"no_graph_maintenance” = “A graph will appear here once more maintenance data has been added.";
-"no_graph_mileage” = “A graph will appear here once more mileage records have been registered.";
+/* Date and Misc */
+"date_label" = "Date";
+"select_date" = "Select Date";
+"date" = "Date";
+"close" = "Close";
 
+/* Graphs */
+"no_graph_fuel" = "A graph will appear here once more fuel data has been added.";
+"no_graph_maintenance" = "A graph will appear here once more maintenance data has been added.";
+"no_graph_mileage" = "A graph will appear here once more mileage records have been registered.";
+
+/* Analytics and Refresh */
+"refreshing" = "Refreshing...";
+"no_active_vehicle_found" = "No active vehicle found.";
+
+/* Notification (Purchase Date Passed) */
 "notification_purchase_date_passed_title" = "Did you purchase your vehicle?";
 "notification_purchase_date_passed_description" = "If you have purchased your vehicle today, make sure to confirm it in the app.";
 
+/* Vehicle Details */
 "vehicle_details_title" = "Vehicle Details";
 
-"fuel_usage_empty_title" = "More data needed";
-"fuel_usage_empty_description" = "Add more fuel entries for a better overview.";
+"cancel" = "Cancel";
+"save" = "Save";
+"latest_mileage" = "Latest mileage";
+"add_maintenance_description" = "Record your maintenance to keep your vehicle in top shape.";
+"free_or_warranty" = "Free / Warranty";
+"days_ago" = "Days ago";
+"maintenance_interval_description" = "When your vehicle's mileage since the last maintenance—such as a tire change, oil change, or brake inspection—exceeds this threshold, you'll receive a notification reminding you it's time for service.";
+
+"monthly_recap_nav_title" = "Here’s a summary of the data you entered last month:";
+"monthly_recap_title" = "Monthly Recap";
+"km_driven" = "Kilometers Driven";
+"total_fuel_used" = "Total Fuel Used";
+"total_fuel_cost" = "Total Fuel Cost";
+"average_fuel_usage" = "Average Fuel Usage";
+"comparison" = "Change in kilometers driven compared to last month:";
+"comparison_result" = "Compared to previous month: %+.0f%%";
+"no_data_available" = "No data available for this month.";
+
+"monthly_recap_notification_title" = "Monthly Recap Ready";
+"monthly_recap_notification_body" = "Tap to view a summary of your vehicle's performance last month.";
+"test_notification_title" = "Test Notification";
+"test_notification_body" = "This is a test notification from FuelTrackr.";
+"test_notification" = "Test Notification";
+"test_notification_success" = "Test notification scheduled.";
+
+"mileage_title" = "Mileage";
+"purchase_date" = "Purchase Date";
+"manufacturing_date" = "Manufacturing Date";
+
+"currency_section" = "Currency";
+"select_currency" = "Select your currency";
+
+"ytd" = "Year to Date";
+"all_time" = "All Time";
