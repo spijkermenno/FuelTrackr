@@ -93,12 +93,12 @@ public struct ActiveVehicleContent: View {
 //                    }
 //                }
                 
-//                FuelUsageView(
-//                    viewModel: vehicleViewModel,
-//                    showAddFuelSheet: $showAddFuelSheet,
-//                    isVehicleActive: vehicle.isPurchased ?? false
-//                )
-//                .padding(.horizontal)
+                FuelUsageView(
+                    viewModel: vehicleViewModel,
+                    showAddFuelSheet: $showAddFuelSheet,
+                    isVehicleActive: vehicle.isPurchased ?? false
+                )
+                .padding(.horizontal)
 //                
 //                MaintenanceView(
 //                    showAddMaintenanceSheet: $showAddMaintenanceSheet,
