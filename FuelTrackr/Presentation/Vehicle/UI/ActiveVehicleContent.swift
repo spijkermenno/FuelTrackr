@@ -1,5 +1,4 @@
 // MARK: - Package: Presentation
-
 //
 //  ActiveVehicleContent.swift
 //  FuelTrackr
@@ -9,9 +8,7 @@
 
 import SwiftUI
 import Domain
-
 import SwiftData
-
 
 public struct ActiveVehicleContent: View {
     @StateObject public var vehicleViewModel: VehicleViewModel
@@ -47,13 +44,15 @@ public struct ActiveVehicleContent: View {
                 VehicleImageView(photoData: vehicleViewModel.activeVehicle?.photo)
                     .padding(.horizontal)
                 
-//                VehiclePurchaseBanner(
-//                    isPurchased: true, //vehicle.isPurchased ?? false,
-//                    purchaseDate: vehicle.purchaseDate,
-//                    onConfirmPurchase: { showEditVehicleSheet = true }
-//                )
-//                .padding(.horizontal)
-//                
+                VehiclePurchaseBanner(
+                    isPurchased: vehicle.isPurchased ?? false,
+                    purchaseDate: vehicle.purchaseDate,
+                    onConfirmPurchase: {
+                        vehicleViewModel.confirmPurchase(context: context)
+                    }
+                )
+                .padding(.horizontal)
+                
                 NewVehicleInfoCard(
                     licensePlate: vehicle.licensePlate,
                     mileage: vehicle.mileages.sorted(by: { $0.date < $1.date }).last?.value ?? 0,
@@ -61,37 +60,12 @@ public struct ActiveVehicleContent: View {
                     productionDate: vehicle.manufacturingDate
                 )
                 .padding(.horizontal)
-
-                let mock = [
-                    VehicleStatisticsUiModel(period: Period.CurrentMonth, distanceDriven: 1230, fuelUsed: 84.3, totalCost: 123.2),
-                    VehicleStatisticsUiModel(period: Period.LastMonth, distanceDriven: 2130, fuelUsed: 834.3, totalCost: 1233.2),
-                    VehicleStatisticsUiModel(period: Period.YTD, distanceDriven: 12350, fuelUsed: 184.3, totalCost: 523.2),
-                    VehicleStatisticsUiModel(period: Period.AllTime, distanceDriven: 1230, fuelUsed: 84.3, totalCost: 123.2),
-                ]
                 
-                VehicleStatisticsCarouselView(items: mock)
+                VehicleStatisticsCarouselView(items: vehicleViewModel.vehicleStatistics(context: context))
                 
-//                GenericCarousel(height: 248) {
-//                    CompactTripOverviewCard()
-//                    CompactTripOverviewCard()
-//                }
-        
                 // New Fuel usage history card
                 
                 // New Maintenance history card
-                
-                
-                
-//                GenericCarousel(height: 290) {
-//                    VehicleInfoCard(viewModel: vehicleViewModel)
-//                    
-//                    if let vehicle = vehicleViewModel.activeVehicle, vehicle.mileages.count > 1 {
-//                        MileageGraphView(
-//                            mileageHistory: vehicle.mileages,
-//                            isMetric: settingsViewModel.isUsingMetric
-//                        )
-//                    }
-//                }
                 
                 FuelUsageView(
                     viewModel: vehicleViewModel,
@@ -99,12 +73,12 @@ public struct ActiveVehicleContent: View {
                     isVehicleActive: vehicle.isPurchased ?? false
                 )
                 .padding(.horizontal)
-//                
-//                MaintenanceView(
-//                    showAddMaintenanceSheet: $showAddMaintenanceSheet,
-//                    isVehicleActive: vehicle.isPurchased ?? false
-//                )
-//                .padding(.horizontal)
+                
+                MaintenanceView(
+                    showAddMaintenanceSheet: $showAddMaintenanceSheet,
+                    isVehicleActive: vehicle.isPurchased ?? false
+                )
+                .padding(.horizontal)
             }
         }
         .id(vehicleViewModel.refreshID)
@@ -125,17 +99,26 @@ public struct ActiveVehicleContent: View {
                 }
             }
         }
-        .sheet(isPresented: $showAddFuelSheet, onDismiss: { vehicleViewModel.loadActiveVehicle(context: context) }) {
-            AddFuelUsageSheet(vehicleViewModel: vehicleViewModel, viewModel: addFuelUsageViewModel)
-                .presentationDetents([.medium])
-                .presentationDragIndicator(.visible)
+        .sheet(isPresented: $showAddFuelSheet, onDismiss: {
+            vehicleViewModel.loadActiveVehicle(context: context)
+        }) {
+            AddFuelUsageSheet(
+                vehicleViewModel: vehicleViewModel,
+                viewModel: addFuelUsageViewModel
+            )
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.visible)
         }
-        .sheet(isPresented: $showAddMaintenanceSheet, onDismiss: { vehicleViewModel.loadActiveVehicle(context: context) }) {
+        .sheet(isPresented: $showAddMaintenanceSheet, onDismiss: {
+            vehicleViewModel.loadActiveVehicle(context: context)
+        }) {
             AddMaintenanceSheet(viewModel: vehicleViewModel)
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
         }
-        .sheet(isPresented: $showEditVehicleSheet, onDismiss: { vehicleViewModel.loadActiveVehicle(context: context) }) {
+        .sheet(isPresented: $showEditVehicleSheet, onDismiss: {
+            vehicleViewModel.loadActiveVehicle(context: context)
+        }) {
             EditVehicleSheet(viewModel: vehicleViewModel)
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)

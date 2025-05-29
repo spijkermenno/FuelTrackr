@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Domain
 
 struct VehicleStatisticCardView: View {
     let uiModel: VehicleStatisticsUiModel
@@ -28,7 +29,7 @@ struct VehicleStatisticCardView: View {
         String(format: "€%.2f", uiModel.totalCost)
     }
     
-    private func title(for period: Period) -> String {
+    private func title(for period: VehicleStatisticsPeriod) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale.current
         dateFormatter.dateFormat = "LLLL yyyy" // e.g., "May 2024" or "mei 2024"
@@ -71,14 +72,15 @@ struct VehicleStatisticCardView: View {
         }
         .background(Color(.systemBackground))
         .cornerRadius(25)
-        .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 0)
+        .shadow(color: Color.black.opacity(0.1),radius: 6,x: 0,y: 0)
+
     }
 }
 
 #Preview {
     let mock = [
-        VehicleStatisticsUiModel(period: Period.CurrentMonth, distanceDriven: 1230, fuelUsed: 84.3, totalCost: 123.2),
-        VehicleStatisticsUiModel(period: Period.LastMonth, distanceDriven: 2130, fuelUsed: 834.3, totalCost: 1233.2)
+        VehicleStatisticsUiModel(period: VehicleStatisticsPeriod.CurrentMonth, distanceDriven: 1230, fuelUsed: 84.3, totalCost: 123.2),
+        VehicleStatisticsUiModel(period: VehicleStatisticsPeriod.LastMonth, distanceDriven: 2130, fuelUsed: 834.3, totalCost: 1233.2)
     ]
     
     VStack(spacing: 8) {

@@ -1,12 +1,3 @@
-//
-//  VehiclePurchaseBanner.swift
-//  FuelTrackr
-//
-//  Created by Menno Spijker on 27/04/2025.
-//
-
-
-//
 //  VehiclePurchaseBanner.swift
 //  FuelTrackr
 //
@@ -16,47 +7,49 @@
 import SwiftUI
 import Domain
 
-
 public struct VehiclePurchaseBanner: View {
     var isPurchased: Bool
     var purchaseDate: Date
     var onConfirmPurchase: () -> Void
 
-    private var shouldShowButtons: Bool {
-        Date() >= purchaseDate
-    }
+    private var shouldShowButtons: Bool { Date() >= purchaseDate }
 
     public var body: some View {
         if !isPurchased {
-            VStack(spacing: 12) {
-                if shouldShowButtons {
-                    Text(NSLocalizedString("vehicle_purchase_question", comment: ""))
-                        .font(.callout)
-                        .foregroundColor(.primary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
-
-                    Button(action: onConfirmPurchase) {
-                        Text(NSLocalizedString("vehicle_purchase_confirm", comment: ""))
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.orange.opacity(0.8))
-                            .foregroundColor(.white)
-                            .cornerRadius(8)
+            Card(
+                header: {
+                    HStack {
+                        Spacer()
+                        Text(NSLocalizedString("vehicle_purchase_question", comment: ""))
+                            .font(.system(size: 20, weight: .bold))
+                            .multilineTextAlignment(.center)
+                        Spacer()
                     }
-                    .padding(.horizontal)
-                } else {
-                    Text(NSLocalizedString("vehicle_not_purchased_banner", comment: ""))
-                        .font(.callout)
-                        .foregroundColor(Color.orange.opacity(0.7))
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
+                },
+                content: {
+                    VStack(spacing: 12) {
+                        if shouldShowButtons {
+                            Button(action: onConfirmPurchase) {
+                                Text(NSLocalizedString("vehicle_purchase_confirm", comment: ""))
+                                    .fontWeight(.medium)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Theme.colors.primary)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(8)
+                            }
+                            .padding(.horizontal)
+                        } else {
+                            Text(NSLocalizedString("vehicle_not_purchased_banner", comment: ""))
+                                .font(.callout)
+                                .multilineTextAlignment(.center)
+                                .foregroundStyle(Theme.colors.primary)
+                                .padding(.horizontal)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
                 }
-            }
-            .padding()
-            .frame(maxWidth: .infinity)
-            .background(Color.orange.opacity(0.15))
-            .cornerRadius(25)
+            )
         }
     }
 }

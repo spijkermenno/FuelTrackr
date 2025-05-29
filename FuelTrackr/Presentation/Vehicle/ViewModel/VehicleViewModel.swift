@@ -14,7 +14,7 @@ public final class VehicleViewModel: ObservableObject {
     @Published public var activeVehicle: Vehicle?
     @Published public var refreshID = UUID()
 
-    // MARK: - Dependencies (Use Cases)
+    // ───── Core vehicle use-cases
     private let loadActiveVehicleUseCase: LoadActiveVehicleUseCase
     private let saveVehicleUseCase: SaveVehicleUseCase
     private let updateVehicleUseCase: UpdateVehicleUseCase
@@ -33,10 +33,18 @@ public final class VehicleViewModel: ObservableObject {
     private let getAverageFuelUsageUseCase: GetAverageFuelUsageUseCase
     private let getUsingMetricUseCase: GetUsingMetricUseCase
 
-    public var hasActiveVehicle: Bool {
-        activeVehicle != nil
-    }
+    // ───── Statistics use-cases
+    private let getCurrentMonthStatsUseCase: GetCurrentMonthStatisticsUseCase
+    private let getLastMonthStatsUseCase:   GetLastMonthStatisticsUseCase
+    private let getYtdStatsUseCase:         GetYearToDateStatisticsUseCase
+    private let getAllTimeStatsUseCase:     GetAllTimeStatisticsUseCase
 
+    // ───── Purchase confirmation use-case
+    private let confirmVehiclePurchaseUseCase: ConfirmVehiclePurchaseUseCase
+    
+    public var hasActiveVehicle: Bool { activeVehicle != nil }
+
+    // ───── Init with DI-ready defaults
     public init(
         loadActiveVehicleUseCase: LoadActiveVehicleUseCase = LoadActiveVehicleUseCase(),
         saveVehicleUseCase: SaveVehicleUseCase = SaveVehicleUseCase(),
@@ -54,7 +62,12 @@ public final class VehicleViewModel: ObservableObject {
         getFuelCostUseCase: GetFuelCostUseCase = GetFuelCostUseCase(),
         getKmDrivenUseCase: GetKmDrivenUseCase = GetKmDrivenUseCase(),
         getAverageFuelUsageUseCase: GetAverageFuelUsageUseCase = GetAverageFuelUsageUseCase(),
-        getUsingMetricUseCase: GetUsingMetricUseCase = GetUsingMetricUseCase()
+        getUsingMetricUseCase: GetUsingMetricUseCase = GetUsingMetricUseCase(),
+        getCurrentMonthStatsUseCase: GetCurrentMonthStatisticsUseCase = GetCurrentMonthStatisticsUseCase(),
+        getLastMonthStatsUseCase: GetLastMonthStatisticsUseCase = GetLastMonthStatisticsUseCase(),
+        getYtdStatsUseCase: GetYearToDateStatisticsUseCase = GetYearToDateStatisticsUseCase(),
+        getAllTimeStatsUseCase: GetAllTimeStatisticsUseCase = GetAllTimeStatisticsUseCase(),
+        confirmVehiclePurchaseUseCase: ConfirmVehiclePurchaseUseCase = ConfirmVehiclePurchaseUseCase()
     ) {
         self.loadActiveVehicleUseCase = loadActiveVehicleUseCase
         self.saveVehicleUseCase = saveVehicleUseCase
@@ -73,14 +86,59 @@ public final class VehicleViewModel: ObservableObject {
         self.getKmDrivenUseCase = getKmDrivenUseCase
         self.getAverageFuelUsageUseCase = getAverageFuelUsageUseCase
         self.getUsingMetricUseCase = getUsingMetricUseCase
+
+        self.getCurrentMonthStatsUseCase = getCurrentMonthStatsUseCase
+        self.getLastMonthStatsUseCase = getLastMonthStatsUseCase
+        self.getYtdStatsUseCase = getYtdStatsUseCase
+        self.getAllTimeStatsUseCase = getAllTimeStatsUseCase
+        
+        self.confirmVehiclePurchaseUseCase = confirmVehiclePurchaseUseCase
     }
 
-    // MARK: - Vehicle Operations
+    // ───── Public helpers
+    public var isUsingMetric: Bool { getUsingMetricUseCase() }
 
-    public var isUsingMetric: Bool {
-        getUsingMetricUseCase()
+    // ───── Confirm purchase
+       public func confirmPurchase(context: ModelContext) {
+           do {
+               try confirmVehiclePurchaseUseCase(context: context)
+               activeVehicle?.isPurchased = true
+               refreshID = UUID()
+           } catch {
+               print("Error confirming purchase: \(error.localizedDescription)")
+           }
+       }
+    
+    public func updateVehiclePurchaseStatus(
+        isPurchased: Bool,
+        context: ModelContext
+    ) {
+        do {
+            try updateVehiclePurchaseStatusUseCase(
+                isPurchased: isPurchased,
+                context: context
+            )
+            refreshID = UUID()
+        } catch {
+            print("Error updating purchase status: \(error.localizedDescription)")
+        }
+    }
+    
+    public func vehicleStatistics(context: ModelContext) -> [VehicleStatisticsUiModel] {
+        do {
+            return [
+                try getCurrentMonthStatsUseCase(context: context),
+                try getLastMonthStatsUseCase(context: context),
+                try getYtdStatsUseCase(context: context),
+                try getAllTimeStatsUseCase(context: context)
+            ]
+        } catch {
+            print("Error generating statistics: \(error.localizedDescription)")
+            return []
+        }
     }
 
+    // ───── Vehicle CRUD
     public func loadActiveVehicle(context: ModelContext) {
         do {
             activeVehicle = try loadActiveVehicleUseCase(context: context)
@@ -90,9 +148,17 @@ public final class VehicleViewModel: ObservableObject {
         }
     }
 
-    public func saveVehicle(vehicle: Vehicle, initialMileage: Int, context: ModelContext) {
+    public func saveVehicle(
+        vehicle: Vehicle,
+        initialMileage: Int,
+        context: ModelContext
+    ) {
         do {
-            try saveVehicleUseCase(vehicle: vehicle, initialMileage: initialMileage, context: context)
+            try saveVehicleUseCase(
+                vehicle: vehicle,
+                initialMileage: initialMileage,
+                context: context
+            )
             activeVehicle = vehicle
             refreshID = UUID()
         } catch {
@@ -100,7 +166,14 @@ public final class VehicleViewModel: ObservableObject {
         }
     }
 
-    public func updateVehicle(name: String, licensePlate: String, purchaseDate: Date, manufacturingDate: Date, photo: Data?, context: ModelContext) {
+    public func updateVehicle(
+        name: String,
+        licensePlate: String,
+        purchaseDate: Date,
+        manufacturingDate: Date,
+        photo: Data?,
+        context: ModelContext
+    ) {
         guard let vehicle = activeVehicle else { return }
 
         vehicle.name = name
@@ -113,22 +186,25 @@ public final class VehicleViewModel: ObservableObject {
             try updateVehicleUseCase(vehicle: vehicle, context: context)
             refreshID = UUID()
 
-            let calendar = Calendar.current
-            let today = calendar.startOfDay(for: Date())
-            let purchaseDay = calendar.startOfDay(for: purchaseDate)
+            let cal = Calendar.current
+            let today = cal.startOfDay(for: Date())
+            let purchaseDay = cal.startOfDay(for: purchaseDate)
 
-            if purchaseDay > today {
-                let _ = calendar.dateComponents([.day], from: today, to: purchaseDay).day ?? 0
-                // Schedule notification logic (optional)
-            } else {
-                try updateVehiclePurchaseStatusUseCase(isPurchased: true, context: context)
+            if purchaseDay <= today {
+                try updateVehiclePurchaseStatusUseCase(
+                    isPurchased: true,
+                    context: context
+                )
             }
         } catch {
             print("Error updating vehicle: \(error.localizedDescription)")
         }
     }
 
-    public func updateVehicle(vehicle: Vehicle, context: ModelContext) {
+    public func updateVehicle(
+        vehicle: Vehicle,
+        context: ModelContext
+    ) {
         do {
             try updateVehicleUseCase(vehicle: vehicle, context: context)
             refreshID = UUID()
@@ -147,15 +223,6 @@ public final class VehicleViewModel: ObservableObject {
         }
     }
 
-    public func updateVehiclePurchaseStatus(isPurchased: Bool, context: ModelContext) {
-        do {
-            try updateVehiclePurchaseStatusUseCase(isPurchased: isPurchased, context: context)
-            refreshID = UUID()
-        } catch {
-            print("Error updating purchase status: \(error.localizedDescription)")
-        }
-    }
-
     public func migrateVehicles(context: ModelContext) {
         do {
             try migrateVehiclesUseCase(context: context)
@@ -164,20 +231,35 @@ public final class VehicleViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Fuel Usage
-
-    public func saveFuelUsage(liters: Double, cost: Double, mileageValue: Int, context: ModelContext) {
+    // ───── Fuel
+    public func saveFuelUsage(
+        liters: Double,
+        cost: Double,
+        mileageValue: Int,
+        context: ModelContext
+    ) {
         do {
-            try saveFuelUsageUseCase(liters: liters, cost: cost, mileageValue: mileageValue, context: context)
+            try saveFuelUsageUseCase(
+                liters: liters,
+                cost: cost,
+                mileageValue: mileageValue,
+                context: context
+            )
             refreshID = UUID()
         } catch {
             print("Error saving fuel usage: \(error.localizedDescription)")
         }
     }
 
-    public func deleteFuelUsage(fuelUsage: FuelUsage, context: ModelContext) {
+    public func deleteFuelUsage(
+        fuelUsage: FuelUsage,
+        context: ModelContext
+    ) {
         do {
-            try deleteFuelUsageUseCase(fuelUsage: fuelUsage, context: context)
+            try deleteFuelUsageUseCase(
+                fuelUsage: fuelUsage,
+                context: context
+            )
             refreshID = UUID()
         } catch {
             print("Error deleting fuel usage: \(error.localizedDescription)")
@@ -193,20 +275,31 @@ public final class VehicleViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Maintenance
-
-    public func saveMaintenance(maintenance: Maintenance, context: ModelContext) {
+    // ───── Maintenance
+    public func saveMaintenance(
+        maintenance: Maintenance,
+        context: ModelContext
+    ) {
         do {
-            try saveMaintenanceUseCase(maintenance: maintenance, context: context)
+            try saveMaintenanceUseCase(
+                maintenance: maintenance,
+                context: context
+            )
             refreshID = UUID()
         } catch {
             print("Error saving maintenance: \(error.localizedDescription)")
         }
     }
 
-    public func deleteMaintenance(maintenance: Maintenance, context: ModelContext) {
+    public func deleteMaintenance(
+        maintenance: Maintenance,
+        context: ModelContext
+    ) {
         do {
-            try deleteMaintenanceUseCase(maintenance: maintenance, context: context)
+            try deleteMaintenanceUseCase(
+                maintenance: maintenance,
+                context: context
+            )
             refreshID = UUID()
         } catch {
             print("Error deleting maintenance: \(error.localizedDescription)")
@@ -222,21 +315,36 @@ public final class VehicleViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Monthly Recap
-
-    public func fuelUsed(forMonth month: Int, year: Int? = nil, context: ModelContext) -> Double {
+    // ───── Monthly helpers
+    public func fuelUsed(
+        forMonth month: Int,
+        year: Int? = nil,
+        context: ModelContext
+    ) -> Double {
         getFuelUsedUseCase(forMonth: month, year: year, context: context)
     }
 
-    public func fuelCost(forMonth month: Int, year: Int? = nil, context: ModelContext) -> Double {
+    public func fuelCost(
+        forMonth month: Int,
+        year: Int? = nil,
+        context: ModelContext
+    ) -> Double {
         getFuelCostUseCase(forMonth: month, year: year, context: context)
     }
 
-    public func kmDriven(forMonth month: Int, year: Int? = nil, context: ModelContext) -> Int {
+    public func kmDriven(
+        forMonth month: Int,
+        year: Int? = nil,
+        context: ModelContext
+    ) -> Int {
         getKmDrivenUseCase(forMonth: month, year: year, context: context)
     }
 
-    public func averageFuelUsage(forMonth month: Int, year: Int? = nil, context: ModelContext) -> Double {
+    public func averageFuelUsage(
+        forMonth month: Int,
+        year: Int? = nil,
+        context: ModelContext
+    ) -> Double {
         getAverageFuelUsageUseCase(forMonth: month, year: year, context: context)
     }
 }
