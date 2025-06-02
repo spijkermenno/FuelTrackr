@@ -116,3 +116,12 @@ struct CircleIconView: View {
         }
     }
 }
+
+#Preview {
+    NewVehicleInfoCard(
+        licensePlate: "12345",
+        mileage: 1,
+        purchaseDate: Date(),
+        productionDate: Date()
+    )
+}

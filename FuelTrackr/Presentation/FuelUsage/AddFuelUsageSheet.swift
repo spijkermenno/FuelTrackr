@@ -34,7 +34,7 @@ struct AddFuelUsageSheet: View {
                 .padding(.bottom, keyboardHeight)
                 .animation(.easeOut(duration: 0.3), value: keyboardHeight)
             }
-            .background(Theme.colors.background)
+            //.background(Theme.colors.background)
             .edgesIgnoringSafeArea(.bottom)
             .onTapGesture { hideKeyboard() }
             .onAppear { startKeyboardObserver() }

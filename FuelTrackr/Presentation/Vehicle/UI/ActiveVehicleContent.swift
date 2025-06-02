@@ -67,14 +67,18 @@ public struct ActiveVehicleContent: View {
                 
                 // New Maintenance history card
                 
-                FuelUsageView(
-                    viewModel: vehicleViewModel,
-                    showAddFuelSheet: $showAddFuelSheet,
-                    isVehicleActive: vehicle.isPurchased ?? false
+                FuelUsagePreviewCard(
+                    items: vehicle.latestFuelUsagePreviews(),
+                    onAdd: { showAddFuelSheet = true },
+                    onShowMore: {
+                        /* navigate to full history if desired */
+                    }
                 )
+                .environmentObject(settingsViewModel)
                 .padding(.horizontal)
                 
                 MaintenanceView(
+                    viewModel: vehicleViewModel,
                     showAddMaintenanceSheet: $showAddMaintenanceSheet,
                     isVehicleActive: vehicle.isPurchased ?? false
                 )
