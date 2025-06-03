@@ -141,8 +141,14 @@ public final class VehicleViewModel: ObservableObject {
     // ───── Vehicle CRUD
     public func loadActiveVehicle(context: ModelContext) {
         do {
-            activeVehicle = try loadActiveVehicleUseCase(context: context)
-            refreshID = UUID()
+            let fetched = try loadActiveVehicleUseCase(context: context)
+
+            // Update only if it’s logically different
+            if fetched != activeVehicle {
+                activeVehicle = fetched
+                refreshID = UUID()   // trigger UI refresh
+            }
+            
         } catch {
             print("Error loading active vehicle: \(error.localizedDescription)")
         }
