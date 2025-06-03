@@ -60,7 +60,7 @@
 "fuel_usage_list_title" = "Brandstof details";
 
 /* Onderhoud */
-"maintenance_title" = "Onderhoudsgeschiedenis";
+"maintenance_title" = "Onderhoud Geschiedenis";
 "maintenance_no_content" = "Geen onderhoudsgegevens beschikbaar. Voeg een record toe met de '+'-knop.";
 "maintenance_details" = "Onderhoudsgegevens";
 "maintenance_type" = "Type onderhoud";

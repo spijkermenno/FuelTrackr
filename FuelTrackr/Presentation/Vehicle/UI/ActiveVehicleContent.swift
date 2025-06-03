@@ -75,10 +75,11 @@ public struct ActiveVehicleContent: View {
                 .environmentObject(settingsViewModel)
                 .padding(.horizontal)
                 
-                MaintenanceView(
-                    viewModel: vehicleViewModel,
-                    showAddMaintenanceSheet: $showAddMaintenanceSheet,
-                    isVehicleActive: vehicle.isPurchased ?? false
+                MaintenancePreviewCard(
+                    items: vehicle.latestMaintenancePreviews(),
+                    isVehicleActive: vehicle.isPurchased ?? false,
+                    onAdd: { showAddMaintenanceSheet = true },
+                    onShowMore: { print("TODO(Not yet implemented)") }
                 )
                 .padding(.horizontal)
             }

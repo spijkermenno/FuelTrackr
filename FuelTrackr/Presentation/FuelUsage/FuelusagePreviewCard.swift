@@ -45,7 +45,7 @@ public struct FuelUsagePreviewCard: View {
                     Text(NSLocalizedString("fuel_usage_title", comment: ""))
                         .font(.system(size: 20, weight: .bold))
                     Spacer()
-                    Button(NSLocalizedString("add_fuel_usage_title", comment: "")) {
+                    Button(NSLocalizedString("add", comment: "")) {
                         onAdd()
                     }
                     .padding(.horizontal, 16)
@@ -62,13 +62,15 @@ public struct FuelUsagePreviewCard: View {
                     ForEach(items) { item in
                         FuelUsagePreviewRow(model: item)
                     }
+                    // TODO
                     
-                    Button(NSLocalizedString("fuel_usage_list_title", comment: "")) {
-                        onShowMore()
-                    }
-                    .font(.footnote)
-                    .foregroundColor(Theme.colors.primary)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
+//                    Button(NSLocalizedString("fuel_usage_list_title", comment: "")) {
+//                        onShowMore()
+//                    }
+//                    .padding(.top, 4)
+//                    .font(.footnote)
+//                    .foregroundColor(Theme.colors.primary)
+//                    .frame(maxWidth: .infinity, alignment: .trailing)
                 }
                 .padding(.horizontal)
             }
