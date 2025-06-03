@@ -35,9 +35,10 @@ public final class VehicleViewModel: ObservableObject {
 
     // ───── Statistics use-cases
     private let getCurrentMonthStatsUseCase: GetCurrentMonthStatisticsUseCase
-    private let getLastMonthStatsUseCase:   GetLastMonthStatisticsUseCase
-    private let getYtdStatsUseCase:         GetYearToDateStatisticsUseCase
-    private let getAllTimeStatsUseCase:     GetAllTimeStatisticsUseCase
+    private let getLastMonthStatsUseCase: GetLastMonthStatisticsUseCase
+    private let getYtdStatsUseCase: GetYearToDateStatisticsUseCase
+    private let getAllTimeStatsUseCase: GetAllTimeStatisticsUseCase
+    private let getProjectedYearStatsUseCase: GetProjectedYearStatsUseCase
 
     // ───── Purchase confirmation use-case
     private let confirmVehiclePurchaseUseCase: ConfirmVehiclePurchaseUseCase
@@ -67,7 +68,8 @@ public final class VehicleViewModel: ObservableObject {
         getLastMonthStatsUseCase: GetLastMonthStatisticsUseCase = GetLastMonthStatisticsUseCase(),
         getYtdStatsUseCase: GetYearToDateStatisticsUseCase = GetYearToDateStatisticsUseCase(),
         getAllTimeStatsUseCase: GetAllTimeStatisticsUseCase = GetAllTimeStatisticsUseCase(),
-        confirmVehiclePurchaseUseCase: ConfirmVehiclePurchaseUseCase = ConfirmVehiclePurchaseUseCase()
+        confirmVehiclePurchaseUseCase: ConfirmVehiclePurchaseUseCase = ConfirmVehiclePurchaseUseCase(),
+        getProjectedYearStatsUseCase: GetProjectedYearStatsUseCase = GetProjectedYearStatsUseCase()
     ) {
         self.loadActiveVehicleUseCase = loadActiveVehicleUseCase
         self.saveVehicleUseCase = saveVehicleUseCase
@@ -91,6 +93,7 @@ public final class VehicleViewModel: ObservableObject {
         self.getLastMonthStatsUseCase = getLastMonthStatsUseCase
         self.getYtdStatsUseCase = getYtdStatsUseCase
         self.getAllTimeStatsUseCase = getAllTimeStatsUseCase
+        self.getProjectedYearStatsUseCase = getProjectedYearStatsUseCase
         
         self.confirmVehiclePurchaseUseCase = confirmVehiclePurchaseUseCase
     }
@@ -130,7 +133,8 @@ public final class VehicleViewModel: ObservableObject {
                 try getCurrentMonthStatsUseCase(context: context),
                 try getLastMonthStatsUseCase(context: context),
                 try getYtdStatsUseCase(context: context),
-                try getAllTimeStatsUseCase(context: context)
+                try getAllTimeStatsUseCase(context: context),
+                try getProjectedYearStatsUseCase(context: context)
             ]
         } catch {
             print("Error generating statistics: \(error.localizedDescription)")
@@ -146,6 +150,7 @@ public final class VehicleViewModel: ObservableObject {
             // Update only if it’s logically different
             if fetched != activeVehicle {
                 activeVehicle = fetched
+                fetched?.print()
                 refreshID = UUID()   // trigger UI refresh
             }
             

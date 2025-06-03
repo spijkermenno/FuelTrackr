@@ -12,26 +12,25 @@ import Domain
 
 public class VehicleRepository: VehicleRepositoryProtocol {
     public init() {}
-
+    
     // MARK: - Vehicle
-
+    
     public func loadActiveVehicle(context: ModelContext) throws -> Vehicle? {
         let vehicle = try context.fetch(FetchDescriptor<Vehicle>()).first
-        printVehicle(vehicle)
         return vehicle
     }
-
+    
     public func refreshActiveVehicle(context: ModelContext) throws -> Vehicle? {
         try loadActiveVehicle(context: context)
     }
-
+    
     public func saveVehicle(
         vehicle: Vehicle,
         initialMileage: Int,
         context: ModelContext
     ) throws {
         context.insert(vehicle)
-
+        
         if initialMileage > 0 {
             let mileage = Mileage(
                 value: initialMileage,
@@ -41,21 +40,21 @@ public class VehicleRepository: VehicleRepositoryProtocol {
             context.insert(mileage)
             vehicle.mileages.append(mileage)
         }
-
+        
         try context.save()
     }
-
+    
     public func updateVehicle(vehicle: Vehicle, context: ModelContext) throws {
         try context.save()
     }
-
+    
     public func deleteVehicle(context: ModelContext) throws {
         for vehicle in try context.fetch(FetchDescriptor<Vehicle>()) {
             context.delete(vehicle)
         }
         try context.save()
     }
-
+    
     public func updateVehiclePurchaseStatus(
         isPurchased: Bool,
         context: ModelContext
@@ -64,7 +63,7 @@ public class VehicleRepository: VehicleRepositoryProtocol {
         vehicle.isPurchased = isPurchased
         try context.save()
     }
-
+    
     public func migrateVehicles(context: ModelContext) throws {
         for vehicle in try context.fetch(FetchDescriptor<Vehicle>()) {
             if vehicle.isPurchased == nil {
@@ -73,9 +72,9 @@ public class VehicleRepository: VehicleRepositoryProtocol {
         }
         try context.save()
     }
-
+    
     // MARK: - Fuel Usage
-
+    
     public func saveFuelUsage(
         liters: Double,
         cost: Double,
@@ -83,13 +82,13 @@ public class VehicleRepository: VehicleRepositoryProtocol {
         context: ModelContext
     ) throws {
         guard let vehicle = try loadActiveVehicle(context: context) else { return }
-
+        
         let mileage = getOrCreateMileage(
             vehicle: vehicle,
             mileageValue: mileageValue,
             context: context
         )
-
+        
         let fuelUsage = FuelUsage(
             liters: liters,
             cost: cost,
@@ -98,10 +97,10 @@ public class VehicleRepository: VehicleRepositoryProtocol {
             vehicle: vehicle
         )
         vehicle.fuelUsages.append(fuelUsage)
-
+        
         try context.save()
     }
-
+    
     public func deleteFuelUsage(
         fuelUsage: FuelUsage,
         context: ModelContext
@@ -109,13 +108,13 @@ public class VehicleRepository: VehicleRepositoryProtocol {
         context.delete(fuelUsage)
         try context.save()
     }
-
+    
     public func resetFuelUsage(context: ModelContext) throws {
         guard let vehicle = try loadActiveVehicle(context: context) else { return }
         vehicle.fuelUsages.removeAll()
         try context.save()
     }
-
+    
     public func getFuelUsed(
         forMonth month: Int,
         year: Int?,
@@ -125,12 +124,12 @@ public class VehicleRepository: VehicleRepositoryProtocol {
             let vehicle = try? loadActiveVehicle(context: context),
             let range = dateRange(forMonth: month, year: year)
         else { return 0 }
-
+        
         return vehicle.fuelUsages
             .filter { $0.date >= range.start && $0.date <= range.end }
             .reduce(0) { $0 + $1.liters }
     }
-
+    
     public func getFuelCost(
         forMonth month: Int,
         year: Int?,
@@ -140,12 +139,12 @@ public class VehicleRepository: VehicleRepositoryProtocol {
             let vehicle = try? loadActiveVehicle(context: context),
             let range = dateRange(forMonth: month, year: year)
         else { return 0 }
-
+        
         return vehicle.fuelUsages
             .filter { $0.date >= range.start && $0.date <= range.end }
             .reduce(0) { $0 + $1.cost }
     }
-
+    
     public func getKmDriven(
         forMonth month: Int,
         year: Int?,
@@ -155,15 +154,15 @@ public class VehicleRepository: VehicleRepositoryProtocol {
             let vehicle = try? loadActiveVehicle(context: context),
             let range = dateRange(forMonth: month, year: year)
         else { return 0 }
-
+        
         let mileages = vehicle.mileages
             .filter { $0.date >= range.start && $0.date <= range.end }
             .sorted { $0.date < $1.date }
-
+        
         guard let first = mileages.first, let last = mileages.last else { return 0 }
         return last.value - first.value
     }
-
+    
     public func getAverageFuelUsage(
         forMonth month: Int,
         year: Int?,
@@ -174,9 +173,9 @@ public class VehicleRepository: VehicleRepositoryProtocol {
         guard liters > 0 else { return 0 }
         return km / liters
     }
-
+    
     // MARK: - Maintenance
-
+    
     public func saveMaintenance(
         maintenance: Maintenance,
         context: ModelContext
@@ -185,7 +184,7 @@ public class VehicleRepository: VehicleRepositoryProtocol {
         vehicle.maintenances.append(maintenance)
         try context.save()
     }
-
+    
     public func deleteMaintenance(
         maintenance: Maintenance,
         context: ModelContext
@@ -193,15 +192,15 @@ public class VehicleRepository: VehicleRepositoryProtocol {
         context.delete(maintenance)
         try context.save()
     }
-
+    
     public func resetMaintenance(context: ModelContext) throws {
         guard let vehicle = try loadActiveVehicle(context: context) else { return }
         vehicle.maintenances.removeAll()
         try context.save()
     }
-
+    
     // MARK: - Helpers
-
+    
     private func getOrCreateMileage(
         vehicle: Vehicle,
         mileageValue: Int,
@@ -215,46 +214,44 @@ public class VehicleRepository: VehicleRepositoryProtocol {
         vehicle.mileages.append(mileage)
         return mileage
     }
-
+    
     private func dateRange(forMonth month: Int, year: Int?) -> (start: Date, end: Date)? {
         let calendar = Calendar.current
         let currentYear = year ?? calendar.component(.year, from: .now)
         guard let start = calendar.date(from: DateComponents(year: currentYear, month: month, day: 1))
         else { return nil }
-
+        
         var comps = DateComponents()
         comps.month = 1
         comps.second = -1
         guard let end = calendar.date(byAdding: comps, to: start)
         else { return nil }
-
+        
         return (start: start, end: end)
     }
-
+    
     // MARK: - Debug
+    
+}
 
-    private func printVehicle(_ vehicle: Vehicle?) {
-        guard let v = vehicle else {
-            print("No active vehicle found.")
-            return
-        }
-
-        let mileages     = v.mileages.map { "\($0.value)" }
-        let fuelUsages   = v.fuelUsages
+extension Vehicle {
+ public func print() {
+        let mileages     = self.mileages.map { "\($0.value)" }
+        let fuelUsages   = self.fuelUsages
             .map { "Liters: \($0.liters), Cost: \($0.cost), Date: \($0.date)" }
-        let maintenances = v.maintenances
+        let maintenances = self.maintenances
             .map { "\($0.type.rawValue), Cost: \($0.cost), Date: \($0.date)" }
 
-        print("--- Active Vehicle Info ---")
-        print("Name: \(v.name)")
-        print("License Plate: \(v.licensePlate)")
-        print("Purchase Date: \(v.purchaseDate)")
-        print("Manufacturing Date: \(v.manufacturingDate)")
-        print("Is Purchased: \(v.isPurchased.map(String.init) ?? "nil")")
-        print("Photo size: \(v.photo?.count ?? 0) bytes")
-        print("Mileages: \(mileages)")
-        print("Fuel Usages: \(fuelUsages)")
-        print("Maintenances: \(maintenances)")
-        print("--------------------------")
+     Swift.print("--- Active Vehicle Info ---")
+     Swift.print("Name: \(self.name)")
+     Swift.print("License Plate: \(self.licensePlate)")
+     Swift.print("Purchase Date: \(self.purchaseDate)")
+     Swift.print("Manufacturing Date: \(self.manufacturingDate)")
+     Swift.print("Is Purchased: \(self.isPurchased.map(String.init) ?? "nil")")
+     Swift.print("Photo size: \(self.photo?.count ?? 0) bytes")
+     Swift.print("Mileages: \(mileages)")
+     Swift.print("Fuel Usages: \(fuelUsages)")
+     Swift.print("Maintenances: \(maintenances)")
+     Swift.print("--------------------------")
     }
 }

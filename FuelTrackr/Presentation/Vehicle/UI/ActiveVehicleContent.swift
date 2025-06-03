@@ -62,9 +62,7 @@ public struct ActiveVehicleContent: View {
                 .padding(.horizontal)
                 
                 VehicleStatisticsCarouselView(items: vehicleViewModel.vehicleStatistics(context: context))
-                
-                // New Fuel usage history card
-                
+                                
                 // New Maintenance history card
                 
                 FuelUsagePreviewCard(

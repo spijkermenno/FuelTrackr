@@ -48,6 +48,9 @@ struct VehicleStatisticCardView: View {
             
         case .AllTime:
             return NSLocalizedString("all_time", comment: "Label for All-Time period")
+            
+        case .ProjectedYear:                            
+            return NSLocalizedString("projected_year", comment: "Label for Projected-Year period")
         }
     }
     
@@ -73,7 +76,7 @@ struct VehicleStatisticCardView: View {
         .background(Color(.systemBackground))
         .cornerRadius(25)
         .shadow(color: Color.black.opacity(0.1),radius: 6,x: 0,y: 0)
-
+        
     }
 }
 
@@ -98,7 +101,7 @@ private struct StatBlock: View {
     public let icon: String
     public let value: String
     public let unit: String
-
+    
     public var body: some View {
         VStack(spacing: 8) {
             Image(systemName: icon)
@@ -107,11 +110,11 @@ private struct StatBlock: View {
                 .padding(10)
                 .background(color)
                 .clipShape(Circle())
-
+            
             Text(value)
                 .font(.headline)
                 .multilineTextAlignment(.center)
-
+            
             Text(unit)
                 .font(.caption)
                 .foregroundColor(.secondary)
