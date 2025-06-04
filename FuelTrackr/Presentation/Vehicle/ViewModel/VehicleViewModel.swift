@@ -149,11 +149,7 @@ public final class VehicleViewModel: ObservableObject {
 
             if fetched != activeVehicle {
                 activeVehicle = fetched
-                if let vehicle = fetched,
-                   let json = try? VehicleJSONExporter().export(vehicle) {
-                    ClipboardHelper.copy(json)          // ⬅️ copies JSON to clipboard
-                }
-                refreshID = UUID()                     // trigger UI refresh
+                refreshID = UUID()
             }
         } catch {
             Swift.print("Error loading active vehicle: \(error.localizedDescription)")
