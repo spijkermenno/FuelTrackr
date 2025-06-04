@@ -20,7 +20,7 @@ public struct Dimensions: Sendable {
     public let spacingSection: CGFloat = 32 // Section padding
 
     // MARK: - Corner Radius
-    public let radiusCard: CGFloat = 20
+    public let radiusCard: CGFloat = 25
     public let radiusButton: CGFloat = 12
 
     // MARK: - Circles (Icons/Avatars)

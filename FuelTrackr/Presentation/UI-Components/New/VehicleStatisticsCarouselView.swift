@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Domain
 
 struct CustomPagingBehavior: ScrollTargetBehavior {
     let pageWidth: CGFloat
@@ -57,6 +58,7 @@ struct VehicleStatisticsCarouselView: View {
                                 VehicleStatisticCardView(uiModel: item)
                                     .frame(width: cardWidth)
                                     .padding(.horizontal, spacing / 2)
+                                    .padding(.vertical, 5)
                                     .scaleEffect(scale)
                                     .opacity(opacity)
                                     .id(index)
@@ -70,11 +72,12 @@ struct VehicleStatisticsCarouselView: View {
                 .scrollTargetBehavior(CustomPagingBehavior(pageWidth: pageWidth))
                 .animation(.interactiveSpring(response: 0.20, dampingFraction: 0.85, blendDuration: 0), value: currentIndex)
                 .scrollPosition(id: $currentIndex)
-                .frame(height: 203)
+                .frame(height: 213)
 
                 PageControl(numberOfPages: items.count, currentPage: currentIndex ?? 0)
             }
         }
+        .frame(height: 203 + PageControl.Height)
     }
 
     private func scaleValue(container: GeometryProxy, item: GeometryProxy) -> CGFloat {
@@ -95,6 +98,8 @@ struct VehicleStatisticsCarouselView: View {
 }
 
 struct PageControl: View {
+    public static let Height: CGFloat = 26
+    
     let numberOfPages: Int
     let currentPage: Int
     
@@ -108,32 +113,19 @@ struct PageControl: View {
         }
         .padding(.top, 2)
         .padding(.bottom)
+        .frame(height: PageControl.Height)
     }
 }
 
 #Preview {
+    let mock = [
+        VehicleStatisticsUiModel(period: VehicleStatisticsPeriod.CurrentMonth, distanceDriven: 1230, fuelUsed: 84.3, totalCost: 123.2),
+        VehicleStatisticsUiModel(period: VehicleStatisticsPeriod.LastMonth, distanceDriven: 2130, fuelUsed: 834.3, totalCost: 1233.2),
+        VehicleStatisticsUiModel(period: VehicleStatisticsPeriod.YTD, distanceDriven: 12350, fuelUsed: 184.3, totalCost: 523.2),
+        VehicleStatisticsUiModel(period: VehicleStatisticsPeriod.AllTime, distanceDriven: 1230, fuelUsed: 84.3, totalCost: 123.2),
+    ]
+
+    
     VehicleStatisticsCarouselView(items: mock)
         .background(Color.gray.opacity(0.1))
 }
-
-struct VehicleStatisticsUiModel: Identifiable {
-    var id: UUID = UUID()
-    var period: Period
-    var distanceDriven: Double
-    var fuelUsed: Double
-    var totalCost: Double
-}
-
-enum Period {
-    case CurrentMonth
-    case LastMonth
-    case YTD
-    case AllTime
-}
-
-private let mock = [
-    VehicleStatisticsUiModel(period: Period.CurrentMonth, distanceDriven: 1230, fuelUsed: 84.3, totalCost: 123.2),
-    VehicleStatisticsUiModel(period: Period.LastMonth, distanceDriven: 2130, fuelUsed: 834.3, totalCost: 1233.2),
-    VehicleStatisticsUiModel(period: Period.YTD, distanceDriven: 12350, fuelUsed: 184.3, totalCost: 523.2),
-    VehicleStatisticsUiModel(period: Period.AllTime, distanceDriven: 1230, fuelUsed: 84.3, totalCost: 123.2),
-]
