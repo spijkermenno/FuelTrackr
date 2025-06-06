@@ -10,9 +10,18 @@ import Foundation
 
 @Model
 public class Mileage: Hashable {
-    @Attribute public var value: Int
-    @Attribute public var date: Date
-    @Relationship(deleteRule: .cascade, inverse: \Vehicle.mileages) public var vehicle: Vehicle?
+    @Attribute public var value: Int? = nil
+    @Attribute public var date: Date? = nil
+
+    // Relationship back to Vehicle (to-one): plain property without @Relationship
+    public var vehicle: Vehicle? = nil
+
+    // Inverse relationships (to-many) only on this side
+    @Relationship(deleteRule: .nullify, inverse: \FuelUsage.mileage)
+    public var fuelUsages: [FuelUsage]? = nil
+
+    @Relationship(deleteRule: .nullify, inverse: \Maintenance.mileage)
+    public var maintenances: [Maintenance]? = nil
 
     public init(value: Int, date: Date, vehicle: Vehicle? = nil) {
         self.value = value

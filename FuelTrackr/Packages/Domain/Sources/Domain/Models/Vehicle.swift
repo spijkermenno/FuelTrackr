@@ -11,17 +11,23 @@ import Foundation
 @Model
 public class Vehicle: Hashable {
     // MARK: - Properties
-    @Attribute public var name: String
-    @Attribute public var licensePlate: String
-    @Attribute public var purchaseDate: Date
-    @Attribute public var manufacturingDate: Date
-    @Attribute public var photo: Data?
+    @Attribute public var name: String? = nil
+    @Attribute public var licensePlate: String? = nil
+    @Attribute public var purchaseDate: Date? = nil
+    @Attribute public var manufacturingDate: Date? = nil
+    @Attribute public var photo: Data? = nil
     @Attribute public var isPurchased: Bool? = nil
 
     // MARK: - Relationships
-    @Relationship(deleteRule: .cascade) public var fuelUsages: [FuelUsage] = []
-    @Relationship(deleteRule: .cascade) public var maintenances: [Maintenance] = []
-    @Relationship(deleteRule: .cascade) public var mileages: [Mileage] = []
+    // Keep @Relationship only on the to-many side.
+    @Relationship(deleteRule: .cascade, inverse: \FuelUsage.vehicle)
+    public var fuelUsages: [FuelUsage]? = nil
+
+    @Relationship(deleteRule: .cascade, inverse: \Maintenance.vehicle)
+    public var maintenances: [Maintenance]? = nil
+
+    @Relationship(deleteRule: .cascade, inverse: \Mileage.vehicle)
+    public var mileages: [Mileage]? = nil
 
     // MARK: - Initializer
     public init(
@@ -42,7 +48,11 @@ public class Vehicle: Hashable {
 
     // MARK: - Computed Properties
     public var latestMileage: Mileage? {
-        mileages.sorted { $0.date > $1.date }.first
+        // Default to empty array if nil
+        let allMileages = mileages ?? []
+        return allMileages
+            .sorted { ($0.date ?? .distantPast) > ($1.date ?? .distantPast) }
+            .first
     }
 
     // MARK: - Hashable

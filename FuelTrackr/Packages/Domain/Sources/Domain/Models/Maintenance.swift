@@ -10,14 +10,15 @@ import Foundation
 
 @Model
 public class Maintenance: Hashable {
-    @Attribute public var type: MaintenanceType
-    @Attribute public var cost: Double
-    @Attribute public var isFree: Bool
-    @Attribute public var date: Date
-    @Attribute public var notes: String?
-    
-    @Relationship(deleteRule: .nullify) public var mileage: Mileage?
-    @Relationship(deleteRule: .cascade, inverse: \Vehicle.maintenances) public var vehicle: Vehicle?
+    @Attribute public var type: MaintenanceType? = nil
+    @Attribute public var cost: Double? = nil
+    @Attribute public var isFree: Bool? = nil
+    @Attribute public var date: Date? = nil
+    @Attribute public var notes: String? = nil
+
+    // To-one relationships: plain properties without @Relationship
+    public var mileage: Mileage? = nil
+    public var vehicle: Vehicle? = nil
 
     public init(
         type: MaintenanceType,

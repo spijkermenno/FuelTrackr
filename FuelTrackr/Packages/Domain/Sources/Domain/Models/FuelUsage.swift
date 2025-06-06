@@ -11,16 +11,21 @@ import Foundation
 @Model
 public class FuelUsage: Hashable {
     // MARK: - Properties
-    @Attribute public var liters: Double
-    @Attribute public var cost: Double
-    @Attribute public var date: Date
+    @Attribute public var liters: Double? = nil
+    @Attribute public var cost: Double? = nil
+    @Attribute public var date: Date? = nil
 
-    // MARK: - Relationships
-    @Relationship(deleteRule: .nullify) public var mileage: Mileage?
-    @Relationship(deleteRule: .cascade, inverse: \Vehicle.fuelUsages) public var vehicle: Vehicle?
+    // To-one relationships: plain properties without @Relationship
+    public var mileage: Mileage? = nil
+    public var vehicle: Vehicle? = nil
 
-    // MARK: - Initializer
-    public init(liters: Double, cost: Double, date: Date, mileage: Mileage? = nil, vehicle: Vehicle? = nil) {
+    public init(
+        liters: Double,
+        cost: Double,
+        date: Date,
+        mileage: Mileage? = nil,
+        vehicle: Vehicle? = nil
+    ) {
         self.liters = liters
         self.cost = cost
         self.date = date
@@ -28,7 +33,6 @@ public class FuelUsage: Hashable {
         self.vehicle = vehicle
     }
 
-    // MARK: - Hashable
     public static func == (lhs: FuelUsage, rhs: FuelUsage) -> Bool {
         return lhs.liters == rhs.liters &&
             lhs.cost == rhs.cost &&

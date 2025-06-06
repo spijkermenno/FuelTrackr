@@ -5,11 +5,11 @@
 //  Predicts statistics for the **current** calendar year by averaging each
 //  calendar month over *completed* previous years. If a month has no
 //  historical samples it contributes nothing to the projection. When no
-//  completed years exist at all, the use‑case falls back to a simple YTD
+//  completed years exist at all, the use-case falls back to a simple YTD
 //  extrapolation. Debug prints log every decision path so you can verify the
 //  calculation in Xcode’s console.
 //
-//  Last revised: 03 Jun 2025.
+//  Last revised: 03 Jun 2025.
 //
 
 import Foundation
@@ -28,7 +28,7 @@ public struct GetProjectedYearStatsUseCase {
     }
 
     public func callAsFunction(context: ModelContext) throws -> VehicleStatisticsUiModel {
-        // ‑‑‑ 1. Ensure we have an active vehicle ‑‑‑
+        // --- 1. Ensure we have an active vehicle ---
         guard let vehicle = try calc.repository.loadActiveVehicle(context: context) else {
             print("ProjectedYearStats | 🚫 No active vehicle – returning zeros")
             return VehicleStatisticsUiModel(period: .ProjectedYear, distanceDriven: 0, fuelUsed: 0, totalCost: 0)
@@ -36,23 +36,45 @@ public struct GetProjectedYearStatsUseCase {
 
         let currentYear = calendar.component(.year, from: Date())
 
-        // ‑‑‑ 2. Which years are complete? (strictly before the current year) ‑‑‑
-        let completedYears: [Int] = Set(vehicle.mileages.map { calendar.component(.year, from: $0.date) })
-            .filter { $0 < currentYear }
-            .sorted()
+        // --- 2. Which years are complete? (strictly before the current year) ---
+        //    • vehicle.mileages is now [Mileage]? so unwrap with ?? []
+        //    • Each Mileage.date is Date?, so use compactMap to drop nil dates.
+        let allDates: [Date] = (vehicle.mileages ?? []).compactMap { $0.date }
+        let completedYears: [Int] = Array(
+            Set(
+                allDates
+                    .map { calendar.component(.year, from: $0) }
+                    .filter { $0 < currentYear }
+            )
+        )
+        .sorted()
 
         if completedYears.isEmpty {
             // --- 2a. Fallback – project using monthly YTD averages ---
-            let monthsWithEntries: Set<Int> = Set(vehicle.mileages
-                .filter { calendar.component(.year, from: $0.date) == currentYear }
-                .map   { calendar.component(.month, from: $0.date) })
+            //    • Filter to current year; unwrap date similarly
+            let thisYearMileages: [Mileage] = (vehicle.mileages ?? [])
+                .filter {
+                    if let dt = $0.date {
+                        return calendar.component(.year, from: dt) == currentYear
+                    } else {
+                        return false
+                    }
+                }
+
+            let monthsWithEntries: Set<Int> = Set(
+                thisYearMileages
+                    .compactMap { $0.date }
+                    .map { calendar.component(.month, from: $0) }
+            )
 
             guard !monthsWithEntries.isEmpty else {
                 print("ProjectedYearStats | 🚫 No mileage in current year – returning zeros")
-                return VehicleStatisticsUiModel(period: .ProjectedYear,
-                                                distanceDriven: 0,
-                                                fuelUsed: 0,
-                                                totalCost: 0)
+                return VehicleStatisticsUiModel(
+                    period: .ProjectedYear,
+                    distanceDriven: 0,
+                    fuelUsed: 0,
+                    totalCost: 0
+                )
             }
 
             let monthsCount = Double(monthsWithEntries.count)
@@ -70,7 +92,7 @@ public struct GetProjectedYearStatsUseCase {
             )
         }
 
-        // ‑‑‑ 3. Average each calendar month across completed years ‑‑‑
+        // --- 3. Average each calendar month across completed years ---
         var projectedDistance = 0.0
         var projectedFuel     = 0.0
         var projectedCost     = 0.0
@@ -81,6 +103,7 @@ public struct GetProjectedYearStatsUseCase {
             var monthCosts:     [Double] = []
 
             for year in completedYears {
+                // These repository calls still return non-optional Int/Double
                 let km   = Double(calc.repository.getKmDriven(forMonth: month, year: year, context: context))
                 let fuel = calc.repository.getFuelUsed(forMonth: month, year: year, context: context)
                 let cost = calc.repository.getFuelCost(forMonth: month, year: year, context: context)
@@ -101,14 +124,20 @@ public struct GetProjectedYearStatsUseCase {
             let avgFuel     = monthFuels.reduce(0, +)     / Double(monthFuels.count)
             let avgCost     = monthCosts.reduce(0, +)     / Double(monthCosts.count)
 
-            print(String(format: "ProjectedYearStats | Month %02d – avgDistance: %.1f km, avgFuel: %.2f L, avgCost: €%.2f", month, avgDistance, avgFuel, avgCost))
+            print(String(
+                format: "ProjectedYearStats | Month %02d – avgDistance: %.1f km, avgFuel: %.2f L, avgCost: €%.2f",
+                month, avgDistance, avgFuel, avgCost
+            ))
 
             projectedDistance += avgDistance
             projectedFuel     += avgFuel
             projectedCost     += avgCost
         }
 
-        print(String(format: "ProjectedYearStats | 📊 Projection – distance: %.0f km, fuel: %.1f L, cost: €%.2f", projectedDistance, projectedFuel, projectedCost))
+        print(String(
+            format: "ProjectedYearStats | 📊 Projection – distance: %.0f km, fuel: %.1f L, cost: €%.2f",
+            projectedDistance, projectedFuel, projectedCost
+        ))
 
         return VehicleStatisticsUiModel(
             period: .ProjectedYear,

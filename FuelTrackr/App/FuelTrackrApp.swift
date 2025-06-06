@@ -20,12 +20,29 @@ struct FuelTrackrApp: App {
 
     init() {
         // TODO create wrapper to make analytics generic and testable
-//        Analytics.logEvent(AnalyticsEventAppOpen, parameters: [
-//            AnalyticsParameterItemID: UUID().uuidString,
-//        ])
+        // Analytics.logEvent(AnalyticsEventAppOpen, parameters: [
+        //     AnalyticsParameterItemID: UUID().uuidString,
+        // ])
 
         do {
-            container = try ModelContainer(for: Vehicle.self, FuelUsage.self, Maintenance.self, Mileage.self)
+            let schema = Schema([
+                Vehicle.self,
+                FuelUsage.self,
+                Maintenance.self,
+                Mileage.self
+            ])
+            let cloudConfig = ModelConfiguration(
+                nil,
+                schema: schema,
+                isStoredInMemoryOnly: false,
+                allowsSave: true,
+                groupContainer: .none,
+                cloudKitDatabase: .private("iCloud.pepper-technologies.nl.FuelTrackr")
+            )
+            container = try ModelContainer(
+                for: schema,
+                configurations: [cloudConfig]
+            )
         } catch {
             fatalError("Failed to create ModelContainer: \(error.localizedDescription)")
         }
@@ -35,12 +52,12 @@ struct FuelTrackrApp: App {
         WindowGroup {
             ContentView()
                 .modelContainer(container)
-                //.environmentObject(notificationHandler)
-//                .onOpenURL { url in
-//                    if url.absoluteString == "fueltrackr://monthlyRecap" {
-//                        notificationHandler.shouldShowMonthlyRecapSheet = true
-//                    }
-//                }
+            // .environmentObject(notificationHandler)
+                            // .onOpenURL { url in
+                            //     if url.absoluteString == "fueltrackr://monthlyRecap" {
+                            //         notificationHandler.shouldShowMonthlyRecapSheet = true
+                            //     }
+                            // }
         }
     }
 }
