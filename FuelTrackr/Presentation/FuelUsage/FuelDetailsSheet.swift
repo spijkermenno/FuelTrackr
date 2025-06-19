@@ -1,5 +1,4 @@
 // MARK: - Package: Presentation
-
 //
 //  FuelDetailsSheet.swift
 //  FuelTrackr
@@ -11,18 +10,19 @@ import SwiftUI
 import Domain
 import Charts
 
-
 public struct FuelDetailsSheet: View {
-    let viewModel = VehicleViewModel()
+    public let viewModel: VehicleViewModel
+
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
 
+    @State private var resolvedVehicle: Vehicle?
     @State private var fuelToDelete: FuelUsage?
     @State private var showDeleteConfirmation = false
 
     private var sortedFuelUsages: [FuelUsage] {
-        guard let fuelUsages = viewModel.activeVehicle?.fuelUsages else { return [] }
-        return fuelUsages.sorted(by: { $0.date > $1.date })
+        guard let usages = resolvedVehicle?.fuelUsages else { return [] }
+        return usages.sorted(by: { $0.date > $1.date })
     }
 
     public var body: some View {
@@ -75,6 +75,9 @@ public struct FuelDetailsSheet: View {
                 }
             }
             .background(Color(uiColor: .systemGroupedBackground))
+            .onAppear {
+                resolvedVehicle = viewModel.resolvedVehicle(context: context)
+            }
         }
     }
 
@@ -88,6 +91,7 @@ public struct FuelDetailsSheet: View {
     private func deleteFuelUsage() {
         if let fuelUsage = fuelToDelete {
             viewModel.deleteFuelUsage(fuelUsage: fuelUsage, context: context)
+            resolvedVehicle = viewModel.resolvedVehicle(context: context)
         }
         fuelToDelete = nil
         showDeleteConfirmation = false

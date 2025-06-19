@@ -1,4 +1,3 @@
-// MARK: - Package: Presentation
 //
 //  ActiveVehicleContent.swift
 //  FuelTrackr
@@ -14,25 +13,21 @@ public struct ActiveVehicleContent: View {
     @StateObject public var vehicleViewModel: VehicleViewModel
     @StateObject public var settingsViewModel = SettingsViewModel()
     @StateObject public var addFuelUsageViewModel = AddFuelUsageViewModel()
-    
+   
     @Environment(\.modelContext) private var context
     @EnvironmentObject private var notificationHandler: NotificationHandler
-    
-    public let vehicle: Vehicle
-    
+
     @Binding public var showAddFuelSheet: Bool
     @Binding public var showAddMaintenanceSheet: Bool
     @Binding public var showEditVehicleSheet: Bool
-    
+
     public init(
         vehicleViewModel: VehicleViewModel,
-        vehicle: Vehicle,
         showAddFuelSheet: Binding<Bool>,
         showAddMaintenanceSheet: Binding<Bool>,
         showEditVehicleSheet: Binding<Bool>
     ) {
         _vehicleViewModel = StateObject(wrappedValue: vehicleViewModel)
-        self.vehicle = vehicle
         _showAddFuelSheet = showAddFuelSheet
         _showAddMaintenanceSheet = showAddMaintenanceSheet
         _showEditVehicleSheet = showEditVehicleSheet
@@ -40,53 +35,58 @@ public struct ActiveVehicleContent: View {
     
     public var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                VehicleImageView(photoData: vehicleViewModel.activeVehicle?.photo)
+            if let vehicle = vehicleViewModel.resolvedVehicle(context: context) {
+                VStack(alignment: .leading, spacing: 16) {
+                    VehicleImageView(photoData: vehicle.photo)
+                        .padding(.horizontal)
+                    
+                    VehiclePurchaseBanner(
+                        isPurchased: vehicle.isPurchased ?? false,
+                        purchaseDate: vehicle.purchaseDate,
+                        onConfirmPurchase: {
+                            vehicleViewModel.confirmPurchase(context: context)
+                        }
+                    )
                     .padding(.horizontal)
-                
-                VehiclePurchaseBanner(
-                    isPurchased: vehicle.isPurchased ?? false,
-                    purchaseDate: vehicle.purchaseDate,
-                    onConfirmPurchase: {
-                        vehicleViewModel.confirmPurchase(context: context)
-                    }
-                )
-                .padding(.horizontal)
-                
-                NewVehicleInfoCard(
-                    licensePlate: vehicle.licensePlate,
-                    mileage: vehicle.mileages.sorted(by: { $0.date < $1.date }).last?.value ?? 0,
-                    purchaseDate: vehicle.purchaseDate,
-                    productionDate: vehicle.manufacturingDate
-                )
-                .padding(.horizontal)
-                
-                VehicleStatisticsCarouselView(items: vehicleViewModel.vehicleStatistics(context: context))
-                                
-                // New Maintenance history card
-                
-                FuelUsagePreviewCard(
-                    items: vehicle.latestFuelUsagePreviews(),
-                    onAdd: { showAddFuelSheet = true },
-                    onShowMore: {
-                        /* navigate to full history if desired */
-                    }
-                )
-                .environmentObject(settingsViewModel)
-                .padding(.horizontal)
-                
-                MaintenancePreviewCard(
-                    items: vehicle.latestMaintenancePreviews(),
-                    isVehicleActive: vehicle.isPurchased ?? false,
-                    onAdd: { showAddMaintenanceSheet = true },
-                    onShowMore: { print("TODO(Not yet implemented)") }
-                )
-                .padding(.horizontal)
+                    
+                    NewVehicleInfoCard(
+                        licensePlate: vehicle.licensePlate,
+                        mileage: vehicle.mileages.sorted(by: { $0.date < $1.date }).last?.value ?? 0,
+                        purchaseDate: vehicle.purchaseDate,
+                        productionDate: vehicle.manufacturingDate
+                    )
+                    .padding(.horizontal)
+                    
+                    VehicleStatisticsCarouselView(items: vehicleViewModel.vehicleStatistics(context: context))
+                    
+                    FuelUsagePreviewCard(
+                        items: vehicle.latestFuelUsagePreviews(),
+                        onAdd: { showAddFuelSheet = true },
+                        onShowMore: {
+                            // Navigate to full history
+                        }
+                    )
+                    .environmentObject(settingsViewModel)
+                    .padding(.horizontal)
+                    
+                    MaintenancePreviewCard(
+                        items: vehicle.latestMaintenancePreviews(),
+                        isVehicleActive: vehicle.isPurchased ?? false,
+                        onAdd: { showAddMaintenanceSheet = true },
+                        onShowMore: {
+                            print("TODO(Not yet implemented)")
+                        }
+                    )
+                    .padding(.horizontal)
+                }
+                .navigationTitle(vehicle.name)
+            } else {
+                Text("No active vehicle found.")
+                    .padding()
             }
         }
         .id(vehicleViewModel.refreshID)
         .background(Color(UIColor.systemBackground))
-        .navigationTitle(vehicle.name)
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -96,7 +96,13 @@ public struct ActiveVehicleContent: View {
                 }
             }
             ToolbarItem(placement: .navigationBarTrailing) {
-                NavigationLink(destination: SettingsPageView(viewModel: settingsViewModel)) {
+                NavigationLink(
+                    destination:
+                        SettingsPageView(
+                            viewModel: settingsViewModel,
+                            vehicleViewModel: vehicleViewModel
+                        )
+                ) {
                     Image(systemName: "gear")
                         .foregroundColor(.primary)
                 }

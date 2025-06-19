@@ -14,11 +14,12 @@ import UserNotifications
 
 public struct SettingsPageView: View {
     @StateObject public var viewModel: SettingsViewModel
-//   private var notificationManager: NotificationManagerProtocol
-
+    @StateObject public var vehicleViewModel: VehicleViewModel
+    //   private var notificationManager: NotificationManagerProtocol
+    
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
-
+        
     @State private var showResetConfirmation = false
     @State private var resetType: ResetType = .none
     @State private var resetMessage: String?
@@ -27,13 +28,13 @@ public struct SettingsPageView: View {
     @State private var alertTitle = ""
     @State private var alertMessage = ""
     @State private var showDeleteConfirmation = false
-
+    
     private enum ResetType {
         case maintenance
         case fuelUsage
         case none
     }
-
+    
     public var body: some View {
         NavigationView {
             VStack(spacing: 0) {
@@ -49,7 +50,7 @@ public struct SettingsPageView: View {
                         .transition(.slide)
                         .zIndex(1)
                 }
-
+                
                 Form {
                     // Notifications
                     Section(header: Text(NSLocalizedString("notifications_section", comment: ""))) {
@@ -59,18 +60,18 @@ public struct SettingsPageView: View {
                                 if newValue {
                                     requestNotificationPermission()
                                 } else {
-//                                    notificationManager.cancelAllNotifications()
+                                    //                                    notificationManager.cancelAllNotifications()
                                 }
                             }
-
+                        
                         Text(NSLocalizedString("notifications_disclaimer", comment: ""))
                             .font(Theme.typography.footnoteFont)
                             .foregroundColor(Theme.colors.onSurface)
                             .padding(.vertical, Theme.dimensions.spacingS)
-
+                        
                         Button(action: {
                             let date = Date().addingTimeInterval(60)
-//                            notificationManager.scheduleMonthlyRecapNotification(for: date)
+                            //                            notificationManager.scheduleMonthlyRecapNotification(for: date)
                             resetMessage = NSLocalizedString("test_notification_success", comment: "")
                             showNotification = true
                             hideNotificationAfterDelay()
@@ -82,7 +83,7 @@ public struct SettingsPageView: View {
                         .padding(.vertical, Theme.dimensions.spacingXS)
                         .disabled(!viewModel.isNotificationsEnabled)
                     }
-
+                    
                     // Currency
                     Section(header: Text(NSLocalizedString("currency_section", comment: ""))) {
                         Menu {
@@ -105,14 +106,14 @@ public struct SettingsPageView: View {
                             }
                         }
                     }
-
+                    
                     // Units
                     Section(header: Text(NSLocalizedString("units_section", comment: ""))) {
                         Toggle(NSLocalizedString("use_metric_units", comment: ""), isOn: $viewModel.isUsingMetric)
                             .onChange(of: viewModel.isUsingMetric) { newValue in
                                 viewModel.updateMetricSystem(newValue)
                             }
-
+                        
                         Toggle(NSLocalizedString("use_imperial_units", comment: ""), isOn: Binding(
                             get: { !viewModel.isUsingMetric },
                             set: { newValue in
@@ -120,33 +121,33 @@ public struct SettingsPageView: View {
                             }
                         ))
                     }
-
+                    
                     // Maintenance Intervals
                     Section(header: Text(NSLocalizedString("default_maintenance_intervals", comment: ""))) {
                         Text(NSLocalizedString("maintenance_interval_description", comment: ""))
                             .font(Theme.typography.footnoteFont)
                             .foregroundColor(Theme.colors.onBackground)
                             .padding(.vertical, Theme.dimensions.spacingS)
-
+                        
                         MaintenanceIntervalRow(
                             title: NSLocalizedString("tires", comment: ""),
                             value: $viewModel.defaultTireInterval,
                             unit: viewModel.isUsingMetric ? "km" : "mi"
                         ) { viewModel.updateTireInterval($0) }
-
+                        
                         MaintenanceIntervalRow(
                             title: NSLocalizedString("oil_change", comment: ""),
                             value: $viewModel.defaultOilChangeInterval,
                             unit: viewModel.isUsingMetric ? "km" : "mi"
                         ) { viewModel.updateOilChangeInterval($0) }
-
+                        
                         MaintenanceIntervalRow(
                             title: NSLocalizedString("brakes", comment: ""),
                             value: $viewModel.defaultBrakeCheckInterval,
                             unit: viewModel.isUsingMetric ? "km" : "mi"
                         ) { viewModel.updateBrakeCheckInterval($0) }
                     }
-
+                    
                     // Reset
                     Section(header: Text(NSLocalizedString("reset_section", comment: ""))) {
                         Button(action: {
@@ -156,7 +157,7 @@ public struct SettingsPageView: View {
                             Text(NSLocalizedString("reset_maintenance_button", comment: ""))
                                 .foregroundColor(Theme.colors.error)
                         }
-
+                        
                         Button(action: {
                             resetType = .fuelUsage
                             showResetConfirmation = true
@@ -164,7 +165,7 @@ public struct SettingsPageView: View {
                             Text(NSLocalizedString("reset_fuel_button", comment: ""))
                                 .foregroundColor(Theme.colors.error)
                         }
-
+                        
                         Button(action: {
                             showDeleteConfirmation = true
                         }) {
@@ -180,6 +181,14 @@ public struct SettingsPageView: View {
                 ) {
                     Button(NSLocalizedString("delete_confirmation_delete", comment: ""), role: .destructive) {
                         dismiss()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            do {
+                                try vehicleViewModel.deleteVehicle(context: context)
+                                vehicleViewModel.loadActiveVehicle(context: context)
+                            } catch {
+                                print("Delete failed: \(error)")
+                            }
+                        }
                     }
                     Button(NSLocalizedString("cancel", comment: ""), role: .cancel) {}
                 }
@@ -206,7 +215,7 @@ public struct SettingsPageView: View {
             )
         }
     }
-
+    
     private func hideNotificationAfterDelay() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             withAnimation {
@@ -214,12 +223,12 @@ public struct SettingsPageView: View {
             }
         }
     }
-
+    
     private func requestNotificationPermission() {
-//        notificationManager.requestAuthorization { granted in
-//            DispatchQueue.main.async {
-//                viewModel.updateNotifications(granted)
-//            }
-//        }
+        //        notificationManager.requestAuthorization { granted in
+        //            DispatchQueue.main.async {
+        //                viewModel.updateNotifications(granted)
+        //            }
+        //        }
     }
 }

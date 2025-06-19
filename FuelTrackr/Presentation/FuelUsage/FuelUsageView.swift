@@ -15,7 +15,10 @@ public struct FuelUsageView: View {
     @ObservedObject var viewModel: VehicleViewModel
     @Binding var showAddFuelSheet: Bool
     var isVehicleActive: Bool
+
+    @Environment(\.modelContext) private var context
     @State private var showAllFuelEntries = false
+    @State private var resolvedVehicle: Vehicle?
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -51,13 +54,24 @@ public struct FuelUsageView: View {
                 .disabled(!isVehicleActive)
             }
 
-            FuelUsageListView(viewModel: viewModel)
+            if let vehicle = resolvedVehicle {
+                FuelUsageListView(vehicle: vehicle)
+            } else {
+                Text(NSLocalizedString("fuel_usage_no_content", comment: ""))
+                    .foregroundColor(.secondary)
+                    .font(.subheadline)
+                    .padding(.vertical, 12)
+                    .frame(maxWidth: .infinity, alignment: .center)
+            }
         }
         .padding()
         .background(Color(.systemGray6))
         .cornerRadius(10)
         .sheet(isPresented: $showAllFuelEntries) {
-            FuelDetailsSheet()
+            FuelDetailsSheet(viewModel: viewModel)
+        }
+        .onAppear {
+            resolvedVehicle = viewModel.resolvedVehicle(context: context)
         }
     }
 }
@@ -65,10 +79,12 @@ public struct FuelUsageView: View {
 // MARK: - FuelUsageListView
 
 public struct FuelUsageListView: View {
-    @ObservedObject var viewModel: VehicleViewModel
+    public let vehicle: Vehicle
 
     public var body: some View {
-        if let fuelUsages = viewModel.activeVehicle?.fuelUsages.sorted(by: { $0.date > $1.date }), !fuelUsages.isEmpty {
+        let fuelUsages = vehicle.fuelUsages.sorted(by: { $0.date > $1.date })
+
+        if !fuelUsages.isEmpty {
             let latestEntries = Array(fuelUsages.prefix(3))
 
             VStack(alignment: .leading, spacing: 0) {
