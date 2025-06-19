@@ -28,7 +28,6 @@ public struct GetProjectedYearStatsUseCase {
     }
 
     public func callAsFunction(context: ModelContext) throws -> VehicleStatisticsUiModel {
-        // ‑‑‑ 1. Ensure we have an active vehicle ‑‑‑
         guard let vehicle = try calc.repository.loadActiveVehicle(context: context) else {
             print("ProjectedYearStats | 🚫 No active vehicle – returning zeros")
             return VehicleStatisticsUiModel(period: .ProjectedYear, distanceDriven: 0, fuelUsed: 0, totalCost: 0)
@@ -36,23 +35,23 @@ public struct GetProjectedYearStatsUseCase {
 
         let currentYear = calendar.component(.year, from: Date())
 
-        // ‑‑‑ 2. Which years are complete? (strictly before the current year) ‑‑‑
         let completedYears: [Int] = Set(vehicle.mileages.map { calendar.component(.year, from: $0.date) })
             .filter { $0 < currentYear }
             .sorted()
 
         if completedYears.isEmpty {
-            // --- 2a. Fallback – project using monthly YTD averages ---
             let monthsWithEntries: Set<Int> = Set(vehicle.mileages
                 .filter { calendar.component(.year, from: $0.date) == currentYear }
                 .map   { calendar.component(.month, from: $0.date) })
 
             guard !monthsWithEntries.isEmpty else {
                 print("ProjectedYearStats | 🚫 No mileage in current year – returning zeros")
-                return VehicleStatisticsUiModel(period: .ProjectedYear,
-                                                distanceDriven: 0,
-                                                fuelUsed: 0,
-                                                totalCost: 0)
+                return VehicleStatisticsUiModel(
+                    period: .ProjectedYear,
+                    distanceDriven: 0,
+                    fuelUsed: 0,
+                    totalCost: 0
+                )
             }
 
             let monthsCount = Double(monthsWithEntries.count)
@@ -70,7 +69,6 @@ public struct GetProjectedYearStatsUseCase {
             )
         }
 
-        // ‑‑‑ 3. Average each calendar month across completed years ‑‑‑
         var projectedDistance = 0.0
         var projectedFuel     = 0.0
         var projectedCost     = 0.0

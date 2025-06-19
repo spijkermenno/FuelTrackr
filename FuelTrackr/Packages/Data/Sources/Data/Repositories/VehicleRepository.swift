@@ -155,12 +155,25 @@ public class VehicleRepository: VehicleRepositoryProtocol {
             let range = dateRange(forMonth: month, year: year)
         else { return 0 }
         
-        let mileages = vehicle.mileages
-            .filter { $0.date >= range.start && $0.date <= range.end }
-            .sorted { $0.date < $1.date }
+        let allMileages = vehicle.mileages.sorted { $0.date < $1.date }
         
-        guard let first = mileages.first, let last = mileages.last else { return 0 }
-        return last.value - first.value
+        // First mileage in the month
+        guard let firstInMonth = allMileages.first(where: { $0.date >= range.start && $0.date <= range.end }) else {
+            return 0
+        }
+        
+        // Last mileage in the month
+        guard let lastInMonth = allMileages.last(where: { $0.date >= range.start && $0.date <= range.end }) else {
+            return 0
+        }
+        
+        // Latest mileage BEFORE the first one in the month
+        guard let previousMileage = allMileages.last(where: { $0.date < firstInMonth.date }) else {
+            return 0 // Or assume 0 km if there's no earlier entry
+        }
+        
+        let driven = lastInMonth.value - previousMileage.value
+        return max(0, driven) // Avoid negative values
     }
     
     public func getAverageFuelUsage(
