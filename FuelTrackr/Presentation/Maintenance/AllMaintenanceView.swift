@@ -13,16 +13,21 @@ import SwiftData
 
 public struct AllMaintenanceView: View {
     @Environment(\.modelContext) var context
-    
-    @StateObject public var viewModel = VehicleViewModel()
+
+    public let vehicleID: PersistentIdentifier
+
+    @State private var vehicle: Vehicle?
     @State private var maintenanceToDelete: Maintenance? = nil
     @State private var showDeleteConfirmation = false
+
+    public init(vehicleID: PersistentIdentifier) {
+        self.vehicleID = vehicleID
+    }
 
     public var body: some View {
         NavigationView {
             List {
-                if let maintenances = viewModel.activeVehicle?.maintenances.sorted(by: { $0.date > $1.date }),
-                   !maintenances.isEmpty {
+                if let maintenances = vehicle?.maintenances.sorted(by: { $0.date > $1.date }), !maintenances.isEmpty {
                     ForEach(Array(maintenances.enumerated()), id: \.element) { index, maintenance in
                         AllMaintenanceRow(maintenance: maintenance, colorIndex: index)
                             .listRowSeparator(.hidden)
@@ -48,11 +53,23 @@ public struct AllMaintenanceView: View {
             ) {
                 Button(NSLocalizedString("delete_confirmation_delete", comment: ""), role: .destructive) {
                     if let maintenance = maintenanceToDelete {
-                        viewModel.deleteMaintenance(maintenance: maintenance, context: context)
+                        context.delete(maintenance)
                     }
                 }
                 Button(NSLocalizedString("cancel", comment: ""), role: .cancel) {}
             }
+        }
+        .onAppear {
+            resolveVehicle()
+        }
+    }
+
+    private func resolveVehicle() {
+        do {
+            vehicle = try context.model(for: vehicleID) as? Vehicle
+        } catch {
+            print("⚠️ Failed to resolve vehicle: \(error)")
+            vehicle = nil
         }
     }
 }

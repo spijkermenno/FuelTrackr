@@ -14,8 +14,10 @@ struct AddFuelUsageSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
 
+    @State private var resolvedVehicle: Vehicle?
+
     private var mileagePlaceholder: String {
-        let currentMileage = vehicleViewModel.activeVehicle?.mileages.last?.value ?? 0
+        let currentMileage = resolvedVehicle?.mileages.last?.value ?? 0
         return viewModel.displayMileagePlaceholder(currentMileage: currentMileage)
     }
 
@@ -38,14 +40,16 @@ struct AddFuelUsageSheet: View {
                 .padding(.horizontal, Theme.dimensions.spacingSection)
             }
             .scrollBounceBehavior(.basedOnSize)
-            .scrollBounceBehavior(.basedOnSize)
             .scrollDismissesKeyboard(.interactively)
             .onTapGesture { hideKeyboard() }
+            .onAppear {
+                resolvedVehicle = vehicleViewModel.resolvedVehicle(context: context)
+            }
         }
     }
 
     private func saveFuelUsage() {
-        if viewModel.saveFuelUsage(activeVehicle: vehicleViewModel.activeVehicle, context: context) {
+        if viewModel.saveFuelUsage(activeVehicle: resolvedVehicle, context: context) {
             dismiss()
         }
     }

@@ -12,7 +12,6 @@ import Domain
 
 public struct EditVehicleSheet: View {
     public var viewModel: VehicleViewModel
-//    public var notificationManager: NotificationManagerProtocol
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
@@ -32,14 +31,24 @@ public struct EditVehicleSheet: View {
                 VStack(spacing: 16) {
                     PhotoPickerSection(photo: $photo, showImagePicker: $showImagePicker)
 
-                    InputField(title: NSLocalizedString("vehicle_name_title", comment: ""), placeholder: NSLocalizedString("vehicle_name_placeholder", comment: ""), text: $name)
+                    InputField(
+                        title: NSLocalizedString("vehicle_name_title", comment: ""),
+                        placeholder: NSLocalizedString("vehicle_name_placeholder", comment: ""),
+                        text: $name
+                    )
 
-                    InputField(title: NSLocalizedString("license_plate_title", comment: ""), placeholder: NSLocalizedString("license_plate_placeholder", comment: ""), text: $licensePlate)
+                    InputField(
+                        title: NSLocalizedString("license_plate_title", comment: ""),
+                        placeholder: NSLocalizedString("license_plate_placeholder", comment: ""),
+                        text: $licensePlate
+                    )
 
                     DatePickerSection(title: NSLocalizedString("purchase_date_title", comment: ""), selection: $purchaseDate)
                     DatePickerSection(title: NSLocalizedString("manufacturing_date_title", comment: ""), selection: $manufacturingDate)
 
-                    LatestMileageSection(vehicle: viewModel.activeVehicle, isMetric: viewModel.isUsingMetric)
+                    if let vehicle = viewModel.resolvedVehicle(context: context) {
+                        LatestMileageSection(vehicle: vehicle, isMetric: viewModel.isUsingMetric)
+                    }
 
                     if let errorMessage = errorMessage {
                         Text(errorMessage)
@@ -72,7 +81,7 @@ public struct EditVehicleSheet: View {
     }
 
     private func initializeFields() {
-        guard let vehicle = viewModel.activeVehicle else { return }
+        guard let vehicle = viewModel.resolvedVehicle(context: context) else { return }
         name = vehicle.name
         licensePlate = vehicle.licensePlate
         purchaseDate = vehicle.purchaseDate
@@ -93,13 +102,7 @@ public struct EditVehicleSheet: View {
         if purchaseDay > today {
             let daysUntilPurchase = Calendar.current.dateComponents([.day], from: today, to: purchaseDay).day ?? 0
 
-//            notificationManager.scheduleNotification(
-//                title: NSLocalizedString("notification_purchase_date_passed_title", comment: ""),
-//                body: NSLocalizedString("notification_purchase_date_passed_description", comment: ""),
-//                inDays: daysUntilPurchase,
-//                atHour: 18,
-//                atMinute: 0
-//            )
+            // Schedule notification if needed
         }
 
         viewModel.updateVehicle(
