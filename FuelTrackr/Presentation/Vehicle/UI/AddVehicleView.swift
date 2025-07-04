@@ -7,19 +7,23 @@
 
 import SwiftUI
 import Domain
-
 import SwiftData
 
-
 public struct AddVehicleView: View {
+    public let onSave: () -> Void
+    
+    public init(onSave: @escaping () -> Void) {
+        self.onSave = onSave
+    }
+    
     @Environment(\.modelContext) public var context
     @Environment(\.dismiss) public var dismiss
     
     @EnvironmentObject public var notificationHandler: NotificationHandler
-
+    
     @StateObject public var vehicleViewModel = VehicleViewModel()
     @StateObject public var settingsViewModel = SettingsViewModel()
-
+    
     @State public var vehicleName: String = ""
     @State public var licensePlate: String = ""
     @State public var purchaseDate: Date = Calendar.current.startOfDay(for: Date())
@@ -28,17 +32,9 @@ public struct AddVehicleView: View {
     @State public var image: UIImage?
     @State public var isImagePickerPresented = false
     @State public var errorMessage: String?
-
-    public var isUsingMetric: Bool {
-        settingsViewModel.isUsingMetric
-    }
-
-    public let onSave: () -> Void
-
-    public init(onSave: @escaping () -> Void) {
-        self.onSave = onSave
-    }
-
+    
+    public var isUsingMetric: Bool { settingsViewModel.isUsingMetric }
+    
     public var body: some View {
         NavigationStack {
             ScrollView {
@@ -47,38 +43,60 @@ public struct AddVehicleView: View {
                         .resizable()
                         .frame(width: 150, height: 150)
                         .cornerRadius(35)
-
+                    
                     Text(NSLocalizedString("welcome_subtitle", comment: ""))
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
-
-                    ToggleSettingsView()
-
+                    
+                    VStack(spacing: 12) {
+                        LabeledToggleView(
+                            title: NSLocalizedString("use_metric_units", comment: ""),
+                            isOn: Binding(
+                                get: { settingsViewModel.isUsingMetric },
+                                set: { settingsViewModel.updateMetricSystem($0) }
+                            )
+                        )
+                        
+                        LabeledToggleView(
+                            title: NSLocalizedString("use_notifications", comment: ""),
+                            isOn: Binding(
+                                get: { settingsViewModel.isNotificationsEnabled },
+                                set: { settingsViewModel.updateNotifications($0) }
+                            )
+                        )
+                    }
+                    
                     TextFieldSection(
                         title: NSLocalizedString("vehicle_name_title", comment: ""),
                         text: $vehicleName,
                         placeholder: NSLocalizedString("vehicle_name_placeholder", comment: "")
                     )
-
+                    
                     TextFieldSection(
                         title: NSLocalizedString("license_plate_title", comment: ""),
                         text: $licensePlate,
                         placeholder: NSLocalizedString("license_plate_placeholder", comment: "")
                     )
-
+                    
                     DatePickerSection(
                         title: NSLocalizedString("purchase_date_title", comment: ""),
                         selection: $purchaseDate
                     )
-
+                    
                     DatePickerSection(
                         title: NSLocalizedString("manufacturing_date_title", comment: ""),
                         selection: $manufacturingDate
                     )
-
+                    
                     VStack(alignment: .leading) {
-                        Text(isUsingMetric ? NSLocalizedString("mileage_title_km", comment: "Mileage in kilometers") : NSLocalizedString("mileage_title_miles", comment: "Mileage in miles"))
+                        let mileageTitleText = if (isUsingMetric) {
+                            NSLocalizedString("mileage_title_km", comment: "km")
+                        } else {
+                            NSLocalizedString("mileage_title_miles", comment: "mi")
+                        }
+                        
+                        Text(mileageTitleText)
                             .font(.headline)
                             .foregroundColor(.primary)
                         TextField(
@@ -91,9 +109,9 @@ public struct AddVehicleView: View {
                         .cornerRadius(8)
                         .foregroundColor(.primary)
                     }
-
+                    
                     PhotoSection(image: $image, isImagePickerPresented: $isImagePickerPresented)
-
+                    
                     if let errorMessage = errorMessage {
                         Text(errorMessage)
                             .foregroundColor(.red)
@@ -101,13 +119,14 @@ public struct AddVehicleView: View {
                             .multilineTextAlignment(.center)
                             .padding(.horizontal)
                     }
-
+                    
                     Button(action: saveVehicle) {
+                        let canSubmit = vehicleName.isEmpty || licensePlate.isEmpty || mileage.isEmpty
                         Text(NSLocalizedString("save_vehicle_button", comment: "Button title for saving vehicle"))
                             .bold()
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(vehicleName.isEmpty || licensePlate.isEmpty || mileage.isEmpty ? Color.gray : Color.orange)
+                            .background(canSubmit ? Color.gray : Theme.colors.primary)
                             .foregroundColor(.white)
                             .cornerRadius(10)
                     }
@@ -123,29 +142,33 @@ public struct AddVehicleView: View {
             ImagePicker(image: $image)
         }
     }
-
+    
     public func saveVehicle() {
+        guard let validatedMileage = validateMileage() else { return }
+        let newVehicle = createVehicle()
+        vehicleViewModel.saveVehicle(vehicle: newVehicle, initialMileage: validatedMileage, context: context)
+        onSave()
+        dismiss()
+    }
+    
+    private func validateMileage() -> Int? {
         guard let mileageValue = Int(mileage), mileageValue >= 0 else {
             errorMessage = NSLocalizedString("invalid_mileage_error", comment: "")
-            return
+            return nil
         }
-
-        let adjustedMileage = isUsingMetric ? mileageValue : convertMilesToKm(miles: mileageValue)
-
-        let newVehicle = Vehicle(
+        return isUsingMetric ? mileageValue : convertMilesToKm(miles: mileageValue)
+    }
+    
+    private func createVehicle() -> Vehicle {
+        Vehicle(
             name: vehicleName,
             licensePlate: licensePlate,
             purchaseDate: purchaseDate,
             manufacturingDate: manufacturingDate,
             photo: image?.jpegData(compressionQuality: 0.8)
         )
-
-        vehicleViewModel.saveVehicle(vehicle: newVehicle, initialMileage: adjustedMileage, context: context)
-
-        onSave()
-        dismiss()
     }
-
+    
     public func convertMilesToKm(miles: Int) -> Int {
         let kmValue = Double(miles) * 1.60934
         return Int(ceil(kmValue))

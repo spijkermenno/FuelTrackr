@@ -1,6 +1,6 @@
 /* Welcome and General */
 "welcome_title" = "Welcome to FuelTrackr!";
-"welcome_subtitle" = "To get started, please fill in the details of your vehicle, and then click the \"Save Vehicle\" button to start tracking.";
+"welcome_subtitle" = "Start by entering your vehicle’s details. Once saved, FuelTrackr will begin tracking your fuel usage, maintenance, and mileage.";
 
 /* Vehicle Editing */
 "edit_vehicle_title" = "Edit Vehicle";
@@ -98,8 +98,11 @@
 "units_section" = "Units";
 "measurement_system" = "Measurement System";
 "measurement_system_description" = "Select the measurement system for distance and fuel.";
-"use_metric_units" = "Use Metric units (L, Km)";
-"use_imperial_units" = "Use Imperial units (G, Mi)";
+"use_metric_units" = "Use metric system";
+
+"currently_using_metric" = "Currently using the metric system for distance and fuel (kilometers and liters)";
+"currently_using_imperial" = "Currently using the imperial system for distance and fuel (miles and gallons)";
+
 "default_maintenance_intervals" = "Default Maintenance Intervals";
 "tires" = "Tires";
 "distribution_belt" = "Distribution Belt";

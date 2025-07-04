@@ -98,8 +98,11 @@
 "units_section" = "Eenheden";
 "measurement_system" = "Meetsysteem";
 "measurement_system_description" = "Selecteer het meetsysteem voor afstand en brandstof.";
-"use_metric_units" = "Gebruik Metrisch systeem (L, Km)";
-"use_imperial_units" = "Gebruik Imperiaal systeem (G, Mi)";
+"use_metric_units" = "Gebruik metrisch systeem";
+
+"currently_using_metric" = "Je gebruikt momenteel het metrische systeem voor afstand en brandstof (kilometers en liters)";
+"currently_using_imperial" = "Je gebruikt momenteel het imperiale systeem voor afstand en brandstof (mijlen en gallons)";
+
 "default_maintenance_intervals" = "Standaard onderhoudsintervallen";
 "tires" = "Banden";
 "distribution_belt" = "Distributieriem";
