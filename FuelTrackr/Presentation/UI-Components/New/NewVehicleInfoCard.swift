@@ -21,12 +21,16 @@ struct NewVehicleInfoCard: View {
                     
                     Text(licensePlate)
                         .font(.system(size: 24, weight: .bold))
+                        .foregroundStyle(.primary)
                 }
                 .padding(.horizontal)
             },
             content: {
                 VStack {
-                    SingleRow(title: "Kilometerstand", value: "\(mileage.formattedWithSeparator) km")
+                    SingleRow(
+                        title: "Kilometerstand",
+                        value: "\(mileage.formattedWithSeparator) km"
+                    )
                     
                     DoubleRow(
                         title: "Aankoopdatum",
@@ -41,7 +45,6 @@ struct NewVehicleInfoCard: View {
                     )
                 }
                 .frame(maxWidth: .infinity)
-                
             }
         )
     }
@@ -54,16 +57,14 @@ private struct SingleRow: View {
     var body: some View {
         HStack {
             Text(title)
-                .fontWeight(Font.Weight.regular)
                 .font(.system(size: 15))
-                .foregroundStyle(Theme.colors.onSurface)
+                .foregroundStyle(.secondary)
             
             Spacer()
             
             Text(value)
-                .fontWeight(Font.Weight.regular)
                 .font(.system(size: 15))
-                .foregroundStyle(Color.black)
+                .foregroundStyle(.primary)
         }
         .padding(8)
     }
@@ -78,25 +79,22 @@ private struct DoubleRow: View {
         VStack(spacing: 8) {
             HStack {
                 Text(title)
-                    .fontWeight(Font.Weight.regular)
                     .font(.system(size: 15))
-                    .foregroundStyle(Theme.colors.onSurface)
+                    .foregroundStyle(.secondary)
                 
                 Spacer()
                 
                 Text(firstValue)
-                    .fontWeight(Font.Weight.regular)
                     .font(.system(size: 15))
-                    .foregroundStyle(Color.black)
+                    .foregroundStyle(.primary)
             }
             
             HStack {
                 Spacer()
                 
                 Text(secondValue)
-                    .fontWeight(Font.Weight.regular)
                     .font(.system(size: 15))
-                    .foregroundStyle(Theme.colors.primary)
+                    .foregroundStyle(.secondary)
             }
         }
         .padding(8)
@@ -107,21 +105,12 @@ struct CircleIconView: View {
     var body: some View {
         ZStack {
             Circle()
-                .fill(Theme.colors.purple)
+                .fill(.blue)
                 .frame(width: 50, height: 50)
             
             Image(systemName: "car.fill")
-                .foregroundColor(.white)
+                .foregroundStyle(.white)
                 .font(.system(size: 24, weight: .medium))
         }
     }
-}
-
-#Preview {
-    NewVehicleInfoCard(
-        licensePlate: "12345",
-        mileage: 1,
-        purchaseDate: Date(),
-        productionDate: Date()
-    )
 }

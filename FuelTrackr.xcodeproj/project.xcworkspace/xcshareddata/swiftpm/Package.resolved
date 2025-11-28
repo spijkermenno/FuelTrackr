@@ -1,5 +1,5 @@
 {
-  "originHash" : "e2e68825bf2268f1664db133f01e0916f0d06c142efb47aeba437a902f8b0e79",
+  "originHash" : "de901519238adf3c1817f01737a82e09056227f74e683cc558ff751e22c06e20",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -107,6 +107,15 @@
       "state" : {
         "revision" : "540318ecedd63d883069ae7f1ed811a2df00b6ac",
         "version" : "2.4.0"
+      }
+    },
+    {
+      "identity" : "scovillekit",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:nl-pepperTechnologies/ScovilleKit.git",
+      "state" : {
+        "revision" : "0d8bc6797e362390ed92c9c82946b3d80c9d4ae7",
+        "version" : "1.0.1"
       }
     },
     {

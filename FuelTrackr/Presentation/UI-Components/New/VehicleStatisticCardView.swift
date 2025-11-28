@@ -73,9 +73,9 @@ struct VehicleStatisticCardView: View {
             .padding(.horizontal)
             .padding(.bottom, 12)
         }
-        .background(Color(.systemBackground))
+        .background(Color(.secondarySystemBackground))
         .cornerRadius(25)
-        .shadow(color: Color.black.opacity(0.1),radius: 6,x: 0,y: 0)
+        //.shadow(color: Color.black.opacity(0.1),radius: 6,x: 0,y: 0)
         
     }
 }
@@ -125,7 +125,7 @@ private struct StatBlock: View {
         .frame(maxWidth: .infinity, minHeight: 120)
         .padding(.vertical, 12)
         .padding(.horizontal, 4)
-        .background(Color(.systemGray6))
+        .background(Color(.tertiarySystemBackground))
         .cornerRadius(15)
     }
 }

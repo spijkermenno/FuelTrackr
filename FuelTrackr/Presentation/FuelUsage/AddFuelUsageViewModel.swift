@@ -9,16 +9,17 @@
 import SwiftUI
 import Domain
 import SwiftData
+import ScovilleKit
 
 public final class AddFuelUsageViewModel: ObservableObject {
     @Published public var liters = ""
     @Published public var cost = ""
     @Published public var mileage = ""
     @Published public var errorMessage: String?
-
+    
     private let saveFuelUsageUseCase: SaveFuelUsageUseCase
     private let getUsingMetricUseCase: GetUsingMetricUseCase
-
+    
     public init(
         saveFuelUsageUseCase: SaveFuelUsageUseCase = SaveFuelUsageUseCase(),
         getUsingMetricUseCase: GetUsingMetricUseCase = GetUsingMetricUseCase()
@@ -26,11 +27,11 @@ public final class AddFuelUsageViewModel: ObservableObject {
         self.saveFuelUsageUseCase = saveFuelUsageUseCase
         self.getUsingMetricUseCase = getUsingMetricUseCase
     }
-
+    
     public var decimalSeparator: String {
         Locale.current.decimalSeparator ?? "."
     }
-
+    
     public func saveFuelUsage(activeVehicle: Vehicle?, context: ModelContext) -> Bool {
         guard let litersValue = parseInput(liters),
               let costValue = parseInput(cost),
@@ -40,9 +41,9 @@ public final class AddFuelUsageViewModel: ObservableObject {
             errorMessage = NSLocalizedString("invalid_input_error", comment: "")
             return false
         }
-
+        
         let adjustedMileage = getUsingMetricUseCase() ? mileageValue : convertMilesToKm(miles: mileageValue)
-
+        
         do {
             try saveFuelUsageUseCase(
                 liters: litersValue,
@@ -50,23 +51,35 @@ public final class AddFuelUsageViewModel: ObservableObject {
                 mileageValue: adjustedMileage,
                 context: context
             )
+            
+            Task { @MainActor in
+                Scoville.track(
+                    FuelTrackrEvents.trackedFuel,
+                    parameters: [
+                        "mileage": adjustedMileage,
+                        "cost": costValue,
+                        "amount": litersValue
+                    ]
+                )
+            }
+            
             return true
         } catch {
             errorMessage = NSLocalizedString("fuel_usage_saved_error", comment: "")
             return false
         }
     }
-
+    
     private func parseInput(_ input: String) -> Double? {
         let normalized = input.replacingOccurrences(of: decimalSeparator, with: ".")
         return Double(normalized)
     }
-
+    
     private func convertMilesToKm(miles: Int) -> Int {
         let kmValue = Double(miles) * 1.60934
         return Int(ceil(kmValue))
     }
-
+    
     public func displayMileagePlaceholder(currentMileage: Int) -> String {
         if getUsingMetricUseCase() {
             return "\(currentMileage) km"

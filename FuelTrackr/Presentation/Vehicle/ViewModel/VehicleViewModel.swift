@@ -13,7 +13,6 @@ public final class VehicleViewModel: ObservableObject {
     @Published public var activeVehicleID: PersistentIdentifier?
     @Published public var refreshID = UUID()
     
-    
     private let loadActiveVehicleUseCase: LoadActiveVehicleUseCase
     private let saveVehicleUseCase: SaveVehicleUseCase
     private let updateVehicleUseCase: UpdateVehicleUseCase
@@ -37,6 +36,8 @@ public final class VehicleViewModel: ObservableObject {
     private let getAllTimeStatsUseCase: GetAllTimeStatisticsUseCase
     private let getProjectedYearStatsUseCase: GetProjectedYearStatsUseCase
     private let confirmVehiclePurchaseUseCase: ConfirmVehiclePurchaseUseCase
+    private let getFuelUsageUseCase: GetFuelUsageUseCase
+    private let updateFuelUsageUseCase: UpdateFuelUsageUseCase
     
     public var hasActiveVehicle: Bool { activeVehicleID != nil }
     public var isUsingMetric: Bool { getUsingMetricUseCase() }
@@ -64,7 +65,9 @@ public final class VehicleViewModel: ObservableObject {
         getYtdStatsUseCase: GetYearToDateStatisticsUseCase = GetYearToDateStatisticsUseCase(),
         getAllTimeStatsUseCase: GetAllTimeStatisticsUseCase = GetAllTimeStatisticsUseCase(),
         getProjectedYearStatsUseCase: GetProjectedYearStatsUseCase = GetProjectedYearStatsUseCase(),
-        confirmVehiclePurchaseUseCase: ConfirmVehiclePurchaseUseCase = ConfirmVehiclePurchaseUseCase()
+        confirmVehiclePurchaseUseCase: ConfirmVehiclePurchaseUseCase = ConfirmVehiclePurchaseUseCase(),
+        getFuelUsageUseCase: GetFuelUsageUseCase = GetFuelUsageUseCase(),
+        updateFuelUsageUseCase: UpdateFuelUsageUseCase = UpdateFuelUsageUseCase()
     ) {
         self.loadActiveVehicleUseCase = loadActiveVehicleUseCase
         self.saveVehicleUseCase = saveVehicleUseCase
@@ -89,6 +92,8 @@ public final class VehicleViewModel: ObservableObject {
         self.getAllTimeStatsUseCase = getAllTimeStatsUseCase
         self.getProjectedYearStatsUseCase = getProjectedYearStatsUseCase
         self.confirmVehiclePurchaseUseCase = confirmVehiclePurchaseUseCase
+        self.getFuelUsageUseCase = getFuelUsageUseCase
+        self.updateFuelUsageUseCase = updateFuelUsageUseCase
     }
     
     public func loadActiveVehicle(context: ModelContext) {
@@ -186,6 +191,25 @@ public final class VehicleViewModel: ObservableObject {
             print("Error resetting fuel usage: \(error.localizedDescription)")
         }
     }
+    
+    public func fuelUsage(id: PersistentIdentifier, context: ModelContext) -> FuelUsage? {
+            (try? getFuelUsageUseCase(id: id, context: context))
+        }
+
+        public func updateFuelUsage(
+            id: PersistentIdentifier,
+            liters: Double,
+            cost: Double,
+            mileageValue: Int,
+            context: ModelContext
+        ) {
+            do {
+                try updateFuelUsageUseCase(id: id, liters: liters, cost: cost, mileageValue: mileageValue, context: context)
+                refreshID = UUID()
+            } catch {
+                print("Error updating fuel usage: \(error.localizedDescription)")
+            }
+        }
     
     public func saveMaintenance(maintenance: Maintenance, context: ModelContext) {
         do {
