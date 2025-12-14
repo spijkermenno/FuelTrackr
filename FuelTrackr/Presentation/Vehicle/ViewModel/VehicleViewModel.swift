@@ -12,7 +12,7 @@ import SwiftData
 public final class VehicleViewModel: ObservableObject {
     @Published public var activeVehicleID: PersistentIdentifier?
     @Published public var refreshID = UUID()
-    
+
     private let loadActiveVehicleUseCase: LoadActiveVehicleUseCase
     private let saveVehicleUseCase: SaveVehicleUseCase
     private let updateVehicleUseCase: UpdateVehicleUseCase
