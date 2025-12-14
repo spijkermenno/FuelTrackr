@@ -41,17 +41,25 @@ public struct ActiveVehicleView: View {
                 )
                 .onAppear {
                     // TODO: Analytics wrapper
-//                    Analytics.logEvent("active_vehicle_found", parameters: [
-//                        "vehicle_name": vehicle.name,
-//                        "license_plate": vehicle.licensePlate
-//                    ])
+                    Analytics.logEvent("active_vehicle_found", parameters: [
+                        "vehicle_name": vehicle.name,
+                        "license_plate": vehicle.licensePlate
+                    ])
                     scheduleNextRecapNotification()
+                    
+                    let escaped = "{\"name\":\"Kia Niro\"}"
+                    let bla = vehicle.toJSON()
+                    
+                    if let data = bla?.data(using: .utf8),
+                       let unescaped = try? JSONSerialization.jsonObject(with: data) {
+                        let cleanData = try! JSONSerialization.data(withJSONObject: unescaped, options: [.prettyPrinted])
+                        print(String(data: cleanData, encoding: .utf8)!) // ✅ clean JSON
+                    }
                 }
             } else {
                 NoActiveVehicleView()
                     .onAppear {
-                        // TODO: Analytics wrapper
-//                        Analytics.logEvent("no_active_vehicle", parameters: nil)
+                        Analytics.logEvent("no_active_vehicle", parameters: nil)
                     }
             }
         }

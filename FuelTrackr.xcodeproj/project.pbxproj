@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		A98BBF112DC1670000F561BF /* Data in Frameworks */ = {isa = PBXBuildFile; productRef = A98BBF102DC1670000F561BF /* Data */; };
 		A98BBF132DC1670300F561BF /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = A98BBF122DC1670300F561BF /* Domain */; };
+		A98D0C352ECCD17800B642CE /* ScovilleKit in Frameworks */ = {isa = PBXBuildFile; productRef = A98D0C342ECCD17800B642CE /* ScovilleKit */; };
 		A9A91A8B2D4C02B000153BE0 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = A9A91A8A2D4C02B000153BE0 /* FirebaseAnalytics */; };
 		A9A91A8D2D4C02B000153BE0 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = A9A91A8C2D4C02B000153BE0 /* FirebaseCore */; };
 		A9A91A8F2D4C02B000153BE0 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = A9A91A8E2D4C02B000153BE0 /* FirebaseCrashlytics */; };
@@ -39,6 +40,11 @@
 			path = FuelTrackr;
 			sourceTree = "<group>";
 		};
+		A98D0DCB2ECCD2A800B642CE /* ScovilleKit */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ScovilleKit;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,6 +56,7 @@
 				A98BBF132DC1670300F561BF /* Domain in Frameworks */,
 				A9A91A8D2D4C02B000153BE0 /* FirebaseCore in Frameworks */,
 				A98BBF112DC1670000F561BF /* Data in Frameworks */,
+				A98D0C352ECCD17800B642CE /* ScovilleKit in Frameworks */,
 				A9A91A912D4C02B000153BE0 /* FirebasePerformance in Frameworks */,
 				A9A91A8B2D4C02B000153BE0 /* FirebaseAnalytics in Frameworks */,
 				A9B3A5F52DC265AA00D219FF /* Data in Frameworks */,
@@ -62,6 +69,7 @@
 		A96F62552D43C5D500872385 = {
 			isa = PBXGroup;
 			children = (
+				A98D0DCB2ECCD2A800B642CE /* ScovilleKit */,
 				A96F62602D43C5D500872385 /* FuelTrackr */,
 				A98BBF0D2DC166F800F561BF /* Frameworks */,
 				A96F625F2D43C5D500872385 /* Products */,
@@ -100,6 +108,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				A96F62602D43C5D500872385 /* FuelTrackr */,
+				A98D0DCB2ECCD2A800B642CE /* ScovilleKit */,
 			);
 			name = FuelTrackr;
 			packageProductDependencies = (
@@ -110,6 +119,7 @@
 				A98BBF102DC1670000F561BF /* Data */,
 				A98BBF122DC1670300F561BF /* Domain */,
 				A9B3A5F42DC265AA00D219FF /* Data */,
+				A98D0C342ECCD17800B642CE /* ScovilleKit */,
 			);
 			productName = DriveWise;
 			productReference = A96F625E2D43C5D500872385 /* FuelTrackr.app */;
@@ -144,6 +154,7 @@
 				A9A91A892D4C02B000153BE0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				A98BBF052DC1660000F561BF /* XCLocalSwiftPackageReference "FuelTrackr/Data" */,
 				A98BBF082DC1661000F561BF /* XCLocalSwiftPackageReference "FuelTrackr/Domain" */,
+				A98D0C332ECCD17800B642CE /* XCRemoteSwiftPackageReference "ScovilleKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A96F625F2D43C5D500872385 /* Products */;
@@ -297,11 +308,11 @@
 		A96F62702D43C5D600872385 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = FuelTrackrIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = FuelTrackr/App/FuelTrackr.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_ASSET_PATHS = "\"FuelTrackr/Preview Content\"";
 				DEVELOPMENT_TEAM = 327PJMKH2C;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -340,11 +351,11 @@
 		A96F62712D43C5D600872385 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = FuelTrackrIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = FuelTrackr/App/FuelTrackr.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_ASSET_PATHS = "\"FuelTrackr/Preview Content\"";
 				DEVELOPMENT_TEAM = 327PJMKH2C;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -415,6 +426,14 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		A98D0C332ECCD17800B642CE /* XCRemoteSwiftPackageReference "ScovilleKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "git@github.com:nl-pepperTechnologies/ScovilleKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.1;
+			};
+		};
 		A9A91A892D4C02B000153BE0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -433,6 +452,11 @@
 		A98BBF122DC1670300F561BF /* Domain */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Domain;
+		};
+		A98D0C342ECCD17800B642CE /* ScovilleKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A98D0C332ECCD17800B642CE /* XCRemoteSwiftPackageReference "ScovilleKit" */;
+			productName = ScovilleKit;
 		};
 		A9A91A8A2D4C02B000153BE0 /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;

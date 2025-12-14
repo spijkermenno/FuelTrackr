@@ -25,9 +25,9 @@ struct Card<Header: View, Content: View>: View {
             content()
         }
         .padding()
-        .background(Color.white)
+        .background(Color(.secondarySystemBackground))
         .cornerRadius(Theme.dimensions.radiusCard)
-        .shadow(color: Color.black.opacity(0.1),radius: 6,x: 0,y: 0)
+        //.shadow(color: Color.black.opacity(0.1),radius: 6,x: 0,y: 0)
         .frame(maxWidth: .infinity)
     }
 }

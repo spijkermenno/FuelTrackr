@@ -15,40 +15,42 @@ public struct PhotoSection: View {
     @Binding public var isImagePickerPresented: Bool
 
     public var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 12) {
             Text(NSLocalizedString("photo_title", comment: "Title for photo section"))
                 .font(.headline)
-                .foregroundColor(.primary)
+                .foregroundStyle(.primary)
 
             if let uiImage = image {
                 Image(uiImage: uiImage)
                     .resizable()
-                    .scaledToFit()
-                    .frame(height: 200)
-                    .cornerRadius(10)
+                    .aspectRatio(contentMode: .fill)
+                    .frame(maxWidth: .infinity, maxHeight: 200)
+                    .clipped()
+                    .cornerRadius(12)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.orange, lineWidth: 2)
+                        RoundedRectangle(cornerRadius: 12)
                     )
             } else {
                 Button(action: {
                     isImagePickerPresented = true
                 }) {
-                    VStack {
+                    VStack(spacing: 8) {
                         Image(systemName: "camera.fill")
-                            .font(.largeTitle)
-                            .foregroundColor(.orange)
+                            .font(.system(size: 40, weight: .semibold))
+                            .foregroundColor(Theme.colors.primary)
 
                         Text(NSLocalizedString("add_photo_button", comment: "Button title for adding a photo"))
-                            .foregroundColor(.orange)
+                            .font(.body)
+                            .foregroundColor(Theme.colors.purple)
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color(UIColor.secondarySystemBackground))
-                    .cornerRadius(10)
+                    .cornerRadius(12)
                 }
             }
         }
+        .padding(.vertical)
     }
 
     public init(image: Binding<UIImage?>, isImagePickerPresented: Binding<Bool>) {

@@ -115,6 +115,35 @@ public class VehicleRepository: VehicleRepositoryProtocol {
         try context.save()
     }
     
+    public func getFuelUsage(id: PersistentIdentifier, context: ModelContext) throws -> FuelUsage? {
+        context.model(for: id) as? FuelUsage
+    }
+
+    public func updateFuelUsage(
+        id: PersistentIdentifier,
+        liters: Double,
+        cost: Double,
+        mileageValue: Int,
+        context: ModelContext
+    ) throws {
+        guard let fuelUsage = try getFuelUsage(id: id, context: context),
+              let vehicle = try loadActiveVehicle(context: context)
+        else { return }
+
+        // (Re)link mileage (create if needed)
+        let mileage = getOrCreateMileage(
+            vehicle: vehicle,
+            mileageValue: mileageValue,
+            context: context
+        )
+        fuelUsage.liters = liters
+        fuelUsage.cost = cost
+        fuelUsage.mileage = mileage
+        // keep original date (or change if you want a date field in the sheet)
+
+        try context.save()
+    }
+    
     public func getFuelUsed(
         forMonth month: Int,
         year: Int?,

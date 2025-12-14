@@ -98,8 +98,11 @@
 "units_section" = "Eenheden";
 "measurement_system" = "Meetsysteem";
 "measurement_system_description" = "Selecteer het meetsysteem voor afstand en brandstof.";
-"use_metric_units" = "Gebruik Metrisch systeem (L, Km)";
-"use_imperial_units" = "Gebruik Imperiaal systeem (G, Mi)";
+"use_metric_units" = "Gebruik metrisch systeem";
+
+"currently_using_metric" = "Je gebruikt momenteel het metrische systeem voor afstand en brandstof (kilometers en liters)";
+"currently_using_imperial" = "Je gebruikt momenteel het imperiale systeem voor afstand en brandstof (mijlen en gallons)";
+
 "default_maintenance_intervals" = "Standaard onderhoudsintervallen";
 "tires" = "Banden";
 "distribution_belt" = "Distributieriem";
@@ -183,3 +186,16 @@
 "ytd" = "Jaar tot nu toe";
 "all_time" = "Alles";
 "projected_year" = "Voorspeld jaar";
+
+"fuel_usage_title" = "Brandstofverbruik";
+"add" = "Toevoegen";
+"edit" = "Bewerken";
+"swipe_to_edit_hint" = "Bewerken";
+
+"edit_fuel_usage_title" = "Brandstofverbruik bewerken";
+"edit_fuel_usage_description" = "Pas liters, kosten of kilometerstand aan voor deze tankbeurt.";
+
+"validation_liters_invalid" = "Voer een geldig aantal liters in (groter dan nul).";
+"validation_cost_invalid" = "Voer een geldig bedrag in (nul of meer).";
+"validation_mileage_invalid" = "Voer een geldige kilometerstand in.";
+"mileage_placeholder_format" = "bijv. %d";

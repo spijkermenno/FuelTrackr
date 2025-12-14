@@ -10,9 +10,8 @@
 import SwiftUI
 import Domain
 
-
 public struct ToggleSettingsView: View {
-    public var viewModel = SettingsViewModel()
+    @StateObject public var viewModel = SettingsViewModel()
 
     public var body: some View {
         VStack(spacing: 12) {
@@ -23,16 +22,7 @@ public struct ToggleSettingsView: View {
                     set: { newValue in viewModel.updateMetricSystem(newValue) }
                 )
             )
-            .toggleStyle(SwitchToggleStyle(tint: .orange))
-
-            Toggle(
-                NSLocalizedString("use_imperial_units", comment: "Toggle for using imperial units"),
-                isOn: Binding(
-                    get: { !viewModel.isUsingMetric },
-                    set: { newValue in viewModel.updateMetricSystem(!newValue) }
-                )
-            )
-            .toggleStyle(SwitchToggleStyle(tint: .orange))
+            .toggleStyle(SwitchToggleStyle(tint: Theme.colors.purple))
         }
         .padding()
     }

@@ -148,10 +148,3 @@ struct ActionButtons: View {
         .padding(.bottom, Theme.dimensions.spacingXL)
     }
 }
-
-#Preview {
-    AddFuelUsageSheet(
-        vehicleViewModel: VehicleViewModel(),
-        viewModel: AddFuelUsageViewModel()
-    )
-}

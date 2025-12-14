@@ -19,11 +19,6 @@ struct FuelTrackrApp: App {
     private let container: ModelContainer
 
     init() {
-        // TODO create wrapper to make analytics generic and testable
-//        Analytics.logEvent(AnalyticsEventAppOpen, parameters: [
-//            AnalyticsParameterItemID: UUID().uuidString,
-//        ])
-
         do {
             container = try ModelContainer(for: Vehicle.self, FuelUsage.self, Maintenance.self, Mileage.self)
         } catch {

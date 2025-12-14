@@ -21,6 +21,12 @@ public struct ActiveVehicleContent: View {
     @Binding public var showAddMaintenanceSheet: Bool
     @Binding public var showEditVehicleSheet: Bool
 
+    // MARK: - Edit Fuel Usage selection
+    private struct FuelUsageSelection: Identifiable {
+        let id: PersistentIdentifier
+    }
+    @State private var selectedFuelUsage: FuelUsageSelection?
+
     public init(
         vehicleViewModel: VehicleViewModel,
         showAddFuelSheet: Binding<Bool>,
@@ -62,8 +68,10 @@ public struct ActiveVehicleContent: View {
                     FuelUsagePreviewCard(
                         items: vehicle.latestFuelUsagePreviews(),
                         onAdd: { showAddFuelSheet = true },
-                        onShowMore: {
-                            // Navigate to full history
+                        onShowMore: {},
+                        onEdit: { preview in
+                            // Open edit sheet for this specific FuelUsage
+                            selectedFuelUsage = FuelUsageSelection(id: preview.fuelUsageID)
                         }
                     )
                     .environmentObject(settingsViewModel)
@@ -74,6 +82,7 @@ public struct ActiveVehicleContent: View {
                         isVehicleActive: vehicle.isPurchased ?? false,
                         onAdd: { showAddMaintenanceSheet = true },
                         onShowMore: {
+                            // TODO: implement maintenance list
                             print("TODO(Not yet implemented)")
                         }
                     )
@@ -108,6 +117,7 @@ public struct ActiveVehicleContent: View {
                 }
             }
         }
+        // Add Fuel Usage
         .sheet(isPresented: $showAddFuelSheet, onDismiss: {
             vehicleViewModel.loadActiveVehicle(context: context)
         }) {
@@ -118,6 +128,19 @@ public struct ActiveVehicleContent: View {
             .presentationDetents([.medium])
             .presentationDragIndicator(.visible)
         }
+        // Edit Fuel Usage (selected from preview list)
+        .sheet(item: $selectedFuelUsage, onDismiss: {
+            vehicleViewModel.loadActiveVehicle(context: context)
+        }) { selection in
+            EditFuelUsageSheet(
+                vehicleViewModel: vehicleViewModel,
+                viewModel: EditFuelUsageViewModel(),
+                fuelUsageID: selection.id
+            )
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.visible)
+        }
+        // Add Maintenance
         .sheet(isPresented: $showAddMaintenanceSheet, onDismiss: {
             vehicleViewModel.loadActiveVehicle(context: context)
         }) {
@@ -125,12 +148,13 @@ public struct ActiveVehicleContent: View {
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
         }
+        // Edit Vehicle
         .sheet(isPresented: $showEditVehicleSheet, onDismiss: {
             vehicleViewModel.loadActiveVehicle(context: context)
         }) {
             EditVehicleSheet(viewModel: vehicleViewModel)
                 .presentationDetents([.large])
-                .presentationDragIndicator(.visible)
+            .presentationDragIndicator(.visible)
         }
         .onAppear {
             vehicleViewModel.loadActiveVehicle(context: context)

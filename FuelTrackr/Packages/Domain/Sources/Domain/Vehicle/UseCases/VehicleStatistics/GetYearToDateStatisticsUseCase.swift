@@ -26,8 +26,10 @@ public struct GetYearToDateStatisticsUseCase {
             .sorted { $0.date < $1.date }
 
         var distance = 0
-        for idx in 1..<yearMileages.count {
-            distance += yearMileages[idx].value - yearMileages[idx - 1].value
+        if yearMileages.count > 1 {
+            for idx in 1..<yearMileages.count {
+                distance += yearMileages[idx].value - yearMileages[idx - 1].value
+            }
         }
 
         // Fuel and cost summed month by month up to the current month
