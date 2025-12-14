@@ -127,10 +127,12 @@ public final class VehicleViewModel: ObservableObject {
         }
     }
     
-    public func updateVehicle(name: String, licensePlate: String, purchaseDate: Date, manufacturingDate: Date, photo: Data?, context: ModelContext) {
+    public func updateVehicle(name: String, brand: String?, model: String?, licensePlate: String, purchaseDate: Date, manufacturingDate: Date, photo: Data?, context: ModelContext) {
         guard let vehicle = resolvedVehicle(context: context) else { return }
         
         vehicle.name = name
+        vehicle.brand = brand
+        vehicle.model = model
         vehicle.licensePlate = licensePlate
         vehicle.purchaseDate = purchaseDate
         vehicle.manufacturingDate = manufacturingDate

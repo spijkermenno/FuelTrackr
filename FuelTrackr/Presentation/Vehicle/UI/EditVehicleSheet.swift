@@ -105,8 +105,11 @@ public struct EditVehicleSheet: View {
             // Schedule notification if needed
         }
 
+        guard let vehicle = viewModel.resolvedVehicle(context: context) else { return }
         viewModel.updateVehicle(
             name: name,
+            brand: vehicle.brand,
+            model: vehicle.model,
             licensePlate: licensePlate,
             purchaseDate: purchaseDate,
             manufacturingDate: manufacturingDate,
