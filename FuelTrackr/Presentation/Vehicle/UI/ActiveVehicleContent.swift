@@ -15,7 +15,6 @@ public struct ActiveVehicleContent: View {
     @StateObject public var addFuelUsageViewModel = AddFuelUsageViewModel()
    
     @Environment(\.modelContext) private var context
-    @EnvironmentObject private var notificationHandler: NotificationHandler
 
     @Binding public var showAddFuelSheet: Bool
     @Binding public var showAddMaintenanceSheet: Bool

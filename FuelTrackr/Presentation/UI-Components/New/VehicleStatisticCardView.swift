@@ -75,8 +75,6 @@ struct VehicleStatisticCardView: View {
         }
         .background(Color(.secondarySystemBackground))
         .cornerRadius(25)
-        //.shadow(color: Color.black.opacity(0.1),radius: 6,x: 0,y: 0)
-        
     }
 }
 

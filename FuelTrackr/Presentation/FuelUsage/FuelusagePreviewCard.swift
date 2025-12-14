@@ -92,13 +92,6 @@ public struct FuelUsagePreviewCard: View {
                     .scrollDisabled(true) // keep outer scroll view in control
                     .frame(height: rowHeight * CGFloat(items.count))
                     .background(Color.clear)
-                    
-                    // If you want a "Show more" action later, add it here:
-                    // Button(NSLocalizedString("fuel_usage_list_title", comment: "")) { onShowMore() }
-                    //     .padding(.top, 4)
-                    //     .font(.footnote)
-                    //     .foregroundColor(Theme.colors.primary)
-                    //     .frame(maxWidth: .infinity, alignment: .trailing)
                 }
                 .padding(.horizontal)
             }
@@ -175,22 +168,3 @@ private struct FuelUsagePreviewRow: View {
         }
     }
 }
-
-// MARK: - Preview (optional)
-// PersistentIdentifier requires a SwiftData context; for previews you can mock or omit.
-/*
-#Preview {
-    let settings = SettingsViewModel()
-    settings.isUsingMetric = true
-    let fakeID = PersistentIdentifier()
-    let sample = [
-        FuelUsagePreviewUiModel(fuelUsageID: fakeID, date: .now, liters: 30.03, cost: 48.43, economy: 19.45),
-        FuelUsagePreviewUiModel(fuelUsageID: fakeID, date: Calendar.current.date(byAdding: .day, value: -7, to: .now)!, liters: 28.5, cost: 45.1, economy: 18.9),
-        FuelUsagePreviewUiModel(fuelUsageID: fakeID, date: Calendar.current.date(byAdding: .day, value: -17, to: .now)!, liters: 27.2, cost: 43.7, economy: 18.3)
-    ]
-    return FuelUsagePreviewCard(items: sample, onAdd: {}, onShowMore: {}, onEdit: { _ in })
-        .environmentObject(settings)
-        .padding()
-        .background(Color.gray.opacity(0.2))
-}
-*/

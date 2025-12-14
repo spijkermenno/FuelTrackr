@@ -15,7 +15,6 @@ import UserNotifications
 public struct SettingsPageView: View {
     @StateObject public var viewModel: SettingsViewModel
     @StateObject public var vehicleViewModel: VehicleViewModel
-    //   private var notificationManager: NotificationManagerProtocol
     
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
@@ -59,8 +58,6 @@ public struct SettingsPageView: View {
                                 viewModel.updateNotifications(newValue)
                                 if newValue {
                                     requestNotificationPermission()
-                                } else {
-                                    //                                    notificationManager.cancelAllNotifications()
                                 }
                             }
                         
@@ -70,8 +67,6 @@ public struct SettingsPageView: View {
                             .padding(.vertical, Theme.dimensions.spacingS)
                         
                         Button(action: {
-                            let date = Date().addingTimeInterval(60)
-                            //                            notificationManager.scheduleMonthlyRecapNotification(for: date)
                             resetMessage = NSLocalizedString("test_notification_success", comment: "")
                             showNotification = true
                             hideNotificationAfterDelay()
@@ -225,10 +220,6 @@ public struct SettingsPageView: View {
     }
     
     private func requestNotificationPermission() {
-        //        notificationManager.requestAuthorization { granted in
-        //            DispatchQueue.main.async {
-        //                viewModel.updateNotifications(granted)
-        //            }
-        //        }
+        // Notification permission request implementation
     }
 }

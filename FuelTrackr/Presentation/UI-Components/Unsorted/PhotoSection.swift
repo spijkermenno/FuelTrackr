@@ -8,7 +8,6 @@
 //
 
 import SwiftUI
-import Domain
 
 public struct PhotoSection: View {
     @Binding public var image: UIImage?

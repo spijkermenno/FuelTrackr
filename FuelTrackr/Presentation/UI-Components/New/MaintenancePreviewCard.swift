@@ -90,13 +90,6 @@ public struct MaintenancePreviewCard: View {
                             MaintenancePreviewRow(model: item)
                         }
                     }
-
-                    // TODO implement
-//                    Button(NSLocalizedString("maintenance_list_title", comment: "")) { onShowMore() }
-//                        .padding(.top, 4)
-//                        .font(.footnote)
-//                        .foregroundColor(Theme.colors.primary)
-//                        .frame(maxWidth: .infinity, alignment: .trailing)
                 }
                 .padding(.horizontal)
             }

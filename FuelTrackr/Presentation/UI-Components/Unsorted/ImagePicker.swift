@@ -8,7 +8,6 @@
 //
 
 import SwiftUI
-import Domain
 
 public struct ImagePicker: UIViewControllerRepresentable {
     @Binding public var image: UIImage?

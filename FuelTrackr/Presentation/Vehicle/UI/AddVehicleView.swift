@@ -19,8 +19,6 @@ public struct AddVehicleView: View {
     @Environment(\.modelContext) public var context
     @Environment(\.dismiss) public var dismiss
     
-    @EnvironmentObject public var notificationHandler: NotificationHandler
-    
     @StateObject public var vehicleViewModel = VehicleViewModel()
     @StateObject public var settingsViewModel = SettingsViewModel()
     
