@@ -12,6 +12,9 @@ import SwiftData
 public final class VehicleViewModel: ObservableObject {
     @Published public var activeVehicleID: PersistentIdentifier?
     @Published public var refreshID = UUID()
+    
+    private var cachedMonthlySummaries: [MonthlyFuelSummaryUiModel]?
+    private var cachedMonthlySummariesVehicleID: PersistentIdentifier?
 
     private let loadActiveVehicleUseCase: LoadActiveVehicleUseCase
     private let saveVehicleUseCase: SaveVehicleUseCase
@@ -100,6 +103,9 @@ public final class VehicleViewModel: ObservableObject {
         do {
             let vehicle = try loadActiveVehicleUseCase(context: context)
             activeVehicleID = vehicle?.persistentModelID
+            // Clear cache when vehicle is reloaded
+            cachedMonthlySummaries = nil
+            cachedMonthlySummariesVehicleID = nil
             refreshID = UUID()
         } catch {
             print("Error loading active vehicle: \(error.localizedDescription)")
@@ -251,6 +257,109 @@ public final class VehicleViewModel: ObservableObject {
             ]
         } catch {
             print("Error generating statistics: \(error.localizedDescription)")
+            return []
+        }
+    }
+    
+    public func monthlyFuelSummaries(context: ModelContext) -> [MonthlyFuelSummaryUiModel] {
+        guard let vehicle = resolvedVehicle(context: context) else {
+            cachedMonthlySummaries = nil
+            cachedMonthlySummariesVehicleID = nil
+            return []
+        }
+        
+        // Return cached result if vehicle hasn't changed
+        if let cached = cachedMonthlySummaries,
+           let cachedID = cachedMonthlySummariesVehicleID,
+           cachedID == vehicle.persistentModelID {
+            return cached
+        }
+        
+        do {
+            let calendar = Calendar.current
+            let now = Date()
+            var summaries: [MonthlyFuelSummaryUiModel] = []
+            
+            // Use the same use cases as vehicleStatistics
+            // Current Month
+            let currentMonthStats = try getCurrentMonthStatsUseCase(context: context)
+            let currentMonth = calendar.component(.month, from: now)
+            let currentYear = calendar.component(.year, from: now)
+            summaries.append(
+                vehicle.monthlyFuelSummary(
+                    month: currentMonth,
+                    year: currentYear,
+                    totalDistance: currentMonthStats.distanceDriven,
+                    totalFuel: currentMonthStats.fuelUsed,
+                    totalCost: currentMonthStats.totalCost
+                )
+            )
+            
+            // Last Month
+            let lastMonthStats = try getLastMonthStatsUseCase(context: context)
+            let lastMonthDate = calendar.date(byAdding: .month, value: -1, to: now) ?? now
+            let lastMonth = calendar.component(.month, from: lastMonthDate)
+            let lastYear = calendar.component(.year, from: lastMonthDate)
+            summaries.append(
+                vehicle.monthlyFuelSummary(
+                    month: lastMonth,
+                    year: lastYear,
+                    totalDistance: lastMonthStats.distanceDriven,
+                    totalFuel: lastMonthStats.fuelUsed,
+                    totalCost: lastMonthStats.totalCost
+                )
+            )
+            
+            // YTD - show as average per month
+            let ytdStats = try getYtdStatsUseCase(context: context)
+            let monthsSoFar = Double(calendar.component(.month, from: now))
+            summaries.append(
+                vehicle.monthlyFuelSummary(
+                    month: currentMonth,
+                    year: currentYear,
+                    totalDistance: ytdStats.distanceDriven / monthsSoFar,
+                    totalFuel: ytdStats.fuelUsed / monthsSoFar,
+                    totalCost: ytdStats.totalCost / monthsSoFar
+                )
+            )
+            
+            // AllTime - show as average per month
+            let allTimeStats = try getAllTimeStatsUseCase(context: context)
+            let uniqueMonths = Set(vehicle.fuelUsages.map { 
+                calendar.dateComponents([.year, .month], from: $0.date)
+            }).count
+            let monthsCount = max(Double(uniqueMonths), 1.0)
+            summaries.append(
+                vehicle.monthlyFuelSummary(
+                    month: currentMonth,
+                    year: currentYear,
+                    totalDistance: allTimeStats.distanceDriven / monthsCount,
+                    totalFuel: allTimeStats.fuelUsed / monthsCount,
+                    totalCost: allTimeStats.totalCost / monthsCount
+                )
+            )
+            
+            // ProjectedYear - show as average per month (projected year / 12)
+            let projectedStats = try getProjectedYearStatsUseCase(context: context)
+            summaries.append(
+                vehicle.monthlyFuelSummary(
+                    month: currentMonth,
+                    year: currentYear,
+                    totalDistance: projectedStats.distanceDriven / 12.0,
+                    totalFuel: projectedStats.fuelUsed / 12.0,
+                    totalCost: projectedStats.totalCost / 12.0
+                )
+            )
+            
+            // Cache the result
+            cachedMonthlySummaries = summaries
+            cachedMonthlySummariesVehicleID = vehicle.persistentModelID
+            
+            return summaries
+        } catch {
+            print("Error generating monthly fuel summaries: \(error.localizedDescription)")
+            cachedMonthlySummaries = nil
+            cachedMonthlySummariesVehicleID = nil
             return []
         }
     }

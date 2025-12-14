@@ -15,6 +15,7 @@ public struct ActiveVehicleContent: View {
     @StateObject public var addFuelUsageViewModel = AddFuelUsageViewModel()
    
     @Environment(\.modelContext) private var context
+    @Environment(\.colorScheme) private var colorScheme
 
     @Binding public var showAddFuelSheet: Bool
     @Binding public var showAddMaintenanceSheet: Bool
@@ -41,60 +42,58 @@ public struct ActiveVehicleContent: View {
     public var body: some View {
         ScrollView {
             if let vehicle = vehicleViewModel.resolvedVehicle(context: context) {
-                VStack(alignment: .leading, spacing: 16) {
-                    VehicleImageView(photoData: vehicle.photo)
-                        .padding(.horizontal)
-                    
-                    VehiclePurchaseBanner(
-                        isPurchased: vehicle.isPurchased ?? false,
-                        purchaseDate: vehicle.purchaseDate,
-                        onConfirmPurchase: {
-                            vehicleViewModel.confirmPurchase(context: context)
-                        }
-                    )
-                    .padding(.horizontal)
-                    
-                    NewVehicleInfoCard(
+                VStack(alignment: .leading, spacing: 20) {
+                    // Vehicle Image Carousel
+                    VehicleImageCarouselView(
+                        photoData: vehicle.photo,
                         licensePlate: vehicle.licensePlate,
-                        mileage: vehicle.mileages.sorted(by: { $0.date < $1.date }).last?.value ?? 0,
+                        currentMileage: vehicle.mileages.sorted(by: { $0.date < $1.date }).last?.value ?? 0,
                         purchaseDate: vehicle.purchaseDate,
-                        productionDate: vehicle.manufacturingDate
+                        productionDate: vehicle.manufacturingDate,
+                        isUsingMetric: settingsViewModel.isUsingMetric
                     )
-                    .padding(.horizontal)
                     
-                    VehicleStatisticsCarouselView(items: vehicleViewModel.vehicleStatistics(context: context))
+                    // Monthly Fuel Summary Carousel
+                    MonthlyFuelSummaryCarouselView(
+                        vehicleViewModel: vehicleViewModel,
+                        isUsingMetric: settingsViewModel.isUsingMetric
+                    )
                     
-                    FuelUsagePreviewCard(
-                        items: vehicle.latestFuelUsagePreviews(),
+                    // Fuel Consumption Section
+                    FuelConsumptionSectionView(
+                        entries: vehicle.fuelConsumptionEntries(limit: 10),
                         onAdd: { showAddFuelSheet = true },
-                        onShowMore: {},
-                        onEdit: { preview in
-                            // Open edit sheet for this specific FuelUsage
-                            selectedFuelUsage = FuelUsageSelection(id: preview.fuelUsageID)
+                        onShowMore: {
+                            // TODO: Navigate to full fuel history
+                        },
+                        onEdit: { entry in
+                            selectedFuelUsage = FuelUsageSelection(id: entry.fuelUsageID)
                         }
                     )
                     .environmentObject(settingsViewModel)
-                    .padding(.horizontal)
+                    .padding(.horizontal, Theme.dimensions.spacingL)
                     
-                    MaintenancePreviewCard(
-                        items: vehicle.latestMaintenancePreviews(),
+                    // Maintenance History Section
+                    MaintenanceHistorySectionView(
+                        entries: vehicle.maintenanceEntries(limit: 10),
                         isVehicleActive: vehicle.isPurchased ?? false,
                         onAdd: { showAddMaintenanceSheet = true },
                         onShowMore: {
-                            // TODO: implement maintenance list
-                            print("TODO(Not yet implemented)")
+                            // TODO: Navigate to full maintenance history
                         }
                     )
-                    .padding(.horizontal)
+                    .environmentObject(settingsViewModel)
+                    .padding(.horizontal, Theme.dimensions.spacingL)
                 }
-                .navigationTitle(vehicle.name)
+                .padding(.vertical, Theme.dimensions.spacingM)
             } else {
                 Text("No active vehicle found.")
                     .padding()
             }
         }
         .id(vehicleViewModel.refreshID)
-        .background(Color(UIColor.systemBackground))
+        .background(Theme.colors(for: colorScheme).background)
+        .navigationTitle(vehicleViewModel.resolvedVehicle(context: context)?.displayName ?? "")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {

@@ -134,6 +134,7 @@
 "select_date" = "Select Date";
 "date" = "Date";
 "close" = "Close";
+"search" = "Search";
 
 /* Graphs */
 "no_graph_fuel" = "A graph will appear here once more fuel data has been added.";
@@ -242,3 +243,22 @@
 "onboarding_completion_description" = "FuelTrackr is now ready to help you track fuel, costs, and maintenance automatically.";
 "onboarding_go_to_dashboard" = "Go to dashboard";
 "done" = "Done";
+
+/* Redesigned Active Vehicle View */
+"fuel_consumption" = "Fuel Consumption";
+"maintenance_history" = "Maintenance History";
+"show_more" = "Show More";
+"fuel_history" = "Fuel History";
+"total_distance_km" = "Total Distance";
+"total_distance_miles" = "Total Distance";
+"average_price" = "Average Price";
+"fuel" = "Fuel";
+"costs" = "Costs";
+"odometer" = "Odometer";
+"brake_replacement" = "Brake Replacement";
+"tire_replacement" = "Tire Replacement";
+"distribution_belt" = "Distribution Belt";
+"other_maintenance" = "Other";
+"mileage" = "Mileage";
+"owned" = "Owned";
+"age" = "Age";

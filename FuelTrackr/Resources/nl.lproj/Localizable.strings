@@ -146,6 +146,7 @@
 "select_date" = "Selecteer datum";
 "date" = "Datum";
 "close" = "Sluiten";
+"search" = "Zoeken";
 
 /* Vernieuwen en Actieve Voertuig */
 "refreshing" = "Vernieuwen...";
@@ -242,3 +243,22 @@
 "onboarding_completion_description" = "FuelTrackr is nu klaar om je te helpen brandstof, kosten en onderhoud automatisch bij te houden.";
 "onboarding_go_to_dashboard" = "Ga naar dashboard";
 "done" = "Gereed";
+
+/* Herontworpen Actieve Voertuig Weergave */
+"fuel_consumption" = "Brandstofverbruik";
+"maintenance_history" = "Onderhoud geschiedenis";
+"show_more" = "Meer weergeven";
+"fuel_history" = "Brandstof geschiedenis";
+"total_distance_km" = "Totale afstand";
+"total_distance_miles" = "Totale afstand";
+"average_price" = "Gemiddelde prijs";
+"fuel" = "Brandstof";
+"costs" = "Kosten";
+"odometer" = "Kilometerstand";
+"brake_replacement" = "Remblokken vervangen";
+"tire_replacement" = "Banden vervangen";
+"distribution_belt" = "Distributieriem";
+"other_maintenance" = "Overig";
+"mileage" = "Kilometerstand";
+"owned" = "Eigendom";
+"age" = "Leeftijd";
