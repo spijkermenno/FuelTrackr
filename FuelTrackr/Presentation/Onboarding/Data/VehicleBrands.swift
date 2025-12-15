@@ -64,3 +64,4 @@ public struct VehicleBrands {
         return brands.filter { $0.lowercased().contains(lowercasedQuery) }
     }
 }
+

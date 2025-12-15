@@ -58,6 +58,7 @@
 "fuel_usage_empty_title" = "More data needed";
 "fuel_usage_empty_description" = "Add more fuel entries for a better overview.";
 "fuel_usage_list_title" = "Fuel Usage Records";
+"fuel_history_need_more_data" = "Add another fuel entry to view the detailed history.";
 
 /* Maintenance */
 "maintenance_title" = "Maintenance History";
@@ -83,6 +84,9 @@
 "invalid_number_error" = "Invalid number. Ensure the input is numeric.";
 "invalid_notes_error" = "Please provide a description for the maintenance.";
 "general_error" = "Something went wrong. Please try again.";
+"mileage_too_low_error" = "The mileage cannot be lower than the previous recorded value (%d).";
+"mileage_suspiciously_high_warning" = "This mileage is much higher than expected. Please check if you added an extra digit.";
+"invalid_input_error" = "Invalid input. Please check all fields.";
 
 /* Notifications */
 "notifications_section" = "Notifications";
@@ -262,3 +266,23 @@
 "mileage" = "Mileage";
 "owned" = "Owned";
 "age" = "Age";
+
+/* Fuel Detail Page */
+"consumption_overview" = "Consumption Overview";
+"average_consumption" = "average consumption";
+"total_cost_label" = "Total cost";
+"last_refueling" = "Last refueling";
+"fuel_entries_last_months" = "Fuel entries last %d months (%d)";
+"fuel_entries_last_month" = "Fuel entries last month (%d)";
+"add_new_refueling" = "+ Add new refueling";
+"timeframe_1m" = "1M";
+"timeframe_3m" = "3M";
+"timeframe_1y" = "1Y";
+"timeframe_ytd" = "YTD";
+"range" = "range";
+"location" = "Location";
+"km_per_liter" = "km/l";
+"liters" = "L";
+"price_per_liter" = "$/L";
+"consumption" = "Consumption";
+"cost" = "Cost";

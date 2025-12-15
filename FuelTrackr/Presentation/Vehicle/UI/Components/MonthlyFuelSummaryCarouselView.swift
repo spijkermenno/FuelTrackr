@@ -131,3 +131,4 @@ struct MonthlySummaryPageControl: View {
         .frame(height: MonthlySummaryPageControl.Height)
     }
 }
+

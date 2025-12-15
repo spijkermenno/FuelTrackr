@@ -58,6 +58,7 @@
 "fuel_usage_empty_title" = "Meer gegevens nodig";
 "fuel_usage_empty_description" = "Voeg meer tankbeurten toe voor een beter overzicht.";
 "fuel_usage_list_title" = "Brandstof details";
+"fuel_history_need_more_data" = "Voeg nog een tankbeurt toe om de gedetailleerde geschiedenis te bekijken.";
 
 /* Onderhoud */
 "maintenance_title" = "Onderhoud Geschiedenis";
@@ -83,6 +84,9 @@
 "invalid_number_error" = "Ongeldig nummer. Zorg ervoor dat de invoer numeriek is.";
 "invalid_notes_error" = "Geef een beschrijving op voor het onderhoud.";
 "general_error" = "Er is iets misgegaan. Probeer het opnieuw.";
+"mileage_too_low_error" = "De kilometerstand kan niet lager zijn dan de vorige geregistreerde waarde (%d).";
+"mileage_suspiciously_high_warning" = "Deze kilometerstand is veel hoger dan verwacht. Controleer of je geen extra cijfer hebt toegevoegd.";
+"invalid_input_error" = "Ongeldige invoer. Controleer alle velden.";
 
 /* Meldingen */
 "notifications_section" = "Meldingen";
@@ -262,3 +266,23 @@
 "mileage" = "Kilometerstand";
 "owned" = "Eigendom";
 "age" = "Leeftijd";
+
+/* Fuel Detail Page */
+"consumption_overview" = "Verbruiksoverzicht";
+"average_consumption" = "gemiddeld verbruik";
+"total_cost_label" = "Kosten totaal";
+"last_refueling" = "Laatste tankbeurt";
+"fuel_entries_last_months" = "Tankbeurten afgelopen %d maanden (%d)";
+"fuel_entries_last_month" = "Tankbeurten afgelopen maand (%d)";
+"add_new_refueling" = "+ Nieuwe tankbeurt toevoegen";
+"timeframe_1m" = "1M";
+"timeframe_3m" = "3M";
+"timeframe_1y" = "1J";
+"timeframe_ytd" = "YTD";
+"range" = "bereik";
+"location" = "Locatie";
+"km_per_liter" = "km/l";
+"liters" = "L";
+"price_per_liter" = "€/L";
+"consumption" = "Verbruik";
+"cost" = "Kosten";

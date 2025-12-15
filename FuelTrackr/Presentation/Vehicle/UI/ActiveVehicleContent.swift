@@ -20,6 +20,8 @@ public struct ActiveVehicleContent: View {
     @Binding public var showAddFuelSheet: Bool
     @Binding public var showAddMaintenanceSheet: Bool
     @Binding public var showEditVehicleSheet: Bool
+    
+    @State private var showFuelDetailsSheet = false
 
     // MARK: - Edit Fuel Usage selection
     private struct FuelUsageSelection: Identifiable {
@@ -64,7 +66,7 @@ public struct ActiveVehicleContent: View {
                         entries: vehicle.fuelConsumptionEntries(limit: 10),
                         onAdd: { showAddFuelSheet = true },
                         onShowMore: {
-                            // TODO: Navigate to full fuel history
+                            showFuelDetailsSheet = true
                         },
                         onEdit: { entry in
                             selectedFuelUsage = FuelUsageSelection(id: entry.fuelUsageID)
@@ -152,6 +154,17 @@ public struct ActiveVehicleContent: View {
         }) {
             EditVehicleSheet(viewModel: vehicleViewModel)
                 .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+        }
+        // Fuel Details Sheet
+        .sheet(isPresented: $showFuelDetailsSheet, onDismiss: {
+            vehicleViewModel.loadActiveVehicle(context: context)
+        }) {
+            FuelDetailsSheet(
+                viewModel: vehicleViewModel,
+                showAddFuelSheet: $showAddFuelSheet
+            )
+            .presentationDetents([.large])
             .presentationDragIndicator(.visible)
         }
         .onAppear {

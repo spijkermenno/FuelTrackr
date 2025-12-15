@@ -64,8 +64,8 @@ public struct FuelConsumptionSectionView: View {
                 }
             }
             
-            // Show more button
-            if entries.count > 3 {
+            // Show more button or message
+            if entries.count >= 2 {
                 Button(action: onShowMore) {
                     Text(NSLocalizedString("fuel_history", comment: "Fuel History"))
                         .font(.system(size: 14, weight: .semibold))
@@ -79,6 +79,12 @@ public struct FuelConsumptionSectionView: View {
                         )
                         .cornerRadius(12)
                 }
+            } else if entries.count == 1 {
+                Text(NSLocalizedString("fuel_history_need_more_data", comment: "Need more data for history"))
+                    .font(.system(size: 14, weight: .regular))
+                    .foregroundColor(colors.onSurface)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 12)
             }
         }
         .padding(Theme.dimensions.spacingL)

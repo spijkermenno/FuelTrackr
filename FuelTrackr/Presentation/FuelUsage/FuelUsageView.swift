@@ -68,7 +68,7 @@ public struct FuelUsageView: View {
         .background(Color(.systemGray6))
         .cornerRadius(10)
         .sheet(isPresented: $showAllFuelEntries) {
-            FuelDetailsSheet(viewModel: viewModel)
+            FuelDetailsSheet(viewModel: viewModel, showAddFuelSheet: $showAddFuelSheet)
         }
         .onAppear {
             resolvedVehicle = viewModel.resolvedVehicle(context: context)

@@ -71,3 +71,4 @@ public struct VehicleModels {
         return models.filter { $0.lowercased().contains(lowercasedQuery) }
     }
 }
+

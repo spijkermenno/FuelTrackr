@@ -32,9 +32,14 @@ struct AddFuelUsageSheet: View {
                         mileage: $viewModel.mileage,
                         mileagePlaceholder: mileagePlaceholder,
                         errorMessage: viewModel.errorMessage,
+                        mileageWarning: viewModel.mileageWarning,
                         onCancel: { dismiss() },
                         onSave: saveFuelUsage
                     )
+                    .onChange(of: viewModel.mileage) { _ in
+                        // Debounce validation
+                        viewModel.validateMileage(against: resolvedVehicle)
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .top)
                 .padding(.horizontal, Theme.dimensions.spacingSection)
@@ -84,6 +89,7 @@ struct InputSection: View {
 
     let mileagePlaceholder: String
     let errorMessage: String?
+    let mileageWarning: String?
 
     var onCancel: () -> Void
     var onSave: () -> Void
@@ -96,6 +102,7 @@ struct InputSection: View {
                 text: $liters,
                 keyboardType: .decimalPad
             )
+            .accessibilityLabel(NSLocalizedString("liters_label", comment: ""))
 
             InputField(
                 title: NSLocalizedString("cost_label", comment: ""),
@@ -103,20 +110,47 @@ struct InputSection: View {
                 text: $cost,
                 keyboardType: .decimalPad
             )
+            .accessibilityLabel(NSLocalizedString("cost_label", comment: ""))
 
-            InputField(
-                title: NSLocalizedString("mileage_label", comment: ""),
-                placeholder: mileagePlaceholder,
-                text: $mileage,
-                keyboardType: .numberPad
-            )
+            VStack(alignment: .leading, spacing: 4) {
+                InputField(
+                    title: NSLocalizedString("mileage_label", comment: ""),
+                    placeholder: mileagePlaceholder,
+                    text: $mileage,
+                    keyboardType: .numberPad,
+                    hasError: errorMessage != nil,
+                    hasWarning: mileageWarning != nil
+                )
+                .accessibilityLabel(NSLocalizedString("mileage_label", comment: ""))
+                
+                if let warning = mileageWarning {
+                    HStack(spacing: 4) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(.orange)
+                            .font(.caption)
+                        Text(warning)
+                            .foregroundColor(.orange)
+                            .font(Theme.typography.footnoteFont)
+                    }
+                    .padding(.horizontal, 4)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel(warning)
+                }
+            }
 
             if let error = errorMessage {
-                Text(error)
-                    .foregroundColor(Theme.colors.error)
-                    .font(Theme.typography.footnoteFont)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
+                HStack(spacing: 4) {
+                    Image(systemName: "exclamationmark.circle.fill")
+                        .foregroundColor(Theme.colors.error)
+                        .font(.caption)
+                    Text(error)
+                        .foregroundColor(Theme.colors.error)
+                        .font(Theme.typography.footnoteFont)
+                }
+                .multilineTextAlignment(.leading)
+                .padding(.horizontal, 4)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(error)
             }
 
             ActionButtons(onCancel: onCancel, onSave: onSave)

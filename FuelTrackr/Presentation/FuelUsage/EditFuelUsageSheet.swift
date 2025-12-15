@@ -37,6 +37,7 @@ struct EditFuelUsageSheet: View {
                         mileage: $viewModel.mileage,
                         mileagePlaceholder: mileagePlaceholder,
                         errorMessage: viewModel.errorMessage,
+                        mileageWarning: nil,
                         onCancel: { dismiss() },
                         onSave: saveEdits
                     )
