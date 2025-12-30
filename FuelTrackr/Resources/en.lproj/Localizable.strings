@@ -221,9 +221,20 @@
 "onboarding_license_plate_placeholder" = "Fill in license plate";
 "onboarding_license_plate_info" = "When available, FuelTrackr will use public vehicle data to pre-fill details. This only works for supported regions and plate formats.";
 "onboarding_add_later" = "I'll add this later";
+
+"onboarding_vehicle_fuel_type_title" = "Vehicle Fuel Type";
+"onboarding_vehicle_fuel_type_question" = "What fuel does your vehicle use?";
+"onboarding_vehicle_fuel_type_placeholder" = "[NYD]";
+
+"fuel_liquid" = "Petrol or Diesel";
+"fuel_electric" = "Electric";
+"fuel_hydrogen" = "Hydrogen";
+"fuel_unknown" = "Unknown";
+
 "onboarding_vehicle_brand_title" = "Vehicle brand";
 "onboarding_vehicle_brand_question" = "What brand is your vehicle?";
 "onboarding_vehicle_brand_placeholder" = "Search or select your brand";
+
 "onboarding_not_on_list" = "Not on the list";
 "onboarding_vehicle_model_title" = "Vehicle model";
 "onboarding_vehicle_model_question" = "Which model do you drive?";

@@ -15,6 +15,7 @@ public class Vehicle: Hashable {
     @Attribute public var brand: String?
     @Attribute public var model: String?
     @Attribute public var licensePlate: String
+    @Attribute public var fuelType: FuelType?
     @Attribute public var purchaseDate: Date
     @Attribute public var manufacturingDate: Date
     @Attribute public var photo: Data?
@@ -31,6 +32,7 @@ public class Vehicle: Hashable {
         brand: String? = nil,
         model: String? = nil,
         licensePlate: String,
+        fuelType: FuelType? = nil,
         purchaseDate: Date,
         manufacturingDate: Date,
         photo: Data? = nil,
@@ -40,6 +42,7 @@ public class Vehicle: Hashable {
         self.brand = brand
         self.model = model
         self.licensePlate = licensePlate
+        self.fuelType = fuelType
         self.purchaseDate = purchaseDate
         self.manufacturingDate = manufacturingDate
         self.photo = photo

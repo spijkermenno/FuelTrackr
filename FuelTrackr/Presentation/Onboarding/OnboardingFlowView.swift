@@ -60,6 +60,8 @@ public struct OnboardingFlowView: View {
                         OnboardingUnitSelectionView(viewModel: viewModel)
                     case .licensePlate:
                         OnboardingLicensePlateView(viewModel: viewModel)
+                    case .vehicleFuelType:
+                        OnboardingVehicleFuelTypeView(viewModel: viewModel)
                     case .vehicleBrand:
                         OnboardingVehicleBrandView(viewModel: viewModel)
                     case .vehicleModel:

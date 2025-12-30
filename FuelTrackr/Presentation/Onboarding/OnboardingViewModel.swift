@@ -14,6 +14,7 @@ public final class OnboardingViewModel: ObservableObject {
     @Published public var currentStep: OnboardingStep = .welcome
     @Published public var isUsingMetric: Bool = true
     @Published public var licensePlate: String = ""
+    @Published public var vehicleFuelType: FuelType = .unknown
     @Published public var vehicleBrand: String = ""
     @Published public var vehicleModel: String = ""
     @Published public var purchaseDate: Date = Calendar.current.startOfDay(for: Date())
@@ -37,16 +38,18 @@ public final class OnboardingViewModel: ObservableObject {
             return 1 // Shows "1 of 9" in design
         case .licensePlate:
             return 2 // Shows "2 of 9" in design
+        case .vehicleFuelType:
+            return 3 // Shows "2 of 9" in design
         case .vehicleBrand:
-            return 3 // Shows "3 of 9" in design
+            return 4 // Shows "3 of 9" in design
         case .vehicleModel:
-            return 4 // Shows "4 of 9" in design
+            return 5 // Shows "4 of 9" in design
         case .optionalDetails:
-            return 5 // Shows "5 of 9" in design
+            return 6 // Shows "5 of 9" in design
         case .currentMileage:
-            return 6 // Shows "6 of 9" in design
+            return 7 // Shows "6 of 9" in design
         case .addPhoto:
-            return 7 // Shows "7 of 9" in design (step 8 is skipped)
+            return 8 // Shows "7 of 9" in design (step 8 is skipped)
         case .completion:
             return 9 // Completion doesn't show progress, but if it did it would be 9
         }
@@ -88,6 +91,10 @@ public final class OnboardingViewModel: ObservableObject {
         setIsUsingMetric(isMetric)
     }
     
+    public func updateVehicleFuelType(_ fuelType: FuelType) {
+        vehicleFuelType = fuelType
+    }
+    
     public func canProceedFromCurrentStep() -> Bool {
         switch currentStep {
         case .welcome:
@@ -96,6 +103,8 @@ public final class OnboardingViewModel: ObservableObject {
             return true
         case .licensePlate:
             return !licensePlate.trimmingCharacters(in: .whitespaces).isEmpty
+        case .vehicleFuelType:
+            return vehicleFuelType != .unknown
         case .vehicleBrand:
             return !vehicleBrand.trimmingCharacters(in: .whitespaces).isEmpty
         case .vehicleModel:
@@ -140,6 +149,7 @@ public final class OnboardingViewModel: ObservableObject {
             brand: vehicleBrand.isEmpty ? nil : vehicleBrand,
             model: vehicleModel.isEmpty ? nil : vehicleModel,
             licensePlate: licensePlate,
+            fuelType: vehicleFuelType,
             purchaseDate: purchaseDate,
             manufacturingDate: productionDate,
             photo: vehiclePhoto?.jpegData(compressionQuality: 0.8)
@@ -152,10 +162,11 @@ public enum OnboardingStep: Int, CaseIterable {
     case welcome = 1
     case unitSelection = 2
     case licensePlate = 3
-    case vehicleBrand = 4
-    case vehicleModel = 5
-    case optionalDetails = 6
-    case currentMileage = 7
+    case vehicleFuelType = 4
+    case vehicleBrand = 5
+    case vehicleModel = 6
+    case optionalDetails = 7
+    case currentMileage = 8
     case addPhoto = 9 // Step 8 is skipped in the design
     case completion = 10
     
@@ -187,6 +198,8 @@ public enum OnboardingStep: Int, CaseIterable {
             return NSLocalizedString("onboarding_unit_selection_title", comment: "")
         case .licensePlate:
             return NSLocalizedString("onboarding_license_plate_title", comment: "")
+        case .vehicleFuelType:
+            return NSLocalizedString("onboarding_vehicle_fuel_type_title", comment: "")
         case .vehicleBrand:
             return NSLocalizedString("onboarding_vehicle_brand_title", comment: "")
         case .vehicleModel:

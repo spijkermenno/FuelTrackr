@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct UnitSelectionButton: View {
+public struct DualTextButton: View {
     let title: String
     let subtitle: String
     let isSelected: Bool
@@ -38,6 +38,41 @@ public struct UnitSelectionButton: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 72)
+            .background(isSelected ? OnboardingColors.primaryBlue : OnboardingColors.background)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(OnboardingColors.primaryBlue, lineWidth: isSelected ? 0 : 2)
+            )
+            .cornerRadius(16)
+        }
+        .buttonStyle(ScaleButtonStyle())
+    }
+}
+
+public struct TextButton: View {
+    let title: String
+    let isSelected: Bool
+    let action: () -> Void
+    
+    public init(
+        title: String,
+        isSelected: Bool,
+        action: @escaping () -> Void
+    ) {
+        self.title = title
+        self.isSelected = isSelected
+        self.action = action
+    }
+    
+    public var body: some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Text(title)
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundColor(isSelected ? OnboardingColors.white : OnboardingColors.primaryBlue)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 53)
             .background(isSelected ? OnboardingColors.primaryBlue : OnboardingColors.background)
             .overlay(
                 RoundedRectangle(cornerRadius: 16)

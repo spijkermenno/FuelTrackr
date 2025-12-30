@@ -34,18 +34,8 @@ public struct OnboardingAddPhotoView: View {
             Spacer()
 
             if let photo = viewModel.vehiclePhoto {
-                Image(uiImage: photo)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 200, height: 200)
-                    .cornerRadius(20)
-                    .clipped()
-                    .shadow(
-                        color: Color.black.opacity(0.1),
-                        radius: 10,
-                        x: 0,
-                        y: 5
-                    )
+                VehicleImageView(photoData: viewModel.vehiclePhoto?.pngData())
+                    .padding()
                     .transition(.scale.combined(with: .opacity))
             } else {
                 Color.clear

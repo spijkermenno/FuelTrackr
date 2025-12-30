@@ -24,7 +24,7 @@ public struct OnboardingUnitSelectionView: View {
             
             // Unit Selection Buttons
             VStack(spacing: 16) {
-                UnitSelectionButton(
+                DualTextButton(
                     title: NSLocalizedString("kilometers_liters", comment: "Kilometers & Liters"),
                     subtitle: NSLocalizedString("metric", comment: "(Metric)"),
                     isSelected: viewModel.isUsingMetric,
@@ -41,7 +41,7 @@ public struct OnboardingUnitSelectionView: View {
                     }
                 )
                 
-                UnitSelectionButton(
+                DualTextButton(
                     title: NSLocalizedString("miles_gallons", comment: "Miles & Gallons"),
                     subtitle: NSLocalizedString("imperial", comment: "(Imperial)"),
                     isSelected: !viewModel.isUsingMetric,

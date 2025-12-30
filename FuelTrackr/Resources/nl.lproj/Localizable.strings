@@ -221,9 +221,20 @@
 "onboarding_license_plate_placeholder" = "Vul kenteken in";
 "onboarding_license_plate_info" = "Wanneer beschikbaar, gebruikt FuelTrackr openbare voertuiggegevens om details vooraf in te vullen. Dit werkt alleen voor ondersteunde regio's en kentekenformaten.";
 "onboarding_add_later" = "Ik voeg dit later toe";
+
+"onboarding_vehicle_fuel_type_title" = "Voertuig brandstof type";
+"onboarding_vehicle_fuel_type_question" = "Welke soort brandstof gebruikt jou voertuig?";
+"onboarding_vehicle_fuel_type_placeholder" = "[Nader te bepalen]";
+
+"fuel_liquid" = "Benzine of Diesel";
+"fuel_electric" = "Elektrisch";
+"fuel_hydrogen" = "Waterstof";
+"fuel_unknown" = "Onbekend";
+
 "onboarding_vehicle_brand_title" = "Voertuigmerk";
 "onboarding_vehicle_brand_question" = "Welk merk is je voertuig?";
 "onboarding_vehicle_brand_placeholder" = "Zoek of selecteer je merk";
+
 "onboarding_not_on_list" = "Niet in de lijst";
 "onboarding_vehicle_model_title" = "Voertuigmodel";
 "onboarding_vehicle_model_question" = "Welk model rijd je?";
