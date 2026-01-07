@@ -20,6 +20,7 @@ public struct FuelConsumptionEntryUiModel: Identifiable {
     public let totalCost: Double
     public let consumptionRate: Double // km/l
     public let distanceDriven: Int // km
+    public let containsPartialFills: Bool // True if this merged entry contains partial fills
     
     public init(
         id: UUID = UUID(),
@@ -31,7 +32,8 @@ public struct FuelConsumptionEntryUiModel: Identifiable {
         pricePerLiter: Double,
         totalCost: Double,
         consumptionRate: Double,
-        distanceDriven: Int
+        distanceDriven: Int,
+        containsPartialFills: Bool = false
     ) {
         self.id = id
         self.fuelUsageID = fuelUsageID
@@ -43,6 +45,7 @@ public struct FuelConsumptionEntryUiModel: Identifiable {
         self.totalCost = totalCost
         self.consumptionRate = consumptionRate
         self.distanceDriven = distanceDriven
+        self.containsPartialFills = containsPartialFills
     }
 }
 
@@ -51,6 +54,13 @@ public struct FuelConsumptionEntryView: View {
     @EnvironmentObject private var settings: SettingsViewModel
     let entry: FuelConsumptionEntryUiModel
     let onEdit: () -> Void
+    let onPartialFillTapped: (() -> Void)?
+    
+    init(entry: FuelConsumptionEntryUiModel, onEdit: @escaping () -> Void, onPartialFillTapped: (() -> Void)? = nil) {
+        self.entry = entry
+        self.onEdit = onEdit
+        self.onPartialFillTapped = onPartialFillTapped
+    }
     
     private var colors: ColorsProtocol {
         Theme.colors(for: colorScheme)
@@ -59,9 +69,13 @@ public struct FuelConsumptionEntryView: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             // Date
-            Text(formatDate(entry.date))
-                .font(.system(size: 14, weight: .regular))
-                .foregroundColor(colors.primary)
+            HStack {
+                Text(formatDate(entry.date))
+                    .font(.system(size: 14, weight: .regular))
+                    .foregroundColor(colors.primary)
+                
+                Spacer()
+            }
             
             // Odometer range
             Text(formatOdometerRange(entry.startOdometer, entry.endOdometer))

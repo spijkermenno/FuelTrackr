@@ -296,3 +296,27 @@
 "price_per_liter" = "$/L";
 "consumption" = "Consumption";
 "cost" = "Cost";
+
+/* Partial Fill */
+"partial_fill" = "Partial Fill";
+"partial_fill_description" = "This refill appears to be partial. It will be merged with the next full refill for accurate consumption calculations.";
+"partial_fill_badge" = "Half Tank";
+"mark_as_full_fill" = "Mark as Full Fill";
+"mark_as_partial_fill" = "Mark as Partial Fill";
+"partial_fill_info" = "Partial fills are automatically detected when a refill is significantly less than your average. They are merged with the next full refill for accurate fuel consumption calculations.";
+"not_enough_data_for_detection" = "Need at least %d refills to detect partial fills";
+"current_status" = "Current Status";
+"fill_type" = "Fill Type";
+"full_fill" = "Full Fill";
+"average_refill_amount" = "Average Refill Amount";
+"merged_partial_fill_description" = "This entry contains multiple fuel fills that have been merged together. You can mark individual entries as full or partial fills below.";
+"merged_group_summary" = "Merged Group Summary";
+"total_fuel" = "Total Fuel";
+"entries_count" = "Entries";
+"entries_in_group" = "Entries in This Group";
+"partial_fill_toggle_description" = "Mark this refill as partial if it wasn't a full tank. Partial refills are merged with the next full refill for accurate consumption calculations.";
+"merged_group_title" = "Merged Group";
+"merged_group_info" = "This entry is part of a merged group. All entries below are combined for consumption calculation until a full fill is reached.";
+"current" = "Current";
+"closing_fill" = "Full Tank";
+"combined_stats" = "Combined Statistics";

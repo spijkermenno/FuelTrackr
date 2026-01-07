@@ -22,6 +22,7 @@ public protocol VehicleRepositoryProtocol {
     func resetFuelUsage(context: ModelContext) throws
     func getFuelUsage(id: PersistentIdentifier, context: ModelContext) throws -> FuelUsage?
     func updateFuelUsage(id: PersistentIdentifier, liters: Double, cost: Double, mileageValue: Int, context: ModelContext) throws
+    func updateFuelUsagePartialFillStatus(id: PersistentIdentifier, isPartialFill: Bool, context: ModelContext) throws
     func getFuelUsed(forMonth: Int, year: Int?, context: ModelContext) -> Double
     func getFuelCost(forMonth: Int, year: Int?, context: ModelContext) -> Double
     func getKmDriven(forMonth: Int, year: Int?, context: ModelContext) -> Int

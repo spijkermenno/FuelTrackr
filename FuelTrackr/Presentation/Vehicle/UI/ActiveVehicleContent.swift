@@ -21,6 +21,8 @@ public struct ActiveVehicleContent: View {
     @Binding public var showEditVehicleSheet: Bool
     
     @State private var showFuelDetailsSheet = false
+    @State private var showMergedPartialFillSheet = false
+    @State private var selectedMergedGroupID: PersistentIdentifier?
 
     // MARK: - Edit Fuel Usage selection
     private struct FuelUsageSelection: Identifiable {
@@ -69,7 +71,8 @@ public struct ActiveVehicleContent: View {
                         },
                         onEdit: { entry in
                             selectedFuelUsage = FuelUsageSelection(id: entry.fuelUsageID)
-                        }
+                        },
+                        onPartialFillTapped: nil
                     )
                     .environmentObject(settingsViewModel)
                     .padding(.horizontal, Theme.dimensions.spacingL)
@@ -92,7 +95,6 @@ public struct ActiveVehicleContent: View {
                     .padding()
             }
         }
-        .id(vehicleViewModel.refreshID)
         .background(Theme.colors(for: colorScheme).background)
         .navigationTitle(vehicleViewModel.resolvedVehicle(context: context)?.displayName ?? "")
         .navigationBarTitleDisplayMode(.large)
@@ -163,6 +165,23 @@ public struct ActiveVehicleContent: View {
             )
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
+        }
+        // Merged Partial Fill Management Sheet
+        .sheet(isPresented: $showMergedPartialFillSheet, onDismiss: {
+            vehicleViewModel.loadActiveVehicle(context: context)
+        }) {
+            if let fuelUsageID = selectedMergedGroupID {
+                MergedPartialFillManagementSheet(
+                    fuelUsageID: fuelUsageID,
+                    viewModel: vehicleViewModel,
+                    onDismiss: {
+                        showMergedPartialFillSheet = false
+                        selectedMergedGroupID = nil
+                    }
+                )
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+            }
         }
         .onAppear {
             vehicleViewModel.loadActiveVehicle(context: context)

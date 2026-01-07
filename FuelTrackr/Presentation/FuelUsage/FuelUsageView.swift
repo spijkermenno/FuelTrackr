@@ -114,8 +114,33 @@ public struct FuelUsageRow: View {
     let usage: FuelUsage
     let nextUsage: FuelUsage?
     let colorIndex: Int
+    
+    // Get merged group for this usage if it's part of a partial fill group
+    private var mergedGroup: [FuelUsage]? {
+        guard let vehicle = usage.vehicle else { return nil }
+        let groups = FuelUsageMergingHelper.groupMergedFuelUsages(vehicle.fuelUsages)
+        return groups.first { group in group.contains { $0.persistentModelID == usage.persistentModelID } }
+    }
 
     var kmPerLiter: Double? {
+        // If this is a partial fill, calculate using merged group
+        if usage.isPartialFill, let group = mergedGroup, let vehicle = usage.vehicle {
+            let sorted = vehicle.fuelUsages.sorted { $0.date < $1.date }
+            guard let groupIndex = sorted.firstIndex(where: { $0.persistentModelID == usage.persistentModelID }),
+                  groupIndex > 0,
+                  let previousMileage = sorted[groupIndex - 1].mileage?.value,
+                  let lastUsage = group.last,
+                  let endMileage = lastUsage.mileage?.value,
+                  endMileage > previousMileage else {
+                return nil
+            }
+            let totalFuel = group.reduce(0.0) { $0 + $1.liters }
+            guard totalFuel > 0 else { return nil }
+            let distance = Double(endMileage - previousMileage)
+            return distance / totalFuel
+        }
+        
+        // Regular calculation for full fills
         if let current = usage.mileage?.value, let previous = nextUsage?.mileage?.value, usage.liters > 0 {
             let distance = Double(current - previous)
             return distance > 0 ? distance / usage.liters : nil

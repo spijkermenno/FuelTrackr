@@ -36,7 +36,6 @@ struct AddFuelUsageSheet: View {
                     litersError: viewModel.litersError,
                     costError: viewModel.costError,
                     mileageError: viewModel.mileageError,
-                    onCancel: { dismiss() },
                     onSave: saveFuelUsage
                 )
             }
@@ -97,6 +96,7 @@ struct InputSection: View {
     @Binding var liters: String
     @Binding var cost: String
     @Binding var mileage: String
+    var isPartialFill: Binding<Bool>?
     
     let mileagePlaceholder: String
     let errorMessage: String?
@@ -104,11 +104,39 @@ struct InputSection: View {
     let litersError: Bool
     let costError: Bool
     let mileageError: Bool
+    let showPartialFillToggle: Bool
     
-    var onCancel: () -> Void
     var onSave: () -> Void
     
     @Environment(\.colorScheme) private var colorScheme
+    
+    init(
+        liters: Binding<String>,
+        cost: Binding<String>,
+        mileage: Binding<String>,
+        mileagePlaceholder: String,
+        errorMessage: String?,
+        mileageWarning: String?,
+        litersError: Bool,
+        costError: Bool,
+        mileageError: Bool,
+        isPartialFill: Binding<Bool>? = nil,
+        showPartialFillToggle: Bool = false,
+        onSave: @escaping () -> Void
+    ) {
+        self._liters = liters
+        self._cost = cost
+        self._mileage = mileage
+        self.isPartialFill = isPartialFill
+        self.mileagePlaceholder = mileagePlaceholder
+        self.errorMessage = errorMessage
+        self.mileageWarning = mileageWarning
+        self.litersError = litersError
+        self.costError = costError
+        self.mileageError = mileageError
+        self.showPartialFillToggle = showPartialFillToggle
+        self.onSave = onSave
+    }
     
     var body: some View {
         let colors = Theme.colors(for: colorScheme)
@@ -171,14 +199,17 @@ struct InputSection: View {
                 .accessibilityLabel(error)
             }
             
-            ActionButtons(onCancel: onCancel, onSave: onSave)
-                .padding(.top, Theme.dimensions.spacingM)
+            ActionButtons(
+                isPartialFill: showPartialFillToggle ? isPartialFill : nil,
+                onSave: onSave
+            )
+            .padding(.top, Theme.dimensions.spacingM)
         }
     }
 }
 
 struct ActionButtons: View {
-    var onCancel: () -> Void
+    var isPartialFill: Binding<Bool>?
     var onSave: () -> Void
     
     @Environment(\.colorScheme) private var colorScheme
@@ -186,13 +217,43 @@ struct ActionButtons: View {
     var body: some View {
         let colors = Theme.colors(for: colorScheme)
         
-        HStack(spacing: Theme.dimensions.spacingM) {
-            Button(NSLocalizedString("cancel", comment: ""), action: onCancel)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(colors.surface)
-                .foregroundColor(colors.onBackground)
-                .cornerRadius(Theme.dimensions.radiusButton)
+        VStack(spacing: Theme.dimensions.spacingM) {
+            // Partial/Full Fill Button (only shown in edit mode)
+            if let isPartialFillBinding = isPartialFill {
+                if isPartialFillBinding.wrappedValue {
+                    // Currently partial - show "Mark as Full Fill" button
+                    Button(action: {
+                        isPartialFillBinding.wrappedValue = false
+                    }) {
+                        Text(NSLocalizedString("mark_as_full_fill", comment: ""))
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(colors.primary)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.clear)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: Theme.dimensions.radiusButton)
+                                    .stroke(colors.primary, lineWidth: 1.5)
+                            )
+                    }
+                } else {
+                    // Currently full - show "Mark as Partial Fill" button
+                    Button(action: {
+                        isPartialFillBinding.wrappedValue = true
+                    }) {
+                        Text(NSLocalizedString("mark_as_partial_fill", comment: ""))
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.orange)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.clear)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: Theme.dimensions.radiusButton)
+                                    .stroke(.orange, lineWidth: 1.5)
+                            )
+                    }
+                }
+            }
             
             Button(NSLocalizedString("save", comment: ""), action: onSave)
                 .frame(maxWidth: .infinity)

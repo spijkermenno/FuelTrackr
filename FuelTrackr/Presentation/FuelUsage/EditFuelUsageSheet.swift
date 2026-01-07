@@ -17,13 +17,19 @@ struct EditFuelUsageSheet: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
+    @Environment(\.colorScheme) private var colorScheme
 
     @State private var resolvedVehicle: Vehicle?
     @State private var existingFuelUsage: FuelUsage?
+    @State private var mergedGroup: [FuelUsage] = []
 
     private var mileagePlaceholder: String {
         let currentMileage = resolvedVehicle?.mileages.last?.value ?? 0
         return viewModel.displayMileagePlaceholder(currentMileage: currentMileage)
+    }
+    
+    private var isPartOfMergedGroup: Bool {
+        !mergedGroup.isEmpty && mergedGroup.count > 1
     }
 
     var body: some View {
@@ -41,9 +47,26 @@ struct EditFuelUsageSheet: View {
                         litersError: viewModel.litersError,
                         costError: viewModel.costError,
                         mileageError: viewModel.mileageError,
-                        onCancel: { dismiss() },
+                        isPartialFill: $viewModel.isPartialFill,
+                        showPartialFillToggle: existingFuelUsage != nil,
                         onSave: saveEdits
                     )
+                    
+                    // Merged Group Section
+                    if isPartOfMergedGroup {
+                        MergedGroupSection(
+                            mergedGroup: mergedGroup,
+                            currentFuelUsageID: fuelUsageID,
+                            viewModel: vehicleViewModel,
+                            onUpdate: {
+                                loadMergedGroup()
+                                if let fu = vehicleViewModel.fuelUsage(id: fuelUsageID, context: context) {
+                                    existingFuelUsage = fu
+                                    self.viewModel.load(from: fu, usingMetric: vehicleViewModel.isUsingMetric)
+                                }
+                            }
+                        )
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .top)
                 .padding(.horizontal, Theme.dimensions.spacingSection)
@@ -51,12 +74,23 @@ struct EditFuelUsageSheet: View {
             .scrollBounceBehavior(.basedOnSize)
             .scrollDismissesKeyboard(.interactively)
             .onTapGesture { hideKeyboard() }
+            .navigationTitle(NSLocalizedString("edit_fuel_usage_title", comment: ""))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "xmark")
+                            .foregroundColor(Theme.colors(for: colorScheme).onBackground)
+                    }
+                }
+            }
             .onAppear {
                 resolvedVehicle = vehicleViewModel.resolvedVehicle(context: context)
                 if existingFuelUsage == nil, let fu = vehicleViewModel.fuelUsage(id: fuelUsageID, context: context) {
                     existingFuelUsage = fu
                     viewModel.load(from: fu, usingMetric: vehicleViewModel.isUsingMetric)
                 }
+                loadMergedGroup()
             }
         }
     }
@@ -70,13 +104,199 @@ struct EditFuelUsageSheet: View {
             mileageValue: validated.mileageValue,
             context: context
         )
+        // Update partial fill status
+        vehicleViewModel.updateFuelUsagePartialFillStatus(
+            id: fuelUsageID,
+            isPartialFill: viewModel.isPartialFill,
+            context: context
+        )
         dismiss()
     }
 
     private func hideKeyboard() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
+    
+    private func loadMergedGroup() {
+        guard let vehicle = resolvedVehicle else { return }
+        let groups = FuelUsageMergingHelper.groupMergedFuelUsages(vehicle.fuelUsages)
+        
+        // Find the group that contains the fuelUsageID
+        if let group = groups.first(where: { group in
+            group.contains { $0.persistentModelID == fuelUsageID }
+        }) {
+            mergedGroup = group
+        } else {
+            mergedGroup = []
+        }
+    }
 }
+
+// MARK: - Merged Group Section
+
+struct MergedGroupSection: View {
+    let mergedGroup: [FuelUsage]
+    let currentFuelUsageID: PersistentIdentifier
+    let viewModel: VehicleViewModel
+    
+    @Environment(\.modelContext) private var context
+    @Environment(\.colorScheme) private var colorScheme
+    
+    var onUpdate: () -> Void
+    
+    private var colors: ColorsProtocol {
+        Theme.colors(for: colorScheme)
+    }
+    
+    private var totalFuel: Double {
+        mergedGroup.reduce(0.0) { $0 + $1.liters }
+    }
+    
+    private var totalCost: Double {
+        mergedGroup.reduce(0.0) { $0 + $1.cost }
+    }
+    
+    private var sortedGroup: [FuelUsage] {
+        mergedGroup.sorted { $0.date < $1.date }
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: Theme.dimensions.spacingM) {
+            headerSection
+            infoSection
+            summarySection
+            entriesSection
+        }
+        .padding(Theme.dimensions.spacingL)
+        .background(containerBackground)
+    }
+    
+    private var headerSection: some View {
+        HStack {
+            Image(systemName: "link")
+                .foregroundColor(.orange)
+                .font(.system(size: 16, weight: .semibold))
+            Text(NSLocalizedString("merged_group_title", comment: ""))
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(colors.onBackground)
+        }
+        .padding(.bottom, Theme.dimensions.spacingXS)
+    }
+    
+    private var infoSection: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "info.circle.fill")
+                .foregroundColor(.orange)
+                .font(.system(size: 14))
+            Text(NSLocalizedString("merged_group_info", comment: ""))
+                .font(.system(size: 14))
+                .foregroundColor(colors.onSurface)
+        }
+        .padding(Theme.dimensions.spacingM)
+        .background(Color.orange.opacity(0.15))
+        .cornerRadius(12)
+    }
+    
+    private var summarySection: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(NSLocalizedString("total_fuel", comment: ""))
+                    .font(.system(size: 12))
+                    .foregroundColor(colors.onSurface)
+                Text(String(format: "%.2f L", totalFuel))
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(colors.onBackground)
+            }
+            
+            Spacer()
+            
+            VStack(alignment: .trailing, spacing: 4) {
+                Text(NSLocalizedString("entries_count", comment: ""))
+                    .font(.system(size: 12))
+                    .foregroundColor(colors.onSurface)
+                Text("\(mergedGroup.count)")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(colors.onBackground)
+            }
+        }
+        .padding(Theme.dimensions.spacingM)
+        .background(colors.surface)
+        .overlay(summaryBorder)
+        .cornerRadius(12)
+    }
+    
+    private var summaryBorder: some View {
+        RoundedRectangle(cornerRadius: 12)
+            .stroke(Color.orange.opacity(0.5), lineWidth: 2)
+    }
+    
+    private var entriesSection: some View {
+        VStack(alignment: .leading, spacing: Theme.dimensions.spacingS) {
+            Text(NSLocalizedString("entries_in_group", comment: ""))
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(colors.onBackground)
+                .padding(.bottom, Theme.dimensions.spacingXS)
+            
+            entriesList
+        }
+    }
+    
+    private var entriesList: some View {
+        VStack(spacing: 0) {
+            ForEach(Array(sortedGroup.enumerated()), id: \.element.persistentModelID) { index, usage in
+                MergedGroupEntryRow(
+                    usage: usage,
+                    isCurrentEntry: usage.persistentModelID == currentFuelUsageID,
+                    viewModel: viewModel,
+                    onUpdate: onUpdate
+                )
+                
+                if index < sortedGroup.count - 1 {
+                    connectingLine
+                }
+            }
+        }
+        .padding(Theme.dimensions.spacingM)
+        .background(entriesContainerBackground)
+    }
+    
+    private var connectingLine: some View {
+        HStack {
+            Circle()
+                .fill(Color.orange.opacity(0.6))
+                .frame(width: 4, height: 4)
+            Rectangle()
+                .fill(Color.orange.opacity(0.3))
+                .frame(height: 1)
+            Spacer()
+        }
+        .padding(.leading, Theme.dimensions.spacingM + 4)
+        .padding(.vertical, 4)
+    }
+    
+    private var entriesContainerBackground: some View {
+        RoundedRectangle(cornerRadius: 12)
+            .fill(Color.orange.opacity(0.08))
+            .overlay(entriesContainerBorder)
+    }
+    
+    private var entriesContainerBorder: some View {
+        RoundedRectangle(cornerRadius: 12)
+            .stroke(Color.orange.opacity(0.4), lineWidth: 1.5)
+    }
+    
+    private var containerBackground: some View {
+        RoundedRectangle(cornerRadius: Theme.dimensions.radiusCard)
+            .fill(colors.surface)
+            .overlay(containerBorder)
+    }
+    
+    private var containerBorder: some View {
+        RoundedRectangle(cornerRadius: Theme.dimensions.radiusCard)
+            .stroke(Color.orange.opacity(0.3), lineWidth: 2)
+    }
+}
+
 
 private struct HeaderSection_Edit: View {
     @Environment(\.colorScheme) private var colorScheme
@@ -85,13 +305,6 @@ private struct HeaderSection_Edit: View {
         let colors = Theme.colors(for: colorScheme)
         
         VStack(alignment: .leading, spacing: Theme.dimensions.spacingS) {
-            Text(NSLocalizedString("edit_fuel_usage_title", comment: ""))
-                .font(Theme.typography.titleFont)
-                .fixedSize(horizontal: false, vertical: true)
-                .multilineTextAlignment(.leading)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.top, Theme.dimensions.spacingSection)
-
             Text(NSLocalizedString("edit_fuel_usage_description", comment: ""))
                 .font(Theme.typography.captionFont)
                 .foregroundColor(colors.onSurface)

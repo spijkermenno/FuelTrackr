@@ -41,6 +41,7 @@ public final class VehicleViewModel: ObservableObject {
     private let confirmVehiclePurchaseUseCase: ConfirmVehiclePurchaseUseCase
     private let getFuelUsageUseCase: GetFuelUsageUseCase
     private let updateFuelUsageUseCase: UpdateFuelUsageUseCase
+    private let updateFuelUsagePartialFillStatusUseCase: UpdateFuelUsagePartialFillStatusUseCase
     
     public var hasActiveVehicle: Bool { activeVehicleID != nil }
     public var isUsingMetric: Bool { getUsingMetricUseCase() }
@@ -70,7 +71,8 @@ public final class VehicleViewModel: ObservableObject {
         getProjectedYearStatsUseCase: GetProjectedYearStatsUseCase = GetProjectedYearStatsUseCase(),
         confirmVehiclePurchaseUseCase: ConfirmVehiclePurchaseUseCase = ConfirmVehiclePurchaseUseCase(),
         getFuelUsageUseCase: GetFuelUsageUseCase = GetFuelUsageUseCase(),
-        updateFuelUsageUseCase: UpdateFuelUsageUseCase = UpdateFuelUsageUseCase()
+        updateFuelUsageUseCase: UpdateFuelUsageUseCase = UpdateFuelUsageUseCase(),
+        updateFuelUsagePartialFillStatusUseCase: UpdateFuelUsagePartialFillStatusUseCase = UpdateFuelUsagePartialFillStatusUseCase()
     ) {
         self.loadActiveVehicleUseCase = loadActiveVehicleUseCase
         self.saveVehicleUseCase = saveVehicleUseCase
@@ -97,10 +99,14 @@ public final class VehicleViewModel: ObservableObject {
         self.confirmVehiclePurchaseUseCase = confirmVehiclePurchaseUseCase
         self.getFuelUsageUseCase = getFuelUsageUseCase
         self.updateFuelUsageUseCase = updateFuelUsageUseCase
+        self.updateFuelUsagePartialFillStatusUseCase = updateFuelUsagePartialFillStatusUseCase
     }
     
     public func loadActiveVehicle(context: ModelContext) {
         do {
+            // Run migration to detect partial fills in existing data
+            try migrateVehiclesUseCase(context: context)
+            
             let vehicle = try loadActiveVehicleUseCase(context: context)
             activeVehicleID = vehicle?.persistentModelID
             // Clear cache when vehicle is reloaded
@@ -218,6 +224,19 @@ public final class VehicleViewModel: ObservableObject {
                 print("Error updating fuel usage: \(error.localizedDescription)")
             }
         }
+    
+    public func updateFuelUsagePartialFillStatus(
+        id: PersistentIdentifier,
+        isPartialFill: Bool,
+        context: ModelContext
+    ) {
+        do {
+            try updateFuelUsagePartialFillStatusUseCase(id: id, isPartialFill: isPartialFill, context: context)
+            refreshID = UUID()
+        } catch {
+            print("Error updating partial fill status: \(error.localizedDescription)")
+        }
+    }
     
     public func saveMaintenance(maintenance: Maintenance, context: ModelContext) {
         do {

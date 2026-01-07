@@ -13,6 +13,21 @@ public struct FuelConsumptionSectionView: View {
     let onAdd: () -> Void
     let onShowMore: () -> Void
     let onEdit: (FuelConsumptionEntryUiModel) -> Void
+    let onPartialFillTapped: ((FuelConsumptionEntryUiModel) -> Void)?
+    
+    init(
+        entries: [FuelConsumptionEntryUiModel],
+        onAdd: @escaping () -> Void,
+        onShowMore: @escaping () -> Void,
+        onEdit: @escaping (FuelConsumptionEntryUiModel) -> Void,
+        onPartialFillTapped: ((FuelConsumptionEntryUiModel) -> Void)? = nil
+    ) {
+        self.entries = entries
+        self.onAdd = onAdd
+        self.onShowMore = onShowMore
+        self.onEdit = onEdit
+        self.onPartialFillTapped = onPartialFillTapped
+    }
     
     private var colors: ColorsProtocol {
         Theme.colors(for: colorScheme)
@@ -50,9 +65,15 @@ public struct FuelConsumptionSectionView: View {
                 let displayedEntries = Array(entries.prefix(3))
                 VStack(spacing: 0) {
                     ForEach(Array(displayedEntries.enumerated()), id: \.element.id) { index, entry in
-                        FuelConsumptionEntryView(entry: entry) {
-                            onEdit(entry)
-                        }
+                        FuelConsumptionEntryView(
+                            entry: entry,
+                            onEdit: {
+                                onEdit(entry)
+                            },
+                            onPartialFillTapped: entry.containsPartialFills ? {
+                                onPartialFillTapped?(entry)
+                            } : nil
+                        )
                         
                         if index < displayedEntries.count - 1 {
                             Divider()

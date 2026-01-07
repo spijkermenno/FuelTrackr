@@ -296,3 +296,27 @@
 "price_per_liter" = "€/L";
 "consumption" = "Verbruik";
 "cost" = "Kosten";
+
+/* Partial Fill */
+"partial_fill" = "Gedeeltelijke Tankbeurt";
+"partial_fill_description" = "Deze tankbeurt lijkt gedeeltelijk te zijn. Deze wordt samengevoegd met de volgende volledige tankbeurt voor nauwkeurige verbruiksberekeningen.";
+"mark_as_full_fill" = "Markeer als Volledige Tankbeurt";
+"mark_as_partial_fill" = "Markeer als Gedeeltelijke Tankbeurt";
+"partial_fill_info" = "Gedeeltelijke tankbeurten worden automatisch gedetecteerd wanneer een tankbeurt aanzienlijk minder is dan uw gemiddelde. Ze worden samengevoegd met de volgende volledige tankbeurt voor nauwkeurige brandstofverbruiksberekeningen.";
+"not_enough_data_for_detection" = "Minimaal %d tankbeurten nodig om gedeeltelijke tankbeurten te detecteren";
+"current_status" = "Huidige Status";
+"fill_type" = "Tankbeurt Type";
+"full_fill" = "Volledige Tankbeurt";
+"average_refill_amount" = "Gemiddelde Tankbeurt";
+"merged_partial_fill_description" = "Deze invoer bevat meerdere tankbeurten die zijn samengevoegd. U kunt individuele invoeren hieronder markeren als volledige of gedeeltelijke tankbeurten.";
+"merged_group_summary" = "Samengevoegde Groep Samenvatting";
+"total_fuel" = "Totale Brandstof";
+"entries_count" = "Invoeren";
+"entries_in_group" = "Invoeren in Deze Groep";
+"partial_fill_toggle_description" = "Markeer deze tankbeurt als gedeeltelijk als het geen volle tank was. Gedeeltelijke tankbeurten worden samengevoegd met de volgende volledige tankbeurt voor nauwkeurige verbruiksberekeningen.";
+"merged_group_title" = "Samengevoegde Groep";
+"merged_group_info" = "Deze invoer maakt deel uit van een samengevoegde groep. Alle invoeren hieronder worden gecombineerd voor verbruiksberekening totdat een volledige tankbeurt is bereikt.";
+"current" = "Huidige";
+"closing_fill" = "Volle Tank";
+"partial_fill_badge" = "Halve Tank";
+"combined_stats" = "Gecombineerde Statistieken";

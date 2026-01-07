@@ -14,18 +14,22 @@ public class FuelUsage: Hashable {
     @Attribute public var liters: Double
     @Attribute public var cost: Double
     @Attribute public var date: Date
+    @Attribute public var isPartialFill: Bool = false
+    @Attribute public var isPartialFillManuallySet: Bool = false
 
     // MARK: - Relationships
     @Relationship(deleteRule: .nullify) public var mileage: Mileage?
     @Relationship(deleteRule: .cascade, inverse: \Vehicle.fuelUsages) public var vehicle: Vehicle?
 
     // MARK: - Initializer
-    public init(liters: Double, cost: Double, date: Date, mileage: Mileage? = nil, vehicle: Vehicle? = nil) {
+    public init(liters: Double, cost: Double, date: Date, mileage: Mileage? = nil, vehicle: Vehicle? = nil, isPartialFill: Bool = false, isPartialFillManuallySet: Bool = false) {
         self.liters = liters
         self.cost = cost
         self.date = date
         self.mileage = mileage
         self.vehicle = vehicle
+        self.isPartialFill = isPartialFill
+        self.isPartialFillManuallySet = isPartialFillManuallySet
     }
 
     // MARK: - Hashable
