@@ -17,12 +17,12 @@ public final class AddFuelUsageViewModel: ObservableObject {
     @Published public var mileage = ""
     @Published public var errorMessage: String?
     @Published public var mileageWarning: String?
+    @Published public var litersError: Bool = false
+    @Published public var costError: Bool = false
+    @Published public var mileageError: Bool = false
     
     private let saveFuelUsageUseCase: SaveFuelUsageUseCase
     private let getUsingMetricUseCase: GetUsingMetricUseCase
-    
-    // Debounce timer for mileage validation
-    private var mileageValidationTask: Task<Void, Never>?
     
     public init(
         saveFuelUsageUseCase: SaveFuelUsageUseCase = SaveFuelUsageUseCase(),
@@ -34,60 +34,6 @@ public final class AddFuelUsageViewModel: ObservableObject {
     
     public var decimalSeparator: String {
         Locale.current.decimalSeparator ?? "."
-    }
-    
-    /// Validates mileage against previous recorded value (debounced)
-    @MainActor
-    public func validateMileage(against vehicle: Vehicle?) {
-        mileageValidationTask?.cancel()
-        
-        // Capture values needed for validation before entering Task to avoid data races
-        let currentMileage = mileage
-        let isUsingMetric = getUsingMetricUseCase()
-        
-        // Capture previous mileage synchronously if vehicle exists
-        let previousMileageValue: Int?
-        if let vehicle = vehicle {
-            previousMileageValue = getPreviousMileage(from: vehicle)
-        } else {
-            previousMileageValue = nil
-        }
-        
-        mileageValidationTask = Task { @MainActor [weak self] in
-            try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 second debounce
-            
-            guard let self = self,
-                  !Task.isCancelled,
-                  !currentMileage.isEmpty,
-                  let mileageValue = Int(currentMileage) else {
-                return
-            }
-            
-            guard let previousMileage = previousMileageValue else {
-                self.mileageWarning = nil
-                return
-            }
-            
-            let adjustedMileage = isUsingMetric ? mileageValue : self.convertMilesToKm(miles: mileageValue)
-            
-            // Check if mileage is lower than previous
-            if adjustedMileage < previousMileage {
-                self.errorMessage = String(format: NSLocalizedString("mileage_too_low_error", comment: ""), previousMileage)
-                self.mileageWarning = nil
-                return
-            }
-            
-            // Check if mileage is suspiciously high (more than 2x or more than 10,000 km/miles higher)
-            let threshold = isUsingMetric ? 10000 : 6214 // ~10,000 km or ~6,214 miles
-            let difference = adjustedMileage - previousMileage
-            
-            if adjustedMileage > previousMileage * 2 || difference > threshold {
-                self.mileageWarning = NSLocalizedString("mileage_suspiciously_high_warning", comment: "")
-                self.errorMessage = nil
-            } else {
-                self.mileageWarning = nil
-            }
-        }
     }
     
     /// Gets the previous mileage from vehicle (from latest mileage or latest fuel usage)
@@ -113,28 +59,74 @@ public final class AddFuelUsageViewModel: ObservableObject {
     }
     
     public func saveFuelUsage(activeVehicle: Vehicle?, context: ModelContext) -> Bool {
-        guard let litersValue = parseInput(liters),
-              let costValue = parseInput(cost),
-              let mileageValue = Int(mileage),
-              mileageValue > 0,
-              let vehicle = activeVehicle else {
-            errorMessage = NSLocalizedString("invalid_input_error", comment: "")
+        // Clear previous errors
+        errorMessage = nil
+        mileageWarning = nil
+        litersError = false
+        costError = false
+        mileageError = false
+        
+        // Validate all fields together
+        let litersValue = parseInput(liters)
+        let costValue = parseInput(cost)
+        let mileageValue = Int(mileage)
+        
+        // Check liters validation
+        if let litersVal = litersValue, litersVal > 0 {
+            // Valid
+        } else {
+            litersError = true
+        }
+        
+        // Check cost validation
+        if let costVal = costValue, costVal >= 0 {
+            // Valid
+        } else {
+            costError = true
+        }
+        
+        // Check mileage format validation
+        if let mileageVal = mileageValue, mileageVal > 0 {
+            // Valid
+        } else {
+            mileageError = true
+        }
+        
+        // If any field has an error, return false
+        if litersError || costError || mileageError || activeVehicle == nil {
             return false
         }
         
-        let adjustedMileage = getUsingMetricUseCase() ? mileageValue : convertMilesToKm(miles: mileageValue)
+        // All basic validations passed, continue with mileage comparison
+        let vehicle = activeVehicle!
+        let isUsingMetric = getUsingMetricUseCase()
+        let adjustedMileage = isUsingMetric ? mileageValue! : convertMilesToKm(miles: mileageValue!)
         
-        // Validate mileage before saving
+        // Validate mileage against previous recorded value
         let previousMileage = getPreviousMileage(from: vehicle)
-        if let previousMileage = previousMileage, adjustedMileage < previousMileage {
-            errorMessage = String(format: NSLocalizedString("mileage_too_low_error", comment: ""), previousMileage)
-            return false
+        if let previousMileage = previousMileage {
+            // Check if mileage is lower than previous
+            if adjustedMileage < previousMileage {
+                errorMessage = String(format: NSLocalizedString("mileage_too_low_error", comment: ""), previousMileage)
+                mileageError = true
+                return false
+            }
+            
+            // Check if mileage is suspiciously high (more than 2x or more than 10,000 km/miles higher)
+            let threshold = isUsingMetric ? 10000 : 6214 // ~10,000 km or ~6,214 miles
+            let difference = adjustedMileage - previousMileage
+            
+            if adjustedMileage > previousMileage * 2 || difference > threshold {
+                mileageWarning = NSLocalizedString("mileage_suspiciously_high_warning", comment: "")
+                // Don't block save for warnings, just show the warning
+            }
         }
         
+        // All validations passed, save the fuel usage
         do {
             try saveFuelUsageUseCase(
-                liters: litersValue,
-                cost: costValue,
+                liters: litersValue!,
+                cost: costValue!,
                 mileageValue: adjustedMileage,
                 context: context
             )
@@ -144,12 +136,18 @@ public final class AddFuelUsageViewModel: ObservableObject {
                     FuelTrackrEvents.trackedFuel,
                     parameters: [
                         "mileage": adjustedMileage,
-                        "cost": costValue,
-                        "amount": litersValue
+                        "cost": costValue!,
+                        "amount": litersValue!
                     ]
                 )
             }
             
+            // Clear any warnings/errors on successful save
+            errorMessage = nil
+            mileageWarning = nil
+            litersError = false
+            costError = false
+            mileageError = false
             return true
         } catch {
             errorMessage = NSLocalizedString("fuel_usage_saved_error", comment: "")
@@ -176,7 +174,4 @@ public final class AddFuelUsageViewModel: ObservableObject {
         }
     }
     
-    deinit {
-        mileageValidationTask?.cancel()
-    }
 }

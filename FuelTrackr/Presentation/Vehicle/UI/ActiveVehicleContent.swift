@@ -12,7 +12,6 @@ import SwiftData
 public struct ActiveVehicleContent: View {
     @StateObject public var vehicleViewModel: VehicleViewModel
     @StateObject public var settingsViewModel = SettingsViewModel()
-    @StateObject public var addFuelUsageViewModel = AddFuelUsageViewModel()
    
     @Environment(\.modelContext) private var context
     @Environment(\.colorScheme) private var colorScheme
@@ -122,10 +121,9 @@ public struct ActiveVehicleContent: View {
             vehicleViewModel.loadActiveVehicle(context: context)
         }) {
             AddFuelUsageSheet(
-                vehicleViewModel: vehicleViewModel,
-                viewModel: addFuelUsageViewModel
+                vehicleViewModel: vehicleViewModel
             )
-            .presentationDetents([.medium])
+            .presentationDetents([.fraction(0.65)])
             .presentationDragIndicator(.visible)
         }
         // Edit Fuel Usage (selected from preview list)
@@ -134,10 +132,9 @@ public struct ActiveVehicleContent: View {
         }) { selection in
             EditFuelUsageSheet(
                 vehicleViewModel: vehicleViewModel,
-                viewModel: EditFuelUsageViewModel(),
                 fuelUsageID: selection.id
             )
-            .presentationDetents([.medium])
+            .presentationDetents([.fraction(0.65)])
             .presentationDragIndicator(.visible)
         }
         // Add Maintenance

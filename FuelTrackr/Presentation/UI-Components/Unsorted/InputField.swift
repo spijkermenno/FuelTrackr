@@ -19,17 +19,19 @@ public struct InputField: View {
     public var hasWarning: Bool = false
     
     @FocusState private var isFocused: Bool
+    @Environment(\.colorScheme) private var colorScheme
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.caption)
                 .foregroundColor(.primary)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .accessibilityHidden(true)
 
             TextField(placeholder, text: $text)
                 .padding()
-                .background(Color(.secondarySystemBackground))
+                .background(backgroundColor)
                 .cornerRadius(8)
                 .keyboardType(keyboardType)
                 .foregroundColor(.primary)
@@ -38,7 +40,7 @@ public struct InputField: View {
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(
                             borderColor,
-                            lineWidth: isFocused ? 2 : (hasError || hasWarning ? 1.5 : 0)
+                            lineWidth: borderWidth
                         )
                 )
                 .accessibilityLabel(title)
@@ -47,15 +49,38 @@ public struct InputField: View {
         }
     }
     
+    private var backgroundColor: Color {
+        // Use systemBackground with higher opacity for better visibility with glass effects
+        // This ensures the input field stands out clearly while maintaining HIG compliance
+        if colorScheme == .dark {
+            return Color(.systemGray6).opacity(0.9)
+        } else {
+            return Color(.systemBackground).opacity(0.95)
+        }
+    }
+    
     private var borderColor: Color {
+        let colors = Theme.colors(for: colorScheme)
+        
         if hasError {
-            return .red
+            return colors.error
         } else if hasWarning {
             return .orange
         } else if isFocused {
-            return .blue
+            return colors.primary
         } else {
-            return .clear
+            // Subtle border for better visibility with glass effects
+            return Color(.separator).opacity(colorScheme == .dark ? 0.5 : 0.3)
+        }
+    }
+    
+    private var borderWidth: CGFloat {
+        if hasError || hasWarning {
+            return 1.5
+        } else if isFocused {
+            return 2.0
+        } else {
+            return 0.5 // Subtle border when not focused
         }
     }
     

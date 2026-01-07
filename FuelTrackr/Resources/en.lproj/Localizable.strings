@@ -86,7 +86,6 @@
 "general_error" = "Something went wrong. Please try again.";
 "mileage_too_low_error" = "The mileage cannot be lower than the previous recorded value (%d).";
 "mileage_suspiciously_high_warning" = "This mileage is much higher than expected. Please check if you added an extra digit.";
-"invalid_input_error" = "Invalid input. Please check all fields.";
 
 /* Notifications */
 "notifications_section" = "Notifications";

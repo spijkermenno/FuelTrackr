@@ -86,7 +86,6 @@
 "general_error" = "Er is iets misgegaan. Probeer het opnieuw.";
 "mileage_too_low_error" = "De kilometerstand kan niet lager zijn dan de vorige geregistreerde waarde (%d).";
 "mileage_suspiciously_high_warning" = "Deze kilometerstand is veel hoger dan verwacht. Controleer of je geen extra cijfer hebt toegevoegd.";
-"invalid_input_error" = "Ongeldige invoer. Controleer alle velden.";
 
 /* Meldingen */
 "notifications_section" = "Meldingen";
@@ -156,7 +155,7 @@
 "refreshing" = "Vernieuwen...";
 "no_active_vehicle_found" = "Geen actief voertuig gevonden.";
 
-"cancel" = "Terug";
+"cancel" = "Annuleren";
 "save" = "Opslaan";
 "latest_mileage" = "Nieuwste kilometerstand";
 "add_maintenance_description" = "Leg je onderhoud vast om je voertuig in topconditie te houden.";

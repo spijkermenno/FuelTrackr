@@ -11,7 +11,7 @@ import SwiftData
 
 struct EditFuelUsageSheet: View {
     @StateObject var vehicleViewModel: VehicleViewModel
-    @StateObject var viewModel: EditFuelUsageViewModel
+    @StateObject private var viewModel = EditFuelUsageViewModel()
 
     let fuelUsageID: PersistentIdentifier
 
@@ -38,6 +38,9 @@ struct EditFuelUsageSheet: View {
                         mileagePlaceholder: mileagePlaceholder,
                         errorMessage: viewModel.errorMessage,
                         mileageWarning: nil,
+                        litersError: viewModel.litersError,
+                        costError: viewModel.costError,
+                        mileageError: viewModel.mileageError,
                         onCancel: { dismiss() },
                         onSave: saveEdits
                     )
@@ -59,7 +62,7 @@ struct EditFuelUsageSheet: View {
     }
 
     private func saveEdits() {
-        guard let validated = viewModel.validate() else { return }
+        guard let validated = viewModel.validate(vehicle: resolvedVehicle, currentFuelUsageID: fuelUsageID) else { return }
         vehicleViewModel.updateFuelUsage(
             id: fuelUsageID,
             liters: validated.liters,
@@ -76,19 +79,25 @@ struct EditFuelUsageSheet: View {
 }
 
 private struct HeaderSection_Edit: View {
+    @Environment(\.colorScheme) private var colorScheme
+    
     var body: some View {
+        let colors = Theme.colors(for: colorScheme)
+        
         VStack(alignment: .leading, spacing: Theme.dimensions.spacingS) {
             Text(NSLocalizedString("edit_fuel_usage_title", comment: ""))
                 .font(Theme.typography.titleFont)
                 .fixedSize(horizontal: false, vertical: true)
                 .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.top, Theme.dimensions.spacingSection)
 
             Text(NSLocalizedString("edit_fuel_usage_description", comment: ""))
                 .font(Theme.typography.captionFont)
-                .foregroundColor(Theme.colors.onSurface)
+                .foregroundColor(colors.onSurface)
                 .fixedSize(horizontal: false, vertical: true)
                 .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }
