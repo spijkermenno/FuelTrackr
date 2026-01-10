@@ -80,7 +80,7 @@ public struct VehicleImageCarouselView: View {
             let pageWidth = cardWidth + spacing
             let sideGutter = (containerWidth - pageWidth) / 2
 
-            VStack {
+            VStack(spacing: 0) {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 0) {
                         ForEach(Array(items.enumerated()), id: \.offset) { index, item in

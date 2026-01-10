@@ -110,6 +110,10 @@ public struct FuelConsumptionSectionView: View {
         }
         .padding(Theme.dimensions.spacingL)
         .background(colors.surface)
-        .cornerRadius(Theme.dimensions.radiusCard)
+        .clipShape(RoundedRectangle(cornerRadius: 31))
+        .overlay(
+            RoundedRectangle(cornerRadius: 31)
+                .stroke(colors.border, lineWidth: 1)
+        )
     }
 }

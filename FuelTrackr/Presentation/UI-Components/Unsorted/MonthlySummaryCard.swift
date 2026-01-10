@@ -17,56 +17,61 @@ public struct MonthlySummaryCard: View {
     public let cost: String
     public let onDetailsTapped: () -> Void
 
+    @Environment(\.colorScheme) private var colorScheme
+    
+    private var colors: ColorsProtocol {
+        Theme.colors(for: colorScheme)
+    }
+    
     public var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: Theme.dimensions.spacingL) {
             HStack {
                 Label {
                     Text(monthTitle)
-                        .font(.headline)
-                        .foregroundColor(Theme.colors.onBackground)
+                        .font(Theme.typography.headlineFont)
+                        .foregroundColor(colors.onBackground)
                 } icon: {
                     Image(systemName: "calendar")
-                        .foregroundColor(Theme.colors.onBackground.opacity(0.7))
+                        .foregroundColor(colors.onBackground.opacity(0.7))
                 }
 
                 Spacer()
 
                 Button(action: onDetailsTapped) {
                     Text(NSLocalizedString("details", comment: "Details"))
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundColor(Theme.colors.onPrimary)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(Theme.colors.primary)
+                        .font(Theme.typography.subheadlineFont)
+                        .foregroundColor(colors.onPrimary)
+                        .padding(.horizontal, Theme.dimensions.spacingM)
+                        .padding(.vertical, Theme.dimensions.spacingS)
+                        .background(colors.primary)
                         .clipShape(Capsule())
                 }
             }
 
-            HStack(spacing: 12) {
+            HStack(spacing: Theme.dimensions.spacingM) {
                 RecapMetric(
                     title: NSLocalizedString("km_driven", comment: "Distance"),
                     value: distance,
                     icon: "car.fill",
-                    backgroundColor: .blue
+                    backgroundColor: colors.accentBlue
                 )
                 RecapMetric(
                     title: NSLocalizedString("total_fuel_used", comment: "Fuel used"),
                     value: fuelUsed,
                     icon: "fuelpump.fill",
-                    backgroundColor: .orange
+                    backgroundColor: colors.accentOrange
                 )
                 RecapMetric(
                     title: NSLocalizedString("total_fuel_cost", comment: "Cost"),
                     value: cost,
                     icon: "eurosign.circle.fill",
-                    backgroundColor: .green
+                    backgroundColor: colors.accentGreen
                 )
             }
         }
-        .padding(20)
-        .background(Theme.colors.surface)
-        .cornerRadius(20)
-        .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 4)
+        .padding(Theme.dimensions.spacingXL)
+        .background(colors.surface)
+        .cornerRadius(12)
     }
 }
 
@@ -75,12 +80,18 @@ public struct RecapMetric: View {
     public let value: String
     public let icon: String
     public let backgroundColor: Color
+    
+    @Environment(\.colorScheme) private var colorScheme
+    
+    private var colors: ColorsProtocol {
+        Theme.colors(for: colorScheme)
+    }
 
     public var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: Theme.dimensions.spacingS) {
             Circle()
                 .fill(backgroundColor)
-                .frame(width: 50, height: 50)
+                .frame(width: Theme.dimensions.circleM, height: Theme.dimensions.circleM)
                 .overlay(
                     Image(systemName: icon)
                         .foregroundColor(.white)
@@ -88,18 +99,18 @@ public struct RecapMetric: View {
                 )
 
             Text(value)
-                .font(.headline)
-                .foregroundColor(Theme.colors.onBackground)
+                .font(Theme.typography.headlineFont)
+                .foregroundColor(colors.onBackground)
 
             Text(title)
-                .font(.footnote)
-                .foregroundColor(.secondary)
+                .font(Theme.typography.footnoteFont)
+                .foregroundColor(colors.onSurface)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
         }
-        .padding()
+        .padding(Theme.dimensions.spacingL)
         .frame(maxWidth: .infinity, maxHeight: 160)
-        .background(Color.gray.opacity(0.1))
+        .background(colors.background.opacity(0.5))
         .cornerRadius(12)
     }
 }

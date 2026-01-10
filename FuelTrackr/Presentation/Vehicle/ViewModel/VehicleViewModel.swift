@@ -280,6 +280,65 @@ public final class VehicleViewModel: ObservableObject {
         }
     }
     
+    private func calculateYearStats(year: Int, context: ModelContext) -> (distance: Double, fuel: Double, cost: Double) {
+        guard let vehicle = resolvedVehicle(context: context) else {
+            return (0, 0, 0)
+        }
+        
+        let calendar = Calendar.current
+        
+        // Calculate distance from consecutive mileage deltas within the year (more accurate than summing months)
+        let yearMileages = vehicle.mileages
+            .filter { calendar.component(.year, from: $0.date) == year }
+            .sorted { $0.date < $1.date }
+        
+        var totalDistance = 0
+        if yearMileages.count > 1 {
+            for idx in 1..<yearMileages.count {
+                totalDistance += yearMileages[idx].value - yearMileages[idx - 1].value
+            }
+        }
+        
+        // Sum fuel and cost for all months in the year
+        var totalFuel = 0.0
+        var totalCost = 0.0
+        for month in 1...12 {
+            totalFuel += getFuelUsedUseCase(forMonth: month, year: year, context: context)
+            totalCost += getFuelCostUseCase(forMonth: month, year: year, context: context)
+        }
+        
+        return (Double(totalDistance), totalFuel, totalCost)
+    }
+    
+    private func calculateAveragePricePerLiter(vehicle: Vehicle, period: MonthlySummaryPeriod) -> Double {
+        let calendar = Calendar.current
+        let fuelUsages: [FuelUsage]
+        
+        switch period {
+        case .month(let month, let year):
+            let monthStart = calendar.date(from: DateComponents(year: year, month: month, day: 1))!
+            let monthEnd = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: monthStart)!
+            fuelUsages = vehicle.fuelUsages.filter { $0.date >= monthStart && $0.date <= monthEnd }
+            
+        case .yearToDate(let year):
+            let yearStart = calendar.date(from: DateComponents(year: year, month: 1, day: 1))!
+            let now = Date()
+            let currentMonth = calendar.component(.month, from: now)
+            let monthEnd = calendar.date(from: DateComponents(year: year, month: currentMonth, day: calendar.range(of: .day, in: .month, for: now)?.count ?? 28))!
+            fuelUsages = vehicle.fuelUsages.filter { $0.date >= yearStart && $0.date <= monthEnd }
+            
+        case .year(let year):
+            let yearStart = calendar.date(from: DateComponents(year: year, month: 1, day: 1))!
+            let yearEnd = calendar.date(from: DateComponents(year: year, month: 12, day: 31))!
+            fuelUsages = vehicle.fuelUsages.filter { $0.date >= yearStart && $0.date <= yearEnd }
+        }
+        
+        guard !fuelUsages.isEmpty else { return 0 }
+        let totalPrice = fuelUsages.reduce(0.0) { $0 + ($1.liters > 0 ? ($1.cost / $1.liters) * $1.liters : 0) }
+        let totalFuel = fuelUsages.reduce(0.0) { $0 + $1.liters }
+        return totalFuel > 0 ? totalPrice / totalFuel : 0
+    }
+    
     public func monthlyFuelSummaries(context: ModelContext) -> [MonthlyFuelSummaryUiModel] {
         guard let vehicle = resolvedVehicle(context: context) else {
             cachedMonthlySummaries = nil
@@ -297,76 +356,76 @@ public final class VehicleViewModel: ObservableObject {
         do {
             let calendar = Calendar.current
             let now = Date()
+            let currentYear = calendar.component(.year, from: now)
+            let currentMonth = calendar.component(.month, from: now)
             var summaries: [MonthlyFuelSummaryUiModel] = []
             
-            // Use the same use cases as vehicleStatistics
-            // Current Month
+            // 1. Current Month
             let currentMonthStats = try getCurrentMonthStatsUseCase(context: context)
-            let currentMonth = calendar.component(.month, from: now)
-            let currentYear = calendar.component(.year, from: now)
+            let currentMonthPeriod = MonthlySummaryPeriod.month(month: currentMonth, year: currentYear)
             summaries.append(
-                vehicle.monthlyFuelSummary(
-                    month: currentMonth,
-                    year: currentYear,
+                MonthlyFuelSummaryUiModel(
+                    period: currentMonthPeriod,
                     totalDistance: currentMonthStats.distanceDriven,
-                    totalFuel: currentMonthStats.fuelUsed,
+                    averagePricePerLiter: calculateAveragePricePerLiter(vehicle: vehicle, period: currentMonthPeriod),
+                    totalFuelVolume: currentMonthStats.fuelUsed,
                     totalCost: currentMonthStats.totalCost
                 )
             )
             
-            // Last Month
+            // 2. Last Month
             let lastMonthStats = try getLastMonthStatsUseCase(context: context)
             let lastMonthDate = calendar.date(byAdding: .month, value: -1, to: now) ?? now
             let lastMonth = calendar.component(.month, from: lastMonthDate)
-            let lastYear = calendar.component(.year, from: lastMonthDate)
+            let lastMonthYear = calendar.component(.year, from: lastMonthDate)
+            let lastMonthPeriod = MonthlySummaryPeriod.month(month: lastMonth, year: lastMonthYear)
             summaries.append(
-                vehicle.monthlyFuelSummary(
-                    month: lastMonth,
-                    year: lastYear,
+                MonthlyFuelSummaryUiModel(
+                    period: lastMonthPeriod,
                     totalDistance: lastMonthStats.distanceDriven,
-                    totalFuel: lastMonthStats.fuelUsed,
+                    averagePricePerLiter: calculateAveragePricePerLiter(vehicle: vehicle, period: lastMonthPeriod),
+                    totalFuelVolume: lastMonthStats.fuelUsed,
                     totalCost: lastMonthStats.totalCost
                 )
             )
             
-            // YTD - show as average per month
+            // 3. YTD (Year to Date) - total, not average
             let ytdStats = try getYtdStatsUseCase(context: context)
-            let monthsSoFar = Double(calendar.component(.month, from: now))
+            let ytdPeriod = MonthlySummaryPeriod.yearToDate(year: currentYear)
             summaries.append(
-                vehicle.monthlyFuelSummary(
-                    month: currentMonth,
-                    year: currentYear,
-                    totalDistance: ytdStats.distanceDriven / monthsSoFar,
-                    totalFuel: ytdStats.fuelUsed / monthsSoFar,
-                    totalCost: ytdStats.totalCost / monthsSoFar
+                MonthlyFuelSummaryUiModel(
+                    period: ytdPeriod,
+                    totalDistance: ytdStats.distanceDriven,
+                    averagePricePerLiter: calculateAveragePricePerLiter(vehicle: vehicle, period: ytdPeriod),
+                    totalFuelVolume: ytdStats.fuelUsed,
+                    totalCost: ytdStats.totalCost
                 )
             )
             
-            // AllTime - show as average per month
-            let allTimeStats = try getAllTimeStatsUseCase(context: context)
-            let uniqueMonths = Set(vehicle.fuelUsages.map { 
-                calendar.dateComponents([.year, .month], from: $0.date)
-            }).count
-            let monthsCount = max(Double(uniqueMonths), 1.0)
+            // 4. This Year (full year total)
+            let thisYearStats = calculateYearStats(year: currentYear, context: context)
+            let thisYearPeriod = MonthlySummaryPeriod.year(year: currentYear)
             summaries.append(
-                vehicle.monthlyFuelSummary(
-                    month: currentMonth,
-                    year: currentYear,
-                    totalDistance: allTimeStats.distanceDriven / monthsCount,
-                    totalFuel: allTimeStats.fuelUsed / monthsCount,
-                    totalCost: allTimeStats.totalCost / monthsCount
+                MonthlyFuelSummaryUiModel(
+                    period: thisYearPeriod,
+                    totalDistance: thisYearStats.distance,
+                    averagePricePerLiter: calculateAveragePricePerLiter(vehicle: vehicle, period: thisYearPeriod),
+                    totalFuelVolume: thisYearStats.fuel,
+                    totalCost: thisYearStats.cost
                 )
             )
             
-            // ProjectedYear - show as average per month (projected year / 12)
-            let projectedStats = try getProjectedYearStatsUseCase(context: context)
+            // 5. Last Year (full year total)
+            let lastYear = currentYear - 1
+            let lastYearStats = calculateYearStats(year: lastYear, context: context)
+            let lastYearPeriod = MonthlySummaryPeriod.year(year: lastYear)
             summaries.append(
-                vehicle.monthlyFuelSummary(
-                    month: currentMonth,
-                    year: currentYear,
-                    totalDistance: projectedStats.distanceDriven / 12.0,
-                    totalFuel: projectedStats.fuelUsed / 12.0,
-                    totalCost: projectedStats.totalCost / 12.0
+                MonthlyFuelSummaryUiModel(
+                    period: lastYearPeriod,
+                    totalDistance: lastYearStats.distance,
+                    averagePricePerLiter: calculateAveragePricePerLiter(vehicle: vehicle, period: lastYearPeriod),
+                    totalFuelVolume: lastYearStats.fuel,
+                    totalCost: lastYearStats.cost
                 )
             )
             

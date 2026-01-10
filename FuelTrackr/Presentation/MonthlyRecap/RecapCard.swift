@@ -31,29 +31,54 @@ public struct RecapCard: View {
         self.comparisonText = comparisonText
     }
 
+    @Environment(\.colorScheme) private var colorScheme
+    
+    private var colors: ColorsProtocol {
+        Theme.colors(for: colorScheme)
+    }
+    
     public var body: some View {
-        VStack(spacing: 16) {
-            HStack(spacing: 12) {
-                RecapMetric(title: NSLocalizedString("km_driven", comment: ""), value: displayedDistance, icon: "car.fill", backgroundColor: .blue)
-                RecapMetric(title: NSLocalizedString("total_fuel_used", comment: ""), value: displayedFuelUsed, icon: "fuelpump.fill", backgroundColor: .orange)
+        VStack(spacing: Theme.dimensions.spacingL) {
+            HStack(spacing: Theme.dimensions.spacingM) {
+                RecapMetric(
+                    title: NSLocalizedString("km_driven", comment: ""),
+                    value: displayedDistance,
+                    icon: "car.fill",
+                    backgroundColor: colors.accentBlue
+                )
+                RecapMetric(
+                    title: NSLocalizedString("total_fuel_used", comment: ""),
+                    value: displayedFuelUsed,
+                    icon: "fuelpump.fill",
+                    backgroundColor: colors.accentOrange
+                )
             }
 
-            HStack(spacing: 12) {
-                RecapMetric(title: NSLocalizedString("total_fuel_cost", comment: ""), value: displayedFuelCost, icon: "eurosign.circle.fill", backgroundColor: .green)
-                RecapMetric(title: NSLocalizedString("average_fuel_usage", comment: ""), value: displayedAverage, icon: "speedometer", backgroundColor: .purple)
+            HStack(spacing: Theme.dimensions.spacingM) {
+                RecapMetric(
+                    title: NSLocalizedString("total_fuel_cost", comment: ""),
+                    value: displayedFuelCost,
+                    icon: "eurosign.circle.fill",
+                    backgroundColor: colors.accentGreen
+                )
+                RecapMetric(
+                    title: NSLocalizedString("average_fuel_usage", comment: ""),
+                    value: displayedAverage,
+                    icon: "speedometer",
+                    backgroundColor: colors.primary
+                )
             }
 
             if let comparison = comparisonText {
                 Text(comparison)
-                    .font(.footnote)
-                    .foregroundColor(.secondary)
+                    .font(Theme.typography.footnoteFont)
+                    .foregroundColor(colors.onSurface)
                     .multilineTextAlignment(.center)
-                    .padding(.top, 8)
+                    .padding(.top, Theme.dimensions.spacingS)
             }
         }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(16)
-        .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+        .padding(Theme.dimensions.spacingL)
+        .background(colors.surface)
+        .cornerRadius(12)
     }
 }
