@@ -8,20 +8,21 @@
 //
 
 import SwiftUI
-import Domain
 
 public struct ImagePicker: UIViewControllerRepresentable {
     @Binding public var image: UIImage?
+    public var sourceType: UIImagePickerController.SourceType = .photoLibrary
 
-    public init(image: Binding<UIImage?>) {
+    public init(image: Binding<UIImage?>, sourceType: UIImagePickerController.SourceType = .photoLibrary) {
         self._image = image
+        self.sourceType = sourceType
     }
 
     public func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
         picker.delegate = context.coordinator
         picker.allowsEditing = true
-        picker.sourceType = .photoLibrary
+        picker.sourceType = sourceType
         return picker
     }
 

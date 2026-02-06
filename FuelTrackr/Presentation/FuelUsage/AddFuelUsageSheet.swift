@@ -9,70 +9,85 @@ import SwiftData
 
 struct AddFuelUsageSheet: View {
     @StateObject var vehicleViewModel: VehicleViewModel
-    @StateObject var viewModel: AddFuelUsageViewModel
-
+    @StateObject private var viewModel = AddFuelUsageViewModel()
+    
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
-
+    
     @State private var resolvedVehicle: Vehicle?
-
+    
     private var mileagePlaceholder: String {
         let currentMileage = resolvedVehicle?.mileages.last?.value ?? 0
         return viewModel.displayMileagePlaceholder(currentMileage: currentMileage)
     }
-
+    
     var body: some View {
         NavigationStack {
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: Theme.dimensions.spacingL) {
-                    HeaderSection()
-                    InputSection(
-                        liters: $viewModel.liters,
-                        cost: $viewModel.cost,
-                        mileage: $viewModel.mileage,
-                        mileagePlaceholder: mileagePlaceholder,
-                        errorMessage: viewModel.errorMessage,
-                        onCancel: { dismiss() },
-                        onSave: saveFuelUsage
-                    )
-                }
-                .frame(maxWidth: .infinity, alignment: .top)
-                .padding(.horizontal, Theme.dimensions.spacingSection)
+            //ScrollView(.vertical, showsIndicators: false) {
+            VStack(spacing: Theme.dimensions.spacingL) {
+                HeaderSection()
+                InputSection(
+                    liters: $viewModel.liters,
+                    cost: $viewModel.cost,
+                    mileage: $viewModel.mileage,
+                    mileagePlaceholder: mileagePlaceholder,
+                    errorMessage: viewModel.errorMessage,
+                    mileageWarning: viewModel.mileageWarning,
+                    litersError: viewModel.litersError,
+                    costError: viewModel.costError,
+                    mileageError: viewModel.mileageError,
+                    onSave: saveFuelUsage
+                )
             }
-            .scrollBounceBehavior(.basedOnSize)
-            .scrollDismissesKeyboard(.interactively)
+            .frame(maxWidth: .infinity, alignment: .top)
+            .padding(.horizontal, Theme.dimensions.spacingSection)
             .onTapGesture { hideKeyboard() }
             .onAppear {
                 resolvedVehicle = vehicleViewModel.resolvedVehicle(context: context)
             }
         }
     }
-
+    
     private func saveFuelUsage() {
         if viewModel.saveFuelUsage(activeVehicle: resolvedVehicle, context: context) {
+            // Reset the form after successful save
+            viewModel.liters = ""
+            viewModel.cost = ""
+            viewModel.mileage = ""
+            viewModel.errorMessage = nil
+            viewModel.mileageWarning = nil
+            viewModel.litersError = false
+            viewModel.costError = false
+            viewModel.mileageError = false
             dismiss()
         }
     }
-
+    
     private func hideKeyboard() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
 
 struct HeaderSection: View {
+    @Environment(\.colorScheme) private var colorScheme
+    
     var body: some View {
+        let colors = Theme.colors(for: colorScheme)
+        
         VStack(alignment: .leading, spacing: Theme.dimensions.spacingS) {
             Text(NSLocalizedString("add_fuel_usage_title", comment: ""))
                 .font(Theme.typography.titleFont)
                 .fixedSize(horizontal: false, vertical: true)
                 .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.top, Theme.dimensions.spacingSection)
-
+            
             Text(NSLocalizedString("add_fuel_usage_description", comment: ""))
                 .font(Theme.typography.captionFont)
-                .foregroundColor(Theme.colors.onSurface)
+                .foregroundColor(colors.onSurface)
                 .fixedSize(horizontal: false, vertical: true)
                 .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }
@@ -81,68 +96,170 @@ struct InputSection: View {
     @Binding var liters: String
     @Binding var cost: String
     @Binding var mileage: String
-
+    var isPartialFill: Binding<Bool>?
+    
     let mileagePlaceholder: String
     let errorMessage: String?
-
-    var onCancel: () -> Void
+    let mileageWarning: String?
+    let litersError: Bool
+    let costError: Bool
+    let mileageError: Bool
+    let showPartialFillToggle: Bool
+    
     var onSave: () -> Void
-
+    
+    @Environment(\.colorScheme) private var colorScheme
+    
+    init(
+        liters: Binding<String>,
+        cost: Binding<String>,
+        mileage: Binding<String>,
+        mileagePlaceholder: String,
+        errorMessage: String?,
+        mileageWarning: String?,
+        litersError: Bool,
+        costError: Bool,
+        mileageError: Bool,
+        isPartialFill: Binding<Bool>? = nil,
+        showPartialFillToggle: Bool = false,
+        onSave: @escaping () -> Void
+    ) {
+        self._liters = liters
+        self._cost = cost
+        self._mileage = mileage
+        self.isPartialFill = isPartialFill
+        self.mileagePlaceholder = mileagePlaceholder
+        self.errorMessage = errorMessage
+        self.mileageWarning = mileageWarning
+        self.litersError = litersError
+        self.costError = costError
+        self.mileageError = mileageError
+        self.showPartialFillToggle = showPartialFillToggle
+        self.onSave = onSave
+    }
+    
     var body: some View {
-        VStack(spacing: Theme.dimensions.spacingM) {
+        let colors = Theme.colors(for: colorScheme)
+        
+        VStack(alignment: .leading, spacing: Theme.dimensions.spacingM) {
             InputField(
                 title: NSLocalizedString("liters_label", comment: ""),
                 placeholder: NSLocalizedString("liters_placeholder", comment: ""),
                 text: $liters,
-                keyboardType: .decimalPad
+                keyboardType: .decimalPad,
+                hasError: litersError
             )
-
+            .accessibilityLabel(NSLocalizedString("liters_label", comment: ""))
+            
             InputField(
                 title: NSLocalizedString("cost_label", comment: ""),
                 placeholder: NSLocalizedString("cost_placeholder", comment: ""),
                 text: $cost,
-                keyboardType: .decimalPad
+                keyboardType: .decimalPad,
+                hasError: costError
             )
-
-            InputField(
-                title: NSLocalizedString("mileage_label", comment: ""),
-                placeholder: mileagePlaceholder,
-                text: $mileage,
-                keyboardType: .numberPad
-            )
-
-            if let error = errorMessage {
-                Text(error)
-                    .foregroundColor(Theme.colors.error)
-                    .font(Theme.typography.footnoteFont)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
+            .accessibilityLabel(NSLocalizedString("cost_label", comment: ""))
+            
+            VStack(alignment: .leading, spacing: 4) {
+                InputField(
+                    title: NSLocalizedString("mileage_label", comment: ""),
+                    placeholder: mileagePlaceholder,
+                    text: $mileage,
+                    keyboardType: .numberPad,
+                    hasError: mileageError,
+                    hasWarning: mileageWarning != nil
+                )
+                .accessibilityLabel(NSLocalizedString("mileage_label", comment: ""))
+                
+                if let warning = mileageWarning {
+                    HStack(spacing: 4) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(.orange)
+                            .font(.caption)
+                        Text(warning)
+                            .foregroundColor(.orange)
+                            .font(Theme.typography.footnoteFont)
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel(warning)
+                }
             }
-
-            ActionButtons(onCancel: onCancel, onSave: onSave)
-                .padding(.top, Theme.dimensions.spacingM)
+            
+            if let error = errorMessage {
+                HStack(spacing: 4) {
+                    Image(systemName: "exclamationmark.circle.fill")
+                        .foregroundColor(colors.error)
+                        .font(.caption)
+                    Text(error)
+                        .foregroundColor(colors.error)
+                        .font(Theme.typography.footnoteFont)
+                }
+                .multilineTextAlignment(.leading)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(error)
+            }
+            
+            ActionButtons(
+                isPartialFill: showPartialFillToggle ? isPartialFill : nil,
+                onSave: onSave
+            )
+            .padding(.top, Theme.dimensions.spacingM)
         }
     }
 }
 
 struct ActionButtons: View {
-    var onCancel: () -> Void
+    var isPartialFill: Binding<Bool>?
     var onSave: () -> Void
-
+    
+    @Environment(\.colorScheme) private var colorScheme
+    
     var body: some View {
-        HStack(spacing: Theme.dimensions.spacingM) {
-            Button(NSLocalizedString("cancel", comment: ""), action: onCancel)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Theme.colors.surface)
-                .foregroundColor(Theme.colors.onBackground)
-                .cornerRadius(Theme.dimensions.radiusButton)
-
+        let colors = Theme.colors(for: colorScheme)
+        
+        VStack(spacing: Theme.dimensions.spacingM) {
+            // Partial/Full Fill Button (only shown in edit mode)
+            if let isPartialFillBinding = isPartialFill {
+                if isPartialFillBinding.wrappedValue {
+                    // Currently partial - show "Mark as Full Fill" button
+                    Button(action: {
+                        isPartialFillBinding.wrappedValue = false
+                    }) {
+                        Text(NSLocalizedString("mark_as_full_fill", comment: ""))
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(colors.primary)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.clear)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: Theme.dimensions.radiusButton)
+                                    .stroke(colors.primary, lineWidth: 1.5)
+                            )
+                    }
+                } else {
+                    // Currently full - show "Mark as Partial Fill" button
+                    Button(action: {
+                        isPartialFillBinding.wrappedValue = true
+                    }) {
+                        Text(NSLocalizedString("mark_as_partial_fill", comment: ""))
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.orange)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.clear)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: Theme.dimensions.radiusButton)
+                                    .stroke(.orange, lineWidth: 1.5)
+                            )
+                    }
+                }
+            }
+            
             Button(NSLocalizedString("save", comment: ""), action: onSave)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Theme.colors.primary)
-                .foregroundColor(Theme.colors.onPrimary)
+                .background(colors.primary)
+                .foregroundColor(colors.onPrimary)
                 .cornerRadius(Theme.dimensions.radiusButton)
         }
         .padding(.bottom, Theme.dimensions.spacingXL)

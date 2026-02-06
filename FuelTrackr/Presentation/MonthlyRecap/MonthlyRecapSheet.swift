@@ -14,6 +14,7 @@ import SwiftData
 
 public struct MonthlyRecapSheet: View {
     @Environment(\.modelContext) private var context
+    @Environment(\.colorScheme) private var colorScheme
 
     @ObservedObject var viewModel: MonthlyRecapViewModel
     @State private var selectedMonth: Int
@@ -93,7 +94,7 @@ public struct MonthlyRecapSheet: View {
 
     public var body: some View {
         NavigationView {
-            VStack(spacing: 30) {
+            VStack(spacing: Theme.dimensions.spacingSection) {
                 MonthNavigationHeader(selectedMonth: $selectedMonth, selectedYear: $selectedYear)
 
                 if kmDriven == 0 && totalFuelUsed == 0 && totalFuelCost == 0 {
@@ -111,7 +112,7 @@ public struct MonthlyRecapSheet: View {
                 Spacer()
             }
             .navigationBarTitleDisplayMode(.inline)
-            .background(Color(UIColor.systemBackground).ignoresSafeArea())
+            .background(Theme.colors(for: colorScheme).background.ignoresSafeArea())
         }
     }
 }

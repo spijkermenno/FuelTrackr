@@ -14,9 +14,12 @@ struct ContentView: View {
             if vehicleViewModel.hasActiveVehicle {
                 ActiveVehicleView(vehicleViewModel: vehicleViewModel, settingsViewModel: settingsViewModel)
             } else {
-                AddVehicleView(onSave: { vehicleViewModel.loadActiveVehicle(context: context) })
+                OnboardingFlowView(
+                    onComplete: {
+                        vehicleViewModel.loadActiveVehicle(context: context)
+                    }
+                )
             }
-            
         }
         .onAppear {
             vehicleViewModel.loadActiveVehicle(context: context)

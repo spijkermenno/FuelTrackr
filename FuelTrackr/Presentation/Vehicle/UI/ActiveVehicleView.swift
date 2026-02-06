@@ -15,12 +15,12 @@ public struct ActiveVehicleView: View {
     @StateObject public var settingsViewModel: SettingsViewModel
     
     @Environment(\.modelContext) public var context
-    @EnvironmentObject public var notificationHandler: NotificationHandler
 
     @State public var showDeleteConfirmation = false
     @State public var showAddFuelSheet = false
     @State public var showAddMaintenanceSheet = false
     @State public var showEditVehicleSheet = false
+    @State public var isShowingPayWall = false
 
     public init(
         vehicleViewModel: VehicleViewModel,
@@ -37,7 +37,8 @@ public struct ActiveVehicleView: View {
                     vehicleViewModel: viewModel,
                     showAddFuelSheet: $showAddFuelSheet,
                     showAddMaintenanceSheet: $showAddMaintenanceSheet,
-                    showEditVehicleSheet: $showEditVehicleSheet
+                    showEditVehicleSheet: $showEditVehicleSheet,
+                    isShowingPayWall: $isShowingPayWall
                 )
                 .onAppear {
                     // TODO: Analytics wrapper
@@ -46,15 +47,6 @@ public struct ActiveVehicleView: View {
                         "license_plate": vehicle.licensePlate
                     ])
                     scheduleNextRecapNotification()
-                    
-                    let escaped = "{\"name\":\"Kia Niro\"}"
-                    let bla = vehicle.toJSON()
-                    
-                    if let data = bla?.data(using: .utf8),
-                       let unescaped = try? JSONSerialization.jsonObject(with: data) {
-                        let cleanData = try! JSONSerialization.data(withJSONObject: unescaped, options: [.prettyPrinted])
-                        print(String(data: cleanData, encoding: .utf8)!) // ✅ clean JSON
-                    }
                 }
             } else {
                 NoActiveVehicleView()
@@ -84,7 +76,7 @@ public struct ActiveVehicleView: View {
         components.second = 0
 
         if let next1st = calendar.date(from: components) {
-            // notificationManager.scheduleMonthlyRecapNotification(for: next1st)
+            // Schedule monthly recap notification
         }
     }
 }

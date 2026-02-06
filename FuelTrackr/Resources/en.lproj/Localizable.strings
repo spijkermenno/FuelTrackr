@@ -58,6 +58,7 @@
 "fuel_usage_empty_title" = "More data needed";
 "fuel_usage_empty_description" = "Add more fuel entries for a better overview.";
 "fuel_usage_list_title" = "Fuel Usage Records";
+"fuel_history_need_more_data" = "Add another fuel entry to view the detailed history.";
 
 /* Maintenance */
 "maintenance_title" = "Maintenance History";
@@ -83,6 +84,8 @@
 "invalid_number_error" = "Invalid number. Ensure the input is numeric.";
 "invalid_notes_error" = "Please provide a description for the maintenance.";
 "general_error" = "Something went wrong. Please try again.";
+"mileage_too_low_error" = "The mileage cannot be lower than the previous recorded value (%d).";
+"mileage_suspiciously_high_warning" = "This mileage is much higher than expected. Please check if you added an extra digit.";
 
 /* Notifications */
 "notifications_section" = "Notifications";
@@ -134,6 +137,7 @@
 "select_date" = "Select Date";
 "date" = "Date";
 "close" = "Close";
+"search" = "Search";
 
 /* Graphs */
 "no_graph_fuel" = "A graph will appear here once more fuel data has been added.";
@@ -199,3 +203,120 @@
 "validation_cost_invalid" = "Please enter a valid cost (zero or more).";
 "validation_mileage_invalid" = "Please enter a valid mileage.";
 "mileage_placeholder_format" = "e.g. %d";
+
+/* Onboarding */
+"onboarding_welcome_title" = "Welcome to FuelTrackr 👋";
+"onboarding_welcome_description" = "Let's set up your vehicle so you can easily track your fuel usage and maintenance.";
+"onboarding_setup_vehicle_button" = "Set up my vehicle";
+"onboarding_unit_selection_title" = "Distance & Consumption";
+"onboarding_unit_selection_question" = "Which units do you use for distance and fuel consumption?";
+"kilometers_liters" = "Kilometers & Liters";
+"miles_gallons" = "Miles & Gallons";
+"metric" = "(Metric)";
+"imperial" = "(Imperial)";
+"continue" = "Continue";
+"onboarding_license_plate_title" = "License plate";
+"onboarding_license_plate_description" = "Enter your vehicle's license plate to automatically fetch public specs.";
+"onboarding_license_plate_placeholder" = "Fill in license plate";
+"onboarding_license_plate_info" = "When available, FuelTrackr will use public vehicle data to pre-fill details. This only works for supported regions and plate formats.";
+"onboarding_add_later" = "I'll add this later";
+
+"onboarding_vehicle_fuel_type_title" = "Vehicle Fuel Type";
+"onboarding_vehicle_fuel_type_question" = "What fuel does your vehicle use?";
+"onboarding_vehicle_fuel_type_placeholder" = "[NYD]";
+
+"fuel_liquid" = "Petrol or Diesel";
+"fuel_electric" = "Electric";
+"fuel_hydrogen" = "Hydrogen";
+"fuel_unknown" = "Unknown";
+
+"onboarding_vehicle_brand_title" = "Vehicle brand";
+"onboarding_vehicle_brand_question" = "What brand is your vehicle?";
+"onboarding_vehicle_brand_placeholder" = "Search or select your brand";
+
+"onboarding_not_on_list" = "Not on the list";
+"onboarding_vehicle_model_title" = "Vehicle model";
+"onboarding_vehicle_model_question" = "Which model do you drive?";
+"onboarding_vehicle_model_placeholder" = "Search or type your model";
+"onboarding_optional_details_title" = "Optional details";
+"onboarding_optional_details_description" = "Add these to improve maintenance estimates and long term cost insights.";
+"onboarding_production_date_title" = "Production month & year";
+"onboarding_select_date_placeholder" = "Select date";
+"onboarding_skip_for_now" = "Skip for now";
+"onboarding_current_mileage_title" = "Current mileage";
+"onboarding_current_mileage_question" = "What's your vehicle's current mileage?";
+"onboarding_mileage_placeholder_km" = "e.g. 125,000 km";
+"onboarding_mileage_placeholder_miles" = "e.g. 77,671 mi";
+"onboarding_add_photo_title" = "Add a photo of your vehicle";
+"onboarding_add_photo_description" = "This helps you recognize it quickly in your overview.";
+"onboarding_take_photo" = "Take photo";
+"onboarding_choose_from_gallery" = "Choose from gallery";
+"onboarding_confirm_photo" = "Confirm Photo";
+"onboarding_reset_photo" = "Reset Photo";
+"onboarding_completion_title" = "Vehicle setup complete! 🎉";
+"onboarding_completion_description" = "FuelTrackr is now ready to help you track fuel, costs, and maintenance automatically.";
+"onboarding_go_to_dashboard" = "Go to dashboard";
+"done" = "Done";
+
+/* Redesigned Active Vehicle View */
+"fuel_consumption" = "Fuel Consumption";
+"maintenance_history" = "Maintenance History";
+"show_more" = "Show More";
+"fuel_history" = "Fuel History";
+"total_distance_km" = "Total Distance";
+"total_distance_miles" = "Total Distance";
+"average_price" = "Average Price";
+"fuel" = "Fuel";
+"costs" = "Costs";
+"odometer" = "Odometer";
+"brake_replacement" = "Brake Replacement";
+"tire_replacement" = "Tire Replacement";
+"distribution_belt" = "Distribution Belt";
+"other_maintenance" = "Other";
+"mileage" = "Mileage";
+"owned" = "Owned";
+"age" = "Age";
+
+/* Fuel Detail Page */
+"consumption_overview" = "Consumption Overview";
+"average_consumption" = "average consumption";
+"total_cost_label" = "Total cost";
+"last_refueling" = "Last refueling";
+"fuel_entries_last_months" = "Fuel entries last %d months (%d)";
+"fuel_entries_last_month" = "Fuel entries last month (%d)";
+"add_new_refueling" = "+ Add new refueling";
+"timeframe_1m" = "1M";
+"timeframe_3m" = "3M";
+"timeframe_1y" = "1Y";
+"timeframe_ytd" = "YTD";
+"range" = "range";
+"location" = "Location";
+"km_per_liter" = "km/l";
+"liters" = "L";
+"price_per_liter" = "$/L";
+"consumption" = "Consumption";
+"cost" = "Cost";
+
+/* Partial Fill */
+"partial_fill" = "Partial Fill";
+"partial_fill_description" = "This refill appears to be partial. It will be merged with the next full refill for accurate consumption calculations.";
+"partial_fill_badge" = "Half Tank";
+"mark_as_full_fill" = "Mark as Full Fill";
+"mark_as_partial_fill" = "Mark as Partial Fill";
+"partial_fill_info" = "Partial fills are automatically detected when a refill is significantly less than your average. They are merged with the next full refill for accurate fuel consumption calculations.";
+"not_enough_data_for_detection" = "Need at least %d refills to detect partial fills";
+"current_status" = "Current Status";
+"fill_type" = "Fill Type";
+"full_fill" = "Full Fill";
+"average_refill_amount" = "Average Refill Amount";
+"merged_partial_fill_description" = "This entry contains multiple fuel fills that have been merged together. You can mark individual entries as full or partial fills below.";
+"merged_group_summary" = "Merged Group Summary";
+"total_fuel" = "Total Fuel";
+"entries_count" = "Entries";
+"entries_in_group" = "Entries in This Group";
+"partial_fill_toggle_description" = "Mark this refill as partial if it wasn't a full tank. Partial refills are merged with the next full refill for accurate consumption calculations.";
+"merged_group_title" = "Merged Group";
+"merged_group_info" = "This entry is part of a merged group. All entries below are combined for consumption calculation until a full fill is reached.";
+"current" = "Current";
+"closing_fill" = "Full Tank";
+"combined_stats" = "Combined Statistics";

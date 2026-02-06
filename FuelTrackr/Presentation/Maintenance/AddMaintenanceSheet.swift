@@ -23,10 +23,16 @@ import Domain
     @State private var date = Date()
     @State private var isFree = false
     @State private var errorMessage: String?
+    @State private var mileageWarning: String?
     @State private var keyboardHeight: CGFloat = 0
+    @State private var resolvedVehicle: Vehicle?
     
     private var decimalSeparator: String {
         Locale.current.decimalSeparator ?? "."
+    }
+    
+    private var isUsingMetric: Bool {
+        viewModel.isUsingMetric
     }
     
      var body: some View {
@@ -43,7 +49,10 @@ import Domain
             .background(Color(UIColor.systemBackground))
             .edgesIgnoringSafeArea(.bottom)
             .onTapGesture { hideKeyboard() }
-            .onAppear { startKeyboardObserver() }
+            .onAppear {
+                startKeyboardObserver()
+                resolvedVehicle = viewModel.resolvedVehicle(context: context)
+            }
             .onDisappear { stopKeyboardObserver() }
         }
     }
@@ -94,12 +103,31 @@ import Domain
                 if isFree { cost = "0" } else { cost = "" }
             }
             
-            InputField(
-                title: NSLocalizedString("mileage_label", comment: ""),
-                placeholder: NSLocalizedString("mileage_placeholder", comment: ""),
-                text: $mileage,
-                keyboardType: .numberPad
-            )
+            VStack(alignment: .leading, spacing: 4) {
+                InputField(
+                    title: NSLocalizedString("mileage_label", comment: ""),
+                    placeholder: NSLocalizedString("mileage_placeholder", comment: ""),
+                    text: $mileage,
+                    keyboardType: .numberPad,
+                    hasError: errorMessage != nil && mileageWarning == nil,
+                    hasWarning: mileageWarning != nil
+                )
+                .accessibilityLabel(NSLocalizedString("mileage_label", comment: ""))
+                
+                if let warning = mileageWarning {
+                    HStack(spacing: 4) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(.orange)
+                            .font(.caption)
+                        Text(warning)
+                            .foregroundColor(.orange)
+                            .font(.footnote)
+                    }
+                    .padding(.horizontal, 4)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel(warning)
+                }
+            }
             
             VStack(alignment: .leading, spacing: 8) {
                 Text(NSLocalizedString("date_label", comment: ""))
@@ -111,17 +139,28 @@ import Domain
                     .padding()
                     .background(Color(.secondarySystemBackground))
                     .cornerRadius(8)
+                    .accessibilityLabel(NSLocalizedString("date_label", comment: ""))
             }
             
             if let errorMessage = errorMessage {
-                Text(errorMessage)
-                    .foregroundColor(.red)
-                    .font(.footnote)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
+                HStack(spacing: 4) {
+                    Image(systemName: "exclamationmark.circle.fill")
+                        .foregroundColor(.red)
+                        .font(.caption)
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                        .font(.footnote)
+                }
+                .multilineTextAlignment(.leading)
+                .padding(.horizontal, 4)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(errorMessage)
             }
         }
         .padding()
+        .onChange(of: mileage) { _ in
+            validateMileage()
+        }
     }
     
     private var maintenanceTypePicker: some View {
@@ -183,25 +222,83 @@ import Domain
         )
         
         viewModel.saveMaintenance(maintenance: maintenance, context: context)
-        viewModel.saveMaintenance(maintenance: maintenance, context: context)
         dismiss()
+    }
+    
+    private func validateMileage() {
+        guard let vehicle = resolvedVehicle,
+              !mileage.isEmpty,
+              let mileageValue = Int(mileage) else {
+            mileageWarning = nil
+            return
+        }
+        
+        let previousMileage = getPreviousMileage(from: vehicle)
+        
+        guard let previousMileage = previousMileage else {
+            mileageWarning = nil
+            return
+        }
+        
+        // Check if mileage is suspiciously high (more than 2x or more than 10,000 km/miles higher)
+        let threshold = isUsingMetric ? 10000 : 6214 // ~10,000 km or ~6,214 miles
+        let difference = mileageValue - previousMileage
+        
+        if mileageValue > previousMileage * 2 || difference > threshold {
+            mileageWarning = NSLocalizedString("mileage_suspiciously_high_warning", comment: "")
+        } else {
+            mileageWarning = nil
+        }
+    }
+    
+    /// Gets the previous mileage from vehicle (from latest mileage or latest fuel usage)
+    private func getPreviousMileage(from vehicle: Vehicle) -> Int? {
+        // Get latest mileage from mileages array
+        let latestMileage = vehicle.latestMileage?.value
+        
+        // Get latest mileage from fuel usages
+        let latestFuelMileage = vehicle.fuelUsages
+            .compactMap { $0.mileage?.value }
+            .max()
+        
+        // Get latest mileage from maintenances
+        let latestMaintenanceMileage = vehicle.maintenances
+            .compactMap { $0.mileage?.value }
+            .max()
+        
+        // Return the highest value between all three
+        let allMileages = [latestMileage, latestFuelMileage, latestMaintenanceMileage].compactMap { $0 }
+        return allMileages.max()
     }
     
     private func validateAllFields() -> Bool {
         if !isFree {
             guard let costValue = parseInput(cost), costValue > 0 else {
                 errorMessage = NSLocalizedString("invalid_cost_error", comment: "")
+                mileageWarning = nil
                 return false
             }
         }
         
         guard let mileageValue = Int(mileage), mileageValue > 0 else {
             errorMessage = NSLocalizedString("invalid_mileage_error", comment: "")
+            mileageWarning = nil
             return false
+        }
+        
+        // Validate mileage against previous value
+        if let vehicle = resolvedVehicle {
+            let previousMileage = getPreviousMileage(from: vehicle)
+            if let previousMileage = previousMileage, mileageValue < previousMileage {
+                errorMessage = String(format: NSLocalizedString("mileage_too_low_error", comment: ""), previousMileage)
+                mileageWarning = nil
+                return false
+            }
         }
         
         if selectedType == .other && notes.isEmpty {
             errorMessage = NSLocalizedString("invalid_notes_error", comment: "")
+            mileageWarning = nil
             return false
         }
         

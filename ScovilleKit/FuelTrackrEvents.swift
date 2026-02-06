@@ -14,4 +14,8 @@ public struct FuelTrackrEvents: AnalyticsEventName, Sendable {
     
     // Fuel
     public static let trackedFuel = FuelTrackrEvents("trackedFuel")
+    public static let failedToLoadProducts = FuelTrackrEvents("failedToLoadProducts")
+    public static let IAPFullPremiumBought = FuelTrackrEvents("IAPFullPremiumBought")
+    public static let IAPCancelled = FuelTrackrEvents("IAPCancelled")
+    public static let IAPFailed = FuelTrackrEvents("IAPFailed")
 }

@@ -15,10 +15,12 @@
 		A9A91A8F2D4C02B000153BE0 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = A9A91A8E2D4C02B000153BE0 /* FirebaseCrashlytics */; };
 		A9A91A912D4C02B000153BE0 /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = A9A91A902D4C02B000153BE0 /* FirebasePerformance */; };
 		A9B3A5F52DC265AA00D219FF /* Data in Frameworks */ = {isa = PBXBuildFile; productRef = A9B3A5F42DC265AA00D219FF /* Data */; };
+		A9C83BAF2F193A61008371FC /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9C83BAE2F193A61008371FC /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		A96F625E2D43C5D500872385 /* FuelTrackr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FuelTrackr.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A9C83BAE2F193A61008371FC /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -52,6 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9C83BAF2F193A61008371FC /* StoreKit.framework in Frameworks */,
 				A9A91A8F2D4C02B000153BE0 /* FirebaseCrashlytics in Frameworks */,
 				A98BBF132DC1670300F561BF /* Domain in Frameworks */,
 				A9A91A8D2D4C02B000153BE0 /* FirebaseCore in Frameworks */,
@@ -87,6 +90,7 @@
 		A98BBF0D2DC166F800F561BF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A9C83BAE2F193A61008371FC /* StoreKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -312,7 +316,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = FuelTrackr/App/FuelTrackr.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 19;
 				DEVELOPMENT_ASSET_PATHS = "\"FuelTrackr/Preview Content\"";
 				DEVELOPMENT_TEAM = 327PJMKH2C;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -355,7 +359,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = FuelTrackr/App/FuelTrackr.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 19;
 				DEVELOPMENT_ASSET_PATHS = "\"FuelTrackr/Preview Content\"";
 				DEVELOPMENT_TEAM = 327PJMKH2C;
 				ENABLE_HARDENED_RUNTIME = YES;

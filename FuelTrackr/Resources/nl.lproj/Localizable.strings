@@ -58,6 +58,7 @@
 "fuel_usage_empty_title" = "Meer gegevens nodig";
 "fuel_usage_empty_description" = "Voeg meer tankbeurten toe voor een beter overzicht.";
 "fuel_usage_list_title" = "Brandstof details";
+"fuel_history_need_more_data" = "Voeg nog een tankbeurt toe om de gedetailleerde geschiedenis te bekijken.";
 
 /* Onderhoud */
 "maintenance_title" = "Onderhoud Geschiedenis";
@@ -83,6 +84,8 @@
 "invalid_number_error" = "Ongeldig nummer. Zorg ervoor dat de invoer numeriek is.";
 "invalid_notes_error" = "Geef een beschrijving op voor het onderhoud.";
 "general_error" = "Er is iets misgegaan. Probeer het opnieuw.";
+"mileage_too_low_error" = "De kilometerstand kan niet lager zijn dan de vorige geregistreerde waarde (%d).";
+"mileage_suspiciously_high_warning" = "Deze kilometerstand is veel hoger dan verwacht. Controleer of je geen extra cijfer hebt toegevoegd.";
 
 /* Meldingen */
 "notifications_section" = "Meldingen";
@@ -146,12 +149,13 @@
 "select_date" = "Selecteer datum";
 "date" = "Datum";
 "close" = "Sluiten";
+"search" = "Zoeken";
 
 /* Vernieuwen en Actieve Voertuig */
 "refreshing" = "Vernieuwen...";
 "no_active_vehicle_found" = "Geen actief voertuig gevonden.";
 
-"cancel" = "Terug";
+"cancel" = "Annuleren";
 "save" = "Opslaan";
 "latest_mileage" = "Nieuwste kilometerstand";
 "add_maintenance_description" = "Leg je onderhoud vast om je voertuig in topconditie te houden.";
@@ -199,3 +203,120 @@
 "validation_cost_invalid" = "Voer een geldig bedrag in (nul of meer).";
 "validation_mileage_invalid" = "Voer een geldige kilometerstand in.";
 "mileage_placeholder_format" = "bijv. %d";
+
+/* Onboarding */
+"onboarding_welcome_title" = "Welkom bij FuelTrackr 👋";
+"onboarding_welcome_description" = "Laten we je voertuig instellen zodat je gemakkelijk je brandstofverbruik en onderhoud kunt bijhouden.";
+"onboarding_setup_vehicle_button" = "Mijn voertuig instellen";
+"onboarding_unit_selection_title" = "Afstand & Verbruik";
+"onboarding_unit_selection_question" = "Welke eenheden gebruik je voor afstand en brandstofverbruik?";
+"kilometers_liters" = "Kilometers & Liters";
+"miles_gallons" = "Mijlen & Gallons";
+"metric" = "(Metrisch)";
+"imperial" = "(Imperiaal)";
+"continue" = "Doorgaan";
+"onboarding_license_plate_title" = "Kenteken";
+"onboarding_license_plate_description" = "Voer het kenteken van je voertuig in om automatisch openbare specificaties op te halen.";
+"onboarding_license_plate_placeholder" = "Vul kenteken in";
+"onboarding_license_plate_info" = "Wanneer beschikbaar, gebruikt FuelTrackr openbare voertuiggegevens om details vooraf in te vullen. Dit werkt alleen voor ondersteunde regio's en kentekenformaten.";
+"onboarding_add_later" = "Ik voeg dit later toe";
+
+"onboarding_vehicle_fuel_type_title" = "Voertuig brandstof type";
+"onboarding_vehicle_fuel_type_question" = "Welke soort brandstof gebruikt jou voertuig?";
+"onboarding_vehicle_fuel_type_placeholder" = "[Nader te bepalen]";
+
+"fuel_liquid" = "Benzine of Diesel";
+"fuel_electric" = "Elektrisch";
+"fuel_hydrogen" = "Waterstof";
+"fuel_unknown" = "Onbekend";
+
+"onboarding_vehicle_brand_title" = "Voertuigmerk";
+"onboarding_vehicle_brand_question" = "Welk merk is je voertuig?";
+"onboarding_vehicle_brand_placeholder" = "Zoek of selecteer je merk";
+
+"onboarding_not_on_list" = "Niet in de lijst";
+"onboarding_vehicle_model_title" = "Voertuigmodel";
+"onboarding_vehicle_model_question" = "Welk model rijd je?";
+"onboarding_vehicle_model_placeholder" = "Zoek of typ je model";
+"onboarding_optional_details_title" = "Optionele details";
+"onboarding_optional_details_description" = "Voeg deze toe om onderhoudsschattingen en langetermijnkosteninzichten te verbeteren.";
+"onboarding_production_date_title" = "Productiemaand & jaar";
+"onboarding_select_date_placeholder" = "Selecteer datum";
+"onboarding_skip_for_now" = "Sla nu over";
+"onboarding_current_mileage_title" = "Huidige kilometerstand";
+"onboarding_current_mileage_question" = "Wat is de huidige kilometerstand van je voertuig?";
+"onboarding_mileage_placeholder_km" = "bijv. 125.000 km";
+"onboarding_mileage_placeholder_miles" = "bijv. 77.671 mi";
+"onboarding_add_photo_title" = "Voeg een foto van je voertuig toe";
+"onboarding_add_photo_description" = "Dit helpt je om het snel te herkennen in je overzicht.";
+"onboarding_take_photo" = "Foto maken";
+"onboarding_choose_from_gallery" = "Kies uit galerij";
+"onboarding_confirm_photo" = "Foto bevestigen";
+"onboarding_reset_photo" = "Foto opnieuw instellen";
+"onboarding_completion_title" = "Voertuiginstellingen voltooid! 🎉";
+"onboarding_completion_description" = "FuelTrackr is nu klaar om je te helpen brandstof, kosten en onderhoud automatisch bij te houden.";
+"onboarding_go_to_dashboard" = "Ga naar dashboard";
+"done" = "Gereed";
+
+/* Herontworpen Actieve Voertuig Weergave */
+"fuel_consumption" = "Brandstofverbruik";
+"maintenance_history" = "Onderhoud geschiedenis";
+"show_more" = "Meer weergeven";
+"fuel_history" = "Brandstof geschiedenis";
+"total_distance_km" = "Totale afstand";
+"total_distance_miles" = "Totale afstand";
+"average_price" = "Gemiddelde prijs";
+"fuel" = "Brandstof";
+"costs" = "Kosten";
+"odometer" = "Kilometerstand";
+"brake_replacement" = "Remblokken vervangen";
+"tire_replacement" = "Banden vervangen";
+"distribution_belt" = "Distributieriem";
+"other_maintenance" = "Overig";
+"mileage" = "Kilometerstand";
+"owned" = "Eigendom";
+"age" = "Leeftijd";
+
+/* Fuel Detail Page */
+"consumption_overview" = "Verbruiksoverzicht";
+"average_consumption" = "gemiddeld verbruik";
+"total_cost_label" = "Kosten totaal";
+"last_refueling" = "Laatste tankbeurt";
+"fuel_entries_last_months" = "Tankbeurten afgelopen %d maanden (%d)";
+"fuel_entries_last_month" = "Tankbeurten afgelopen maand (%d)";
+"add_new_refueling" = "+ Nieuwe tankbeurt toevoegen";
+"timeframe_1m" = "1M";
+"timeframe_3m" = "3M";
+"timeframe_1y" = "1J";
+"timeframe_ytd" = "YTD";
+"range" = "bereik";
+"location" = "Locatie";
+"km_per_liter" = "km/l";
+"liters" = "L";
+"price_per_liter" = "€/L";
+"consumption" = "Verbruik";
+"cost" = "Kosten";
+
+/* Partial Fill */
+"partial_fill" = "Gedeeltelijke Tankbeurt";
+"partial_fill_description" = "Deze tankbeurt lijkt gedeeltelijk te zijn. Deze wordt samengevoegd met de volgende volledige tankbeurt voor nauwkeurige verbruiksberekeningen.";
+"mark_as_full_fill" = "Markeer als Volledige Tankbeurt";
+"mark_as_partial_fill" = "Markeer als Gedeeltelijke Tankbeurt";
+"partial_fill_info" = "Gedeeltelijke tankbeurten worden automatisch gedetecteerd wanneer een tankbeurt aanzienlijk minder is dan uw gemiddelde. Ze worden samengevoegd met de volgende volledige tankbeurt voor nauwkeurige brandstofverbruiksberekeningen.";
+"not_enough_data_for_detection" = "Minimaal %d tankbeurten nodig om gedeeltelijke tankbeurten te detecteren";
+"current_status" = "Huidige Status";
+"fill_type" = "Tankbeurt Type";
+"full_fill" = "Volledige Tankbeurt";
+"average_refill_amount" = "Gemiddelde Tankbeurt";
+"merged_partial_fill_description" = "Deze invoer bevat meerdere tankbeurten die zijn samengevoegd. U kunt individuele invoeren hieronder markeren als volledige of gedeeltelijke tankbeurten.";
+"merged_group_summary" = "Samengevoegde Groep Samenvatting";
+"total_fuel" = "Totale Brandstof";
+"entries_count" = "Invoeren";
+"entries_in_group" = "Invoeren in Deze Groep";
+"partial_fill_toggle_description" = "Markeer deze tankbeurt als gedeeltelijk als het geen volle tank was. Gedeeltelijke tankbeurten worden samengevoegd met de volgende volledige tankbeurt voor nauwkeurige verbruiksberekeningen.";
+"merged_group_title" = "Samengevoegde Groep";
+"merged_group_info" = "Deze invoer maakt deel uit van een samengevoegde groep. Alle invoeren hieronder worden gecombineerd voor verbruiksberekening totdat een volledige tankbeurt is bereikt.";
+"current" = "Huidige";
+"closing_fill" = "Volle Tank";
+"partial_fill_badge" = "Halve Tank";
+"combined_stats" = "Gecombineerde Statistieken";

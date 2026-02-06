@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct Card<Header: View, Content: View>: View {
+    @Environment(\.colorScheme) private var colorScheme
     let header: () -> Header
     let content: () -> Content
     
@@ -19,15 +20,18 @@ struct Card<Header: View, Content: View>: View {
         self.content = content
     }
     
+    private var colors: ColorsProtocol {
+        Theme.colors(for: colorScheme)
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             header()
             content()
         }
         .padding()
-        .background(Color(.secondarySystemBackground))
+        .background(colors.surface)
         .cornerRadius(Theme.dimensions.radiusCard)
-        //.shadow(color: Color.black.opacity(0.1),radius: 6,x: 0,y: 0)
         .frame(maxWidth: .infinity)
     }
 }

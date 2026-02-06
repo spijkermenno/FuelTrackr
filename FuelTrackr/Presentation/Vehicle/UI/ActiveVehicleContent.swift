@@ -12,14 +12,18 @@ import SwiftData
 public struct ActiveVehicleContent: View {
     @StateObject public var vehicleViewModel: VehicleViewModel
     @StateObject public var settingsViewModel = SettingsViewModel()
-    @StateObject public var addFuelUsageViewModel = AddFuelUsageViewModel()
    
     @Environment(\.modelContext) private var context
-    @EnvironmentObject private var notificationHandler: NotificationHandler
+    @Environment(\.colorScheme) private var colorScheme
 
     @Binding public var showAddFuelSheet: Bool
+    @Binding public var isShowingPayWall: Bool
     @Binding public var showAddMaintenanceSheet: Bool
     @Binding public var showEditVehicleSheet: Bool
+    
+    @State private var showFuelDetailsSheet = false
+    @State private var showMergedPartialFillSheet = false
+    @State private var selectedMergedGroupID: PersistentIdentifier?
 
     // MARK: - Edit Fuel Usage selection
     private struct FuelUsageSelection: Identifiable {
@@ -31,71 +35,75 @@ public struct ActiveVehicleContent: View {
         vehicleViewModel: VehicleViewModel,
         showAddFuelSheet: Binding<Bool>,
         showAddMaintenanceSheet: Binding<Bool>,
-        showEditVehicleSheet: Binding<Bool>
+        showEditVehicleSheet: Binding<Bool>,
+        isShowingPayWall: Binding<Bool>
     ) {
         _vehicleViewModel = StateObject(wrappedValue: vehicleViewModel)
         _showAddFuelSheet = showAddFuelSheet
         _showAddMaintenanceSheet = showAddMaintenanceSheet
         _showEditVehicleSheet = showEditVehicleSheet
+        _isShowingPayWall = isShowingPayWall
     }
     
     public var body: some View {
         ScrollView {
             if let vehicle = vehicleViewModel.resolvedVehicle(context: context) {
-                VStack(alignment: .leading, spacing: 16) {
-                    VehicleImageView(photoData: vehicle.photo)
-                        .padding(.horizontal)
-                    
-                    VehiclePurchaseBanner(
-                        isPurchased: vehicle.isPurchased ?? false,
-                        purchaseDate: vehicle.purchaseDate,
-                        onConfirmPurchase: {
-                            vehicleViewModel.confirmPurchase(context: context)
-                        }
-                    )
-                    .padding(.horizontal)
-                    
-                    NewVehicleInfoCard(
+                VStack(alignment: .leading, spacing: 20) {
+                    // Vehicle Image Carousel
+                    VehicleImageCarouselView(
+                        photoData: vehicle.photo,
                         licensePlate: vehicle.licensePlate,
-                        mileage: vehicle.mileages.sorted(by: { $0.date < $1.date }).last?.value ?? 0,
+                        currentMileage: vehicle.mileages.sorted(by: { $0.date < $1.date }).last?.value ?? 0,
                         purchaseDate: vehicle.purchaseDate,
-                        productionDate: vehicle.manufacturingDate
+                        productionDate: vehicle.manufacturingDate,
+                        isUsingMetric: settingsViewModel.isUsingMetric
                     )
-                    .padding(.horizontal)
                     
-                    VehicleStatisticsCarouselView(items: vehicleViewModel.vehicleStatistics(context: context))
+                    Button("show paywall", action: {
+                        isShowingPayWall = true
+                    })
                     
-                    FuelUsagePreviewCard(
-                        items: vehicle.latestFuelUsagePreviews(),
+                    // Monthly Fuel Summary Carousel
+                    MonthlyFuelSummaryCarouselView(
+                        vehicleViewModel: vehicleViewModel,
+                        isUsingMetric: settingsViewModel.isUsingMetric
+                    )
+                    
+                    // Fuel Consumption Section
+                    FuelConsumptionSectionView(
+                        entries: vehicle.fuelConsumptionEntries(limit: 10),
                         onAdd: { showAddFuelSheet = true },
-                        onShowMore: {},
-                        onEdit: { preview in
-                            // Open edit sheet for this specific FuelUsage
-                            selectedFuelUsage = FuelUsageSelection(id: preview.fuelUsageID)
-                        }
+                        onShowMore: {
+                            showFuelDetailsSheet = true
+                        },
+                        onEdit: { entry in
+                            selectedFuelUsage = FuelUsageSelection(id: entry.fuelUsageID)
+                        },
+                        onPartialFillTapped: nil
                     )
                     .environmentObject(settingsViewModel)
-                    .padding(.horizontal)
+                    .padding(.horizontal, Theme.dimensions.spacingL)
                     
-                    MaintenancePreviewCard(
-                        items: vehicle.latestMaintenancePreviews(),
+                    // Maintenance History Section
+                    MaintenanceHistorySectionView(
+                        entries: vehicle.maintenanceEntries(limit: 10),
                         isVehicleActive: vehicle.isPurchased ?? false,
                         onAdd: { showAddMaintenanceSheet = true },
                         onShowMore: {
-                            // TODO: implement maintenance list
-                            print("TODO(Not yet implemented)")
+                            // TODO: Navigate to full maintenance history
                         }
                     )
-                    .padding(.horizontal)
+                    .environmentObject(settingsViewModel)
+                    .padding(.horizontal, Theme.dimensions.spacingL)
                 }
-                .navigationTitle(vehicle.name)
+                .padding(.vertical, Theme.dimensions.spacingM)
             } else {
                 Text("No active vehicle found.")
                     .padding()
             }
         }
-        .id(vehicleViewModel.refreshID)
-        .background(Color(UIColor.systemBackground))
+        .background(Theme.colors(for: colorScheme).background)
+        .navigationTitle(vehicleViewModel.resolvedVehicle(context: context)?.displayName ?? "")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -117,15 +125,17 @@ public struct ActiveVehicleContent: View {
                 }
             }
         }
+        .sheet(isPresented: $isShowingPayWall) {
+            InAppPurchasePayWall()
+        }
         // Add Fuel Usage
         .sheet(isPresented: $showAddFuelSheet, onDismiss: {
             vehicleViewModel.loadActiveVehicle(context: context)
         }) {
             AddFuelUsageSheet(
-                vehicleViewModel: vehicleViewModel,
-                viewModel: addFuelUsageViewModel
+                vehicleViewModel: vehicleViewModel
             )
-            .presentationDetents([.medium])
+            .presentationDetents([.fraction(0.65)])
             .presentationDragIndicator(.visible)
         }
         // Edit Fuel Usage (selected from preview list)
@@ -134,10 +144,9 @@ public struct ActiveVehicleContent: View {
         }) { selection in
             EditFuelUsageSheet(
                 vehicleViewModel: vehicleViewModel,
-                viewModel: EditFuelUsageViewModel(),
                 fuelUsageID: selection.id
             )
-            .presentationDetents([.medium])
+            .presentationDetents([.fraction(0.65)])
             .presentationDragIndicator(.visible)
         }
         // Add Maintenance
@@ -155,6 +164,34 @@ public struct ActiveVehicleContent: View {
             EditVehicleSheet(viewModel: vehicleViewModel)
                 .presentationDetents([.large])
             .presentationDragIndicator(.visible)
+        }
+        // Fuel Details Sheet
+        .sheet(isPresented: $showFuelDetailsSheet, onDismiss: {
+            vehicleViewModel.loadActiveVehicle(context: context)
+        }) {
+            FuelDetailsSheet(
+                viewModel: vehicleViewModel,
+                showAddFuelSheet: $showAddFuelSheet
+            )
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+        }
+        // Merged Partial Fill Management Sheet
+        .sheet(isPresented: $showMergedPartialFillSheet, onDismiss: {
+            vehicleViewModel.loadActiveVehicle(context: context)
+        }) {
+            if let fuelUsageID = selectedMergedGroupID {
+                MergedPartialFillManagementSheet(
+                    fuelUsageID: fuelUsageID,
+                    viewModel: vehicleViewModel,
+                    onDismiss: {
+                        showMergedPartialFillSheet = false
+                        selectedMergedGroupID = nil
+                    }
+                )
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+            }
         }
         .onAppear {
             vehicleViewModel.loadActiveVehicle(context: context)

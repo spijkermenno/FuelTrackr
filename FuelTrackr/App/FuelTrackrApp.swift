@@ -6,7 +6,6 @@
 import SwiftUI
 import SwiftData
 import FirebaseCore
-import FirebaseAnalytics
 
 import Domain
 import Data
@@ -14,7 +13,6 @@ import Data
 @main
 struct FuelTrackrApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @StateObject var notificationHandler = NotificationHandler()
 
     private let container: ModelContainer
 
@@ -30,12 +28,6 @@ struct FuelTrackrApp: App {
         WindowGroup {
             ContentView()
                 .modelContainer(container)
-                //.environmentObject(notificationHandler)
-//                .onOpenURL { url in
-//                    if url.absoluteString == "fueltrackr://monthlyRecap" {
-//                        notificationHandler.shouldShowMonthlyRecapSheet = true
-//                    }
-//                }
         }
     }
 }
