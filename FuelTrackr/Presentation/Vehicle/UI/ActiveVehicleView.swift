@@ -20,6 +20,7 @@ public struct ActiveVehicleView: View {
     @State public var showAddFuelSheet = false
     @State public var showAddMaintenanceSheet = false
     @State public var showEditVehicleSheet = false
+    @State public var isShowingPayWall = false
 
     public init(
         vehicleViewModel: VehicleViewModel,
@@ -36,7 +37,8 @@ public struct ActiveVehicleView: View {
                     vehicleViewModel: viewModel,
                     showAddFuelSheet: $showAddFuelSheet,
                     showAddMaintenanceSheet: $showAddMaintenanceSheet,
-                    showEditVehicleSheet: $showEditVehicleSheet
+                    showEditVehicleSheet: $showEditVehicleSheet,
+                    isShowingPayWall: $isShowingPayWall
                 )
                 .onAppear {
                     // TODO: Analytics wrapper

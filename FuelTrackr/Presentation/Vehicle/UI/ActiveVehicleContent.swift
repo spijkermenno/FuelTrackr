@@ -17,6 +17,7 @@ public struct ActiveVehicleContent: View {
     @Environment(\.colorScheme) private var colorScheme
 
     @Binding public var showAddFuelSheet: Bool
+    @Binding public var isShowingPayWall: Bool
     @Binding public var showAddMaintenanceSheet: Bool
     @Binding public var showEditVehicleSheet: Bool
     
@@ -34,12 +35,14 @@ public struct ActiveVehicleContent: View {
         vehicleViewModel: VehicleViewModel,
         showAddFuelSheet: Binding<Bool>,
         showAddMaintenanceSheet: Binding<Bool>,
-        showEditVehicleSheet: Binding<Bool>
+        showEditVehicleSheet: Binding<Bool>,
+        isShowingPayWall: Binding<Bool>
     ) {
         _vehicleViewModel = StateObject(wrappedValue: vehicleViewModel)
         _showAddFuelSheet = showAddFuelSheet
         _showAddMaintenanceSheet = showAddMaintenanceSheet
         _showEditVehicleSheet = showEditVehicleSheet
+        _isShowingPayWall = isShowingPayWall
     }
     
     public var body: some View {
@@ -55,6 +58,10 @@ public struct ActiveVehicleContent: View {
                         productionDate: vehicle.manufacturingDate,
                         isUsingMetric: settingsViewModel.isUsingMetric
                     )
+                    
+                    Button("show paywall", action: {
+                        isShowingPayWall = true
+                    })
                     
                     // Monthly Fuel Summary Carousel
                     MonthlyFuelSummaryCarouselView(
@@ -117,6 +124,9 @@ public struct ActiveVehicleContent: View {
                         .foregroundColor(.primary)
                 }
             }
+        }
+        .sheet(isPresented: $isShowingPayWall) {
+            InAppPurchasePayWall()
         }
         // Add Fuel Usage
         .sheet(isPresented: $showAddFuelSheet, onDismiss: {
