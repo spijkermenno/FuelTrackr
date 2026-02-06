@@ -12,10 +12,12 @@ public struct MonthlyFuelSummaryCard: View {
     @Environment(\.colorScheme) private var colorScheme
     let summary: MonthlyFuelSummaryUiModel
     let isUsingMetric: Bool
+    let fuelType: FuelType?
     
-    public init(summary: MonthlyFuelSummaryUiModel, isUsingMetric: Bool) {
+    public init(summary: MonthlyFuelSummaryUiModel, isUsingMetric: Bool, fuelType: FuelType? = nil) {
         self.summary = summary
         self.isUsingMetric = isUsingMetric
+        self.fuelType = fuelType
     }
     
     private var colors: ColorsProtocol {
@@ -86,29 +88,21 @@ public struct MonthlyFuelSummaryCard: View {
     
     private func formatDistance(_ km: Double) -> String {
         if isUsingMetric {
-            return String(format: "%.0f km", km)
+            return String(format: "%.0f %@", km, NSLocalizedString("unit_km", comment: ""))
         } else {
             let miles = km * 0.621371
-            return String(format: "%.0f mi", miles)
+            return String(format: "%.0f %@", miles, NSLocalizedString("unit_mi", comment: ""))
         }
     }
     
-    private func formatPrice(_ pricePerLiter: Double) -> String {
-        if isUsingMetric {
-            return String(format: "€%.2f/L", pricePerLiter)
-        } else {
-            let pricePerGallon = pricePerLiter * 3.78541
-            return String(format: "$%.2f/G", pricePerGallon)
-        }
+    private func formatPrice(_ pricePerUnit: Double) -> String {
+        let fuelTypeToUse = fuelType ?? .liquid
+        return fuelTypeToUse.formatPricePerUnit(pricePerUnit, isUsingMetric: isUsingMetric)
     }
     
-    private func formatFuel(_ liters: Double) -> String {
-        if isUsingMetric {
-            return String(format: "%.2f L", liters)
-        } else {
-            let gallons = liters * 0.264172
-            return String(format: "%.2f G", gallons)
-        }
+    private func formatFuel(_ amount: Double) -> String {
+        let fuelTypeToUse = fuelType ?? .liquid
+        return fuelTypeToUse.formatFuelAmount(amount, isUsingMetric: isUsingMetric)
     }
     
     private func formatCost(_ cost: Double) -> String {

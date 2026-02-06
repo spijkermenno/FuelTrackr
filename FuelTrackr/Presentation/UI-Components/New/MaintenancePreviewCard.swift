@@ -44,18 +44,15 @@ public struct MaintenancePreviewCard: View {
     public let items: [MaintenancePreviewUiModel]
     public let onAdd: () -> Void
     public let onShowMore: () -> Void
-    public let isVehicleActive: Bool
 
     public init(
         items: [MaintenancePreviewUiModel],
-        isVehicleActive: Bool,
         onAdd: @escaping () -> Void,
         onShowMore: @escaping () -> Void
     ) {
         self.items = items
         self.onAdd = onAdd
         self.onShowMore = onShowMore
-        self.isVehicleActive = isVehicleActive
     }
 
     public var body: some View {
@@ -68,10 +65,9 @@ public struct MaintenancePreviewCard: View {
                     Button(NSLocalizedString("add", comment: "")) { onAdd() }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 6)
-                        .background(isVehicleActive ? Theme.colors.primary : Color.gray.opacity(0.5))
+                        .background(Theme.colors.primary)
                         .foregroundColor(.white)
                         .cornerRadius(24)
-                        .disabled(!isVehicleActive)
                 }
                 .padding(.horizontal)
             },
@@ -153,7 +149,7 @@ private struct MaintenancePreviewRow: View {
         MaintenancePreviewUiModel(date: Calendar.current.date(byAdding: .day, value: -30, to: .now)!, type: .brakes, cost: 0, notes: "Warranty replacement", isFree: true),
         MaintenancePreviewUiModel(date: Calendar.current.date(byAdding: .day, value: -75, to: .now)!, type: .tires, cost: 450, notes: "Winter tires", isFree: false)
     ]
-    return MaintenancePreviewCard(items: samples, isVehicleActive: true, onAdd: {}, onShowMore: {})
+    return MaintenancePreviewCard(items: samples, onAdd: {}, onShowMore: {})
         .padding()
         .background(Color.gray.opacity(0.2))
 }

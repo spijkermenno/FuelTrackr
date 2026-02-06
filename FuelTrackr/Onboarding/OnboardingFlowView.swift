@@ -56,16 +56,16 @@ public struct OnboardingFlowView: View {
                     switch viewModel.currentStep {
                     case .welcome:
                         OnboardingWelcomeView(viewModel: viewModel)
+                    case .notifications:
+                        OnboardingNotificationsView(viewModel: viewModel)
+                    case .tracking:
+                        OnboardingTrackingView(viewModel: viewModel)
                     case .unitSelection:
                         OnboardingUnitSelectionView(viewModel: viewModel)
-                    case .licensePlate:
-                        OnboardingLicensePlateView(viewModel: viewModel)
+                    case .vehicleName:
+                        OnboardingVehicleNameView(viewModel: viewModel)
                     case .vehicleFuelType:
                         OnboardingVehicleFuelTypeView(viewModel: viewModel)
-                    case .vehicleBrand:
-                        OnboardingVehicleBrandView(viewModel: viewModel)
-                    case .vehicleModel:
-                        OnboardingVehicleModelView(viewModel: viewModel)
                     case .optionalDetails:
                         OnboardingOptionalDetailsView(viewModel: viewModel)
                     case .currentMileage:
@@ -83,8 +83,8 @@ public struct OnboardingFlowView: View {
                     removal: .move(edge: .leading).combined(with: .opacity)
                 ))
                 
-                // Persistent progress indicator - only show when not on welcome or completion
-                if viewModel.currentStep != .welcome && viewModel.currentStep != .completion {
+                // Persistent progress indicator - only show when not on welcome, notifications, tracking, or completion
+                if viewModel.currentStep != .welcome && viewModel.currentStep != .notifications && viewModel.currentStep != .tracking && viewModel.currentStep != .completion {
                     OnboardingProgressIndicator(
                         currentStep: viewModel.currentStepIndex,
                         totalSteps: viewModel.totalSteps

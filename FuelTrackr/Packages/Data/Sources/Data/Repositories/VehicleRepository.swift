@@ -333,7 +333,6 @@ extension Vehicle {
 
      Swift.print("--- Active Vehicle Info ---")
      Swift.print("Name: \(self.name)")
-     Swift.print("License Plate: \(self.licensePlate)")
      Swift.print("Purchase Date: \(self.purchaseDate)")
      Swift.print("Manufacturing Date: \(self.manufacturingDate)")
      Swift.print("Is Purchased: \(self.isPurchased.map(String.init) ?? "nil")")

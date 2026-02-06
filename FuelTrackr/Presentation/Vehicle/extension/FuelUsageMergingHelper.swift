@@ -53,8 +53,15 @@ struct FuelUsageMergingHelper {
     /// - Parameters:
     ///   - group: Array of fuel usages (partial fills + final full fill)
     ///   - previousMileage: The mileage before this group started
-    /// - Returns: Consumption rate (km/l) or nil if calculation not possible
-    static func calculateConsumptionForGroup(_ group: [FuelUsage], previousMileage: Int?) -> Double? {
+    ///   - fuelType: The vehicle's fuel type
+    ///   - isUsingMetric: Whether to use metric or imperial units
+    /// - Returns: Consumption rate (in appropriate unit for fuel type) or nil if calculation not possible
+    static func calculateConsumptionForGroup(
+        _ group: [FuelUsage],
+        previousMileage: Int?,
+        fuelType: FuelType? = nil,
+        isUsingMetric: Bool = true
+    ) -> Double? {
         guard let lastUsage = group.last,
               let endMileage = lastUsage.mileage?.value else {
             print("   ❌ [FuelUsageMergingHelper] Cannot calculate: missing end mileage")
@@ -79,12 +86,23 @@ struct FuelUsageMergingHelper {
         }
         
         let distance = Double(endMileage - startMileage)
-        let consumption = distance / totalFuel
+        
+        // Use fuel type-aware calculation if available, otherwise fall back to liquid (km/L)
+        let fuelTypeToUse = fuelType ?? .liquid
+        guard let consumption = fuelTypeToUse.calculateConsumption(
+            distance: distance,
+            fuelAmount: totalFuel,
+            isUsingMetric: isUsingMetric
+        ) else {
+            print("   ❌ [FuelUsageMergingHelper] Cannot calculate: fuel type calculation failed")
+            return nil
+        }
         
         print("   ✅ [FuelUsageMergingHelper] Consumption calculated:")
         print("      - Distance: \(distance) km (\(startMileage) → \(endMileage))")
-        print("      - Total fuel: \(String(format: "%.2f", totalFuel)) L")
-        print("      - Consumption: \(String(format: "%.2f", consumption)) km/L")
+        print("      - Total fuel: \(String(format: "%.2f", totalFuel))")
+        print("      - Fuel type: \(fuelTypeToUse)")
+        print("      - Consumption: \(fuelTypeToUse.formatConsumption(consumption, isUsingMetric: isUsingMetric))")
         
         return consumption
     }

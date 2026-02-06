@@ -26,18 +26,37 @@ struct AddFuelUsageSheet: View {
             //ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: Theme.dimensions.spacingL) {
                 HeaderSection()
-                InputSection(
-                    liters: $viewModel.liters,
-                    cost: $viewModel.cost,
-                    mileage: $viewModel.mileage,
-                    mileagePlaceholder: mileagePlaceholder,
-                    errorMessage: viewModel.errorMessage,
-                    mileageWarning: viewModel.mileageWarning,
-                    litersError: viewModel.litersError,
-                    costError: viewModel.costError,
-                    mileageError: viewModel.mileageError,
-                    onSave: saveFuelUsage
-                )
+                if let vehicle = resolvedVehicle {
+                    InputSection(
+                        liters: $viewModel.liters,
+                        cost: $viewModel.cost,
+                        mileage: $viewModel.mileage,
+                        mileagePlaceholder: mileagePlaceholder,
+                        errorMessage: viewModel.errorMessage,
+                        mileageWarning: viewModel.mileageWarning,
+                        litersError: viewModel.litersError,
+                        costError: viewModel.costError,
+                        mileageError: viewModel.mileageError,
+                        fuelType: vehicle.fuelType,
+                        isUsingMetric: vehicleViewModel.isUsingMetric,
+                        onSave: saveFuelUsage
+                    )
+                } else {
+                    InputSection(
+                        liters: $viewModel.liters,
+                        cost: $viewModel.cost,
+                        mileage: $viewModel.mileage,
+                        mileagePlaceholder: mileagePlaceholder,
+                        errorMessage: viewModel.errorMessage,
+                        mileageWarning: viewModel.mileageWarning,
+                        litersError: viewModel.litersError,
+                        costError: viewModel.costError,
+                        mileageError: viewModel.mileageError,
+                        fuelType: nil,
+                        isUsingMetric: vehicleViewModel.isUsingMetric,
+                        onSave: saveFuelUsage
+                    )
+                }
             }
             .frame(maxWidth: .infinity, alignment: .top)
             .padding(.horizontal, Theme.dimensions.spacingSection)
@@ -105,6 +124,8 @@ struct InputSection: View {
     let costError: Bool
     let mileageError: Bool
     let showPartialFillToggle: Bool
+    let fuelType: FuelType?
+    let isUsingMetric: Bool
     
     var onSave: () -> Void
     
@@ -120,6 +141,8 @@ struct InputSection: View {
         litersError: Bool,
         costError: Bool,
         mileageError: Bool,
+        fuelType: FuelType? = nil,
+        isUsingMetric: Bool = true,
         isPartialFill: Binding<Bool>? = nil,
         showPartialFillToggle: Bool = false,
         onSave: @escaping () -> Void
@@ -135,7 +158,31 @@ struct InputSection: View {
         self.costError = costError
         self.mileageError = mileageError
         self.showPartialFillToggle = showPartialFillToggle
+        self.fuelType = fuelType
+        self.isUsingMetric = isUsingMetric
         self.onSave = onSave
+    }
+    
+    private var fuelAmountLabel: String {
+        let fuelTypeToUse = fuelType ?? .liquid
+        switch (fuelTypeToUse, isUsingMetric) {
+        case (.liquid, true): return NSLocalizedString("liters_label", comment: "")
+        case (.liquid, false): return NSLocalizedString("gallons_label", comment: "")
+        case (.electric, _): return NSLocalizedString("kwh_label", comment: "")
+        case (.hydrogen, _): return NSLocalizedString("kg_h2_label", comment: "")
+        case (.unknown, _): return NSLocalizedString("fuel_amount_label", comment: "")
+        }
+    }
+    
+    private var fuelAmountPlaceholder: String {
+        let fuelTypeToUse = fuelType ?? .liquid
+        switch (fuelTypeToUse, isUsingMetric) {
+        case (.liquid, true): return NSLocalizedString("liters_placeholder", comment: "")
+        case (.liquid, false): return NSLocalizedString("gallons_placeholder", comment: "")
+        case (.electric, _): return NSLocalizedString("kwh_placeholder", comment: "")
+        case (.hydrogen, _): return NSLocalizedString("kg_h2_placeholder", comment: "")
+        case (.unknown, _): return NSLocalizedString("fuel_amount_placeholder", comment: "")
+        }
     }
     
     var body: some View {
@@ -143,13 +190,13 @@ struct InputSection: View {
         
         VStack(alignment: .leading, spacing: Theme.dimensions.spacingM) {
             InputField(
-                title: NSLocalizedString("liters_label", comment: ""),
-                placeholder: NSLocalizedString("liters_placeholder", comment: ""),
+                title: fuelAmountLabel,
+                placeholder: fuelAmountPlaceholder,
                 text: $liters,
                 keyboardType: .decimalPad,
                 hasError: litersError
             )
-            .accessibilityLabel(NSLocalizedString("liters_label", comment: ""))
+            .accessibilityLabel(fuelAmountLabel)
             
             InputField(
                 title: NSLocalizedString("cost_label", comment: ""),

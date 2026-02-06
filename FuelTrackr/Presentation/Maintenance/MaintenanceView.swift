@@ -15,18 +15,15 @@ public struct MaintenanceView: View {
     @ObservedObject var viewModel: VehicleViewModel
 
     @Binding public var showAddMaintenanceSheet: Bool
-    public var isVehicleActive: Bool
 
     @State private var showAllMaintenanceEntries = false
     @State private var resolvedVehicle: Vehicle?
 
     public init(
         viewModel: VehicleViewModel,
-        showAddMaintenanceSheet: Binding<Bool>,
-        isVehicleActive: Bool
+        showAddMaintenanceSheet: Binding<Bool>
     ) {
         _showAddMaintenanceSheet = showAddMaintenanceSheet
-        self.isVehicleActive = isVehicleActive
         self.viewModel = viewModel
     }
 
@@ -80,10 +77,9 @@ public struct MaintenanceView: View {
                 .foregroundColor(.white)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(isVehicleActive ? Color.orange : Color.gray.opacity(0.5))
+                .background(Color.orange)
                 .cornerRadius(8)
             }
-            .disabled(!isVehicleActive)
 
             Button(action: {
                 showAllMaintenanceEntries = true
@@ -93,10 +89,9 @@ public struct MaintenanceView: View {
                     .foregroundColor(.white)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
-                    .background(isVehicleActive ? Color.orange : Color.gray.opacity(0.5))
+                    .background(Color.orange)
                     .cornerRadius(8)
             }
-            .disabled(!isVehicleActive)
         }
     }
 }

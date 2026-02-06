@@ -12,6 +12,7 @@ import Charts
 import SwiftData
 
 public enum FuelDetailTimeframe: String, CaseIterable {
+    case all = "All"
     case oneMonth = "1M"
     case threeMonths = "3M"
     case oneYear = "1Y"
@@ -19,6 +20,8 @@ public enum FuelDetailTimeframe: String, CaseIterable {
     
     var localized: String {
         switch self {
+        case .all:
+            return NSLocalizedString("timeframe_all", comment: "")
         case .oneMonth:
             return NSLocalizedString("timeframe_1m", comment: "")
         case .threeMonths:
@@ -35,6 +38,9 @@ public enum FuelDetailTimeframe: String, CaseIterable {
         let end = baseDate
         
         switch self {
+        case .all:
+            // Return a very early date to include all data
+            return (Date.distantPast, end)
         case .oneMonth:
             let start = calendar.date(byAdding: .month, value: -1, to: end) ?? end
             return (start, end)
@@ -165,14 +171,25 @@ public struct FuelDetailsSheet: View {
             previousMileage = endMileage
         }
         
-        // Calculate average: total distance / total fuel used
-        let averageConsumption = totalFuel > 0 && totalDistance > 0 ? Double(totalDistance) / totalFuel : 0
+        // Calculate average using fuel type-aware calculation
+        let fuelType = vehicle.fuelType ?? .liquid
+        let averageConsumption: Double
+        if totalFuel > 0 && totalDistance > 0 {
+            averageConsumption = fuelType.calculateConsumption(
+                distance: Double(totalDistance),
+                fuelAmount: totalFuel,
+                isUsingMetric: viewModel.isUsingMetric
+            ) ?? 0
+        } else {
+            averageConsumption = 0
+        }
         
         return (averageConsumption, totalCost)
     }
     
-    private var monthsInTimeframe: Int {
+    private var monthsInTimeframe: Int? {
         switch selectedTimeframe {
+        case .all: return nil
         case .oneMonth: return 1
         case .threeMonths: return 3
         case .oneYear: return 12
@@ -199,7 +216,9 @@ public struct FuelDetailsSheet: View {
                         // Consumption Overview Card
                         ConsumptionOverviewCard(
                             averageConsumption: consumptionStats.average,
-                            totalCost: consumptionStats.totalCost
+                            totalCost: consumptionStats.totalCost,
+                            fuelType: vehicle.fuelType,
+                            isUsingMetric: viewModel.isUsingMetric
                         )
                         .padding(.horizontal, Theme.dimensions.spacingL)
                         .padding(.top, Theme.dimensions.spacingM)
@@ -254,6 +273,7 @@ public struct FuelDetailsSheet: View {
                                 FuelEntriesGroupedView(
                                     fuelUsages: filteredFuelUsages,
                                     vehicle: vehicle,
+                                    isUsingMetric: viewModel.isUsingMetric,
                                     onPartialFillTapped: { usage in
                                         fuelUsageForPartialFillManagement = FuelUsageSelection(id: usage.persistentModelID, fuelUsage: usage)
                                     },
@@ -321,10 +341,15 @@ public struct FuelDetailsSheet: View {
     
     private func formatFuelEntriesTitle() -> String {
         let count = filteredFuelUsages.count
-        if monthsInTimeframe == 1 {
-            return String(format: NSLocalizedString("fuel_entries_last_month", comment: ""), count)
+        if let months = monthsInTimeframe {
+            if months == 1 {
+                return String(format: NSLocalizedString("fuel_entries_last_month", comment: ""), count)
+            } else {
+                return String(format: NSLocalizedString("fuel_entries_last_months", comment: ""), months, count)
+            }
         } else {
-            return String(format: NSLocalizedString("fuel_entries_last_months", comment: ""), monthsInTimeframe, count)
+            // All timeframe
+            return String(format: NSLocalizedString("fuel_entries_all", comment: ""), count)
         }
     }
     
@@ -358,22 +383,6 @@ struct VehicleInfoHeader: View {
     
     var body: some View {
         VStack(spacing: 12) {
-            HStack {
-                Circle()
-                    .fill(colors.primary)
-                    .frame(width: 40, height: 40)
-                    .overlay(
-                        Text(String(vehicle.licensePlate.prefix(2)))
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.white)
-                    )
-                
-                Text(vehicle.licensePlate)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(colors.onBackground)
-                
-                Spacer()
-            }
             
             HStack {
                 Text(NSLocalizedString("mileage_label", comment: ""))
@@ -446,10 +455,17 @@ struct TimeframeSelector: View {
 struct ConsumptionOverviewCard: View {
     let averageConsumption: Double
     let totalCost: Double
+    let fuelType: FuelType?
+    let isUsingMetric: Bool
     @Environment(\.colorScheme) private var colorScheme
     
     private var colors: ColorsProtocol {
         Theme.colors(for: colorScheme)
+    }
+    
+    private var consumptionText: String {
+        let fuelTypeToUse = fuelType ?? .liquid
+        return fuelTypeToUse.formatConsumption(averageConsumption, isUsingMetric: isUsingMetric)
     }
     
     var body: some View {
@@ -460,8 +476,8 @@ struct ConsumptionOverviewCard: View {
             
             HStack(spacing: 24) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(String(format: "%.2f", averageConsumption))
-                        .font(.system(size: 32, weight: .bold))
+                    Text(consumptionText)
+                        .font(.system(size: 24, weight: .bold))
                         .foregroundColor(colors.primary)
                     
                     Text(NSLocalizedString("average_consumption", comment: ""))
@@ -473,7 +489,7 @@ struct ConsumptionOverviewCard: View {
                 
                 VStack(alignment: .trailing, spacing: 4) {
                     Text(formatCurrency(totalCost))
-                        .font(.system(size: 32, weight: .bold))
+                        .font(.system(size: 24, weight: .bold))
                         .foregroundColor(colors.onBackground)
                     
                     Text(NSLocalizedString("total_cost_label", comment: ""))
@@ -491,7 +507,9 @@ struct ConsumptionOverviewCard: View {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         formatter.locale = Locale.current
-        return formatter.string(from: NSNumber(value: value)) ?? String(format: "€%.2f", value)
+        formatter.maximumFractionDigits = 2
+        formatter.minimumFractionDigits = 0
+        return formatter.string(from: NSNumber(value: value)) ?? String(format: "%.2f", value)
     }
 }
 
@@ -570,13 +588,12 @@ struct FuelConsumptionGraphView: View {
                         let totalFuel = group.reduce(0.0) { $0 + $1.liters }
                         if totalFuel > 0 {
                             let distance = Double(endMileage - prevMileage)
-                            if isUsingMetric {
-                                consumption = distance / totalFuel // km/l
-                            } else {
-                                let miles = distance / 1.60934
-                                let gallons = totalFuel * 0.264172
-                                consumption = gallons > 0 ? miles / gallons : 0 // mpg
-                            }
+                            let fuelType = vehicle.fuelType ?? .liquid
+                            consumption = fuelType.calculateConsumption(
+                                distance: distance,
+                                fuelAmount: totalFuel,
+                                isUsingMetric: isUsingMetric
+                            ) ?? 0
                         }
                     }
                 } else if let currentMileage = usage.mileage?.value,
@@ -584,13 +601,12 @@ struct FuelConsumptionGraphView: View {
                           currentMileage > prevMileage {
                     // Standalone full fill - regular calculation
                     let distance = Double(currentMileage - prevMileage)
-                    if isUsingMetric {
-                        consumption = distance / usage.liters // km/l
-                    } else {
-                        let miles = distance / 1.60934
-                        let gallons = usage.liters * 0.264172
-                        consumption = gallons > 0 ? miles / gallons : 0 // mpg
-                    }
+                    let fuelType = vehicle.fuelType ?? .liquid
+                    consumption = fuelType.calculateConsumption(
+                        distance: distance,
+                        fuelAmount: usage.liters,
+                        isUsingMetric: isUsingMetric
+                    ) ?? 0
                 }
             }
             
@@ -625,7 +641,16 @@ struct FuelConsumptionGraphView: View {
     }
     
     private var consumptionUnit: String {
-        isUsingMetric ? NSLocalizedString("km_per_liter", comment: "") : "mpg"
+        let fuelType = vehicle.fuelType ?? .liquid
+        switch (fuelType, isUsingMetric) {
+        case (.liquid, true): return NSLocalizedString("km_per_liter", comment: "")
+        case (.liquid, false): return "mpg"
+        case (.electric, true): return "kWh/100km"
+        case (.electric, false): return "mi/kWh"
+        case (.hydrogen, true): return "kg H₂/100km"
+        case (.hydrogen, false): return "mi/kg H₂"
+        case (.unknown, _): return "-"
+        }
     }
     
     private var priceUnit: String {
@@ -754,66 +779,131 @@ struct FuelConsumptionGraphView: View {
         if hasConsumption {
             let yAxisMin = consumptionRangeValues.min
             let yAxisMax = consumptionRangeValues.max
-            let xDates = xAxisDates
-            let yValues = yAxisValues
+            let averageConsumption = consumptionData.map { $0.value }.reduce(0, +) / Double(consumptionData.count)
             
-            Chart {
-                ForEach(consumptionData, id: \.date) { dataPoint in
-                    LineMark(
-                        x: .value("Date", dataPoint.date),
-                        y: .value("Consumption", dataPoint.value)
-                    )
-                    .foregroundStyle(colors.primary)
-                    .interpolationMethod(.catmullRom)
-                    .lineStyle(StrokeStyle(lineWidth: 2))
+            VStack(alignment: .leading, spacing: 12) {
+                // Chart Title
+                Text(NSLocalizedString("consumption_over_time", comment: "Consumption Over Time"))
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(colors.onBackground)
+                
+                Chart {
+                    // Area fill under the line
+                    ForEach(consumptionData, id: \.date) { dataPoint in
+                        AreaMark(
+                            x: .value("Date", dataPoint.date),
+                            yStart: .value("Min", yAxisMin),
+                            yEnd: .value("Consumption", dataPoint.value)
+                        )
+                        .foregroundStyle(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    colors.primary.opacity(0.3),
+                                    colors.primary.opacity(0.1),
+                                    Color.clear
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        .interpolationMethod(.catmullRom)
+                    }
                     
-                    PointMark(
-                        x: .value("Date", dataPoint.date),
-                        y: .value("Consumption", dataPoint.value)
-                    )
-                    .foregroundStyle(colors.primary)
-                    .symbolSize(30)
-                }
-            }
-            .chartXAxis {
-                AxisMarks(values: .automatic(desiredCount: 5)) { value in
-                    AxisValueLabel {
-                        if let date = value.as(Date.self) {
-                            Text(formatGraphDate(date))
-                                .font(.caption)
-                                .foregroundColor(colors.onSurface)
+                    // Average consumption reference line
+                    RuleMark(y: .value("Average", averageConsumption))
+                        .foregroundStyle(colors.onSurface.opacity(0.4))
+                        .lineStyle(StrokeStyle(lineWidth: 1, dash: [5, 5]))
+                        .annotation(position: .top, alignment: .trailing, spacing: 4) {
+                            Text(String(format: "%.1f", averageConsumption))
+                                .font(.caption2)
+                                .foregroundColor(colors.onSurface.opacity(0.7))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 3)
+                                .background(colors.surface.opacity(0.9))
+                                .cornerRadius(4)
                         }
+                    
+                    // Main consumption line
+                    ForEach(consumptionData, id: \.date) { dataPoint in
+                        LineMark(
+                            x: .value("Date", dataPoint.date),
+                            y: .value("Consumption", dataPoint.value)
+                        )
+                        .foregroundStyle(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    colors.primary,
+                                    colors.secondary
+                                ]),
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .interpolationMethod(.catmullRom)
+                        .lineStyle(StrokeStyle(lineWidth: 3, lineCap: .round))
+                        
+                        // Data points
+                        PointMark(
+                            x: .value("Date", dataPoint.date),
+                            y: .value("Consumption", dataPoint.value)
+                        )
+                        .foregroundStyle(colors.primary)
+                        .symbolSize(50)
+                        .symbol(.circle)
+                        .opacity(0.9)
                     }
-                    AxisGridLine()
-                        .foregroundStyle(colors.divider)
-                    AxisTick()
-                        .foregroundStyle(colors.onSurface)
                 }
-            }
-            .chartYScale(domain: yAxisMin...yAxisMax)
-            .chartYAxis {
-                AxisMarks(position: .leading, values: .automatic(desiredCount: 5)) { value in
-                    AxisValueLabel {
-                        if let doubleValue = value.as(Double.self) {
-                            Text(String(format: "%.1f", doubleValue))
-                                .font(.caption)
-                                .foregroundColor(colors.onSurface)
+                .chartXAxis {
+                    AxisMarks(values: .automatic(desiredCount: 5)) { value in
+                        AxisValueLabel {
+                            if let date = value.as(Date.self) {
+                                Text(formatGraphDate(date))
+                                    .font(.caption2)
+                                    .foregroundColor(colors.onSurface)
+                            }
                         }
+                        AxisGridLine()
+                            .foregroundStyle(colors.divider.opacity(0.5))
+                        AxisTick()
+                            .foregroundStyle(colors.onSurface.opacity(0.3))
                     }
-                    AxisGridLine()
-                        .foregroundStyle(colors.divider)
-                    AxisTick()
-                        .foregroundStyle(colors.onSurface)
                 }
+                .chartYScale(domain: yAxisMin...yAxisMax)
+                .chartYAxis {
+                    AxisMarks(position: .leading, values: .automatic(desiredCount: 5)) { value in
+                        AxisValueLabel {
+                            if let doubleValue = value.as(Double.self) {
+                                Text(String(format: "%.1f", doubleValue))
+                                    .font(.caption2)
+                                    .foregroundColor(colors.onSurface)
+                            }
+                        }
+                        AxisGridLine()
+                            .foregroundStyle(colors.divider.opacity(0.5))
+                        AxisTick()
+                            .foregroundStyle(colors.onSurface.opacity(0.3))
+                    }
+                }
+                .chartXAxisLabel(NSLocalizedString("date", comment: ""), position: .bottom, alignment: .center)
+                .chartYAxisLabel(consumptionUnit, position: .leading, alignment: .center)
+                .frame(height: 240)
+                .padding(.top, 4)
+                .padding(.bottom, 4)
+                .padding(.leading, 4)
+                .padding(.trailing, 12)
             }
-            .chartXAxisLabel(NSLocalizedString("date", comment: ""), position: .bottom, alignment: .center)
-            .chartYAxisLabel(consumptionUnit, position: .leading, alignment: .center)
-            .frame(height: 200)
         } else {
-            Text(NSLocalizedString("fuel_usage_no_content", comment: ""))
-                .font(.caption)
-                .foregroundColor(colors.onSurface)
-                .frame(height: 200)
+            VStack(spacing: 12) {
+                Text(NSLocalizedString("consumption_over_time", comment: "Consumption Over Time"))
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(colors.onBackground)
+                
+                Text(NSLocalizedString("fuel_usage_no_content", comment: ""))
+                    .font(.caption)
+                    .foregroundColor(colors.onSurface)
+                    .frame(height: 220)
+                    .frame(maxWidth: .infinity)
+            }
         }
     }
     
@@ -831,6 +921,7 @@ struct DetailedFuelEntryRow: View {
     let usage: FuelUsage
     let nextUsage: FuelUsage?
     let isClosingEntry: Bool
+    let isUsingMetric: Bool
     let onPartialFillTapped: (() -> Void)?
     let onEdit: (() -> Void)?
     
@@ -840,12 +931,14 @@ struct DetailedFuelEntryRow: View {
         usage: FuelUsage,
         nextUsage: FuelUsage?,
         isClosingEntry: Bool = false,
+        isUsingMetric: Bool = true,
         onPartialFillTapped: (() -> Void)? = nil,
         onEdit: (() -> Void)? = nil
     ) {
         self.usage = usage
         self.nextUsage = nextUsage
         self.isClosingEntry = isClosingEntry
+        self.isUsingMetric = isUsingMetric
         self.onPartialFillTapped = onPartialFillTapped
         self.onEdit = onEdit
     }
@@ -899,7 +992,13 @@ struct DetailedFuelEntryRow: View {
                       let previousMileage = sorted[groupIndex - 1].mileage?.value else {
                     return nil
                 }
-                return FuelUsageMergingHelper.calculateConsumptionForGroup(group, previousMileage: previousMileage)
+                guard let vehicle = usage.vehicle else { return nil }
+                return FuelUsageMergingHelper.calculateConsumptionForGroup(
+                    group,
+                    previousMileage: previousMileage,
+                    fuelType: vehicle.fuelType,
+                    isUsingMetric: isUsingMetric
+                )
             }
         }
         
@@ -907,11 +1006,17 @@ struct DetailedFuelEntryRow: View {
         guard let currentMileage = usage.mileage?.value,
               let previousMileage = nextUsage?.mileage?.value,
               usage.liters > 0,
-              currentMileage > previousMileage else {
+              currentMileage > previousMileage,
+              let vehicle = usage.vehicle else {
             return nil
         }
         let distance = Double(currentMileage - previousMileage)
-        return distance / usage.liters
+        let fuelType = vehicle.fuelType ?? .liquid
+        return fuelType.calculateConsumption(
+            distance: distance,
+            fuelAmount: usage.liters,
+            isUsingMetric: isUsingMetric
+        )
     }
     
     private var range: Double? {
@@ -992,35 +1097,59 @@ struct DetailedFuelEntryRow: View {
                     .foregroundColor(colors.onSurface)
             }
             
-            // First Row of Pills: Liters, Price/L, Total Cost
+            // First Row of Pills: Fuel Amount, Price/Unit, Total Cost
             HStack(spacing: 8) {
-                // Liters (Red/purple pill matching ActiveVehicleContent)
-                FuelPill(
-                    icon: "car.fill",
-                    text: String(format: "%.2f", usage.liters).replacingOccurrences(of: ".", with: ",") + "L",
-                    backgroundColor: colors.accentRedLight,
-                    iconColor: hexColor("#E63946"), // Red icon
-                    textColor: hexColor("#613E8D") // Dark purple for text
-                )
-                
-                // Price per liter (Green pill matching ActiveVehicleContent)
-                if usage.liters > 0 {
+                // Fuel Amount (Red/purple pill matching FuelConsumptionEntryView)
+                if let vehicle = usage.vehicle {
+                    let fuelType = vehicle.fuelType ?? .liquid
+                    let fuelText = fuelType.formatFuelAmount(usage.liters, isUsingMetric: isUsingMetric)
                     FuelPill(
-                        icon: "fuelpump.fill",
-                        text: formatPricePerLiter(pricePerLiter),
-                        backgroundColor: colors.accentGreenLight,
-                        iconColor: hexColor("#00C864"), // Green icon
-                        textColor: hexColor("#306B42") // Dark green for text
+                        icon: "car.fill",
+                        text: fuelText.replacingOccurrences(of: ".", with: ","),
+                        backgroundColor: colors.accentRedLight,
+                        iconColor: colors.accentRed,
+                        textColor: colorScheme == .dark ? colors.accentRed : hexColor("#613E8D") // Adaptive: red in dark mode, dark purple in light
                     )
+                    
+                    // Price per unit (Green pill matching FuelConsumptionEntryView)
+                    if usage.liters > 0 {
+                        let priceText = fuelType.formatPricePerUnit(pricePerLiter, isUsingMetric: isUsingMetric)
+                        FuelPill(
+                            icon: "fuelpump.fill",
+                            text: priceText.replacingOccurrences(of: ".", with: ","),
+                            backgroundColor: colors.accentGreenLight,
+                            iconColor: colors.accentGreen,
+                            textColor: colorScheme == .dark ? colors.accentGreen : hexColor("#306B42") // Adaptive: green in dark mode, dark green in light
+                        )
+                    }
+                } else {
+                    // Fallback for when vehicle is not available
+                    FuelPill(
+                        icon: "car.fill",
+                        text: String(format: "%.2f", usage.liters).replacingOccurrences(of: ".", with: ",") + "L",
+                        backgroundColor: colors.accentRedLight,
+                        iconColor: colors.accentRed,
+                        textColor: colorScheme == .dark ? colors.accentRed : hexColor("#613E8D")
+                    )
+                    
+                    if usage.liters > 0 {
+                        FuelPill(
+                            icon: "fuelpump.fill",
+                            text: formatPricePerLiter(pricePerLiter),
+                            backgroundColor: colors.accentGreenLight,
+                            iconColor: colors.accentGreen,
+                            textColor: colorScheme == .dark ? colors.accentGreen : hexColor("#306B42")
+                        )
+                    }
                 }
                 
-                // Total cost (Orange pill matching ActiveVehicleContent)
+                // Total cost (Orange pill matching FuelConsumptionEntryView)
                 FuelPill(
                     icon: "dollarsign.circle.fill",
                     text: formatCurrency(usage.cost),
                     backgroundColor: colors.accentOrangeLight,
-                    iconColor: hexColor("#FFB400"), // Orange icon
-                    textColor: hexColor("#8F6126") // Dark orange for text
+                    iconColor: colors.accentOrange,
+                    textColor: colorScheme == .dark ? colors.accentOrange : hexColor("#8F6126") // Adaptive: orange in dark mode, dark orange in light
                 )
                 
                 Spacer()
@@ -1029,12 +1158,14 @@ struct DetailedFuelEntryRow: View {
             // Second Row of Pills: Consumption, Distance Driven
             HStack(spacing: 8) {
                 // Consumption (show for non-partial fills, but hide for closing entries in groups since combined stats shows it)
-                if !usage.isPartialFill && !isClosingEntry, let consumption = consumption {
+                if !usage.isPartialFill && !isClosingEntry, let consumption = consumption, let vehicle = usage.vehicle {
+                    let fuelType = vehicle.fuelType ?? .liquid
+                    let consumptionText = fuelType.formatConsumption(consumption, isUsingMetric: isUsingMetric)
                     FuelPill(
                         icon: "fuelpump.fill",
-                        text: String(format: "%.2f", consumption).replacingOccurrences(of: ".", with: ",") + " km/l",
+                        text: consumptionText.replacingOccurrences(of: ".", with: ","),
                         backgroundColor: colors.fuelUsagePillBackground,
-                        iconColor: colors.accentRed,
+                        iconColor: colors.fuelUsagePillText,
                         textColor: colors.fuelUsagePillText
                     )
                 }
@@ -1046,7 +1177,7 @@ struct DetailedFuelEntryRow: View {
                         icon: "speedometer",
                         text: String(format: "%d", distanceDriven).replacingOccurrences(of: ".", with: ",") + " km",
                         backgroundColor: colors.kmDrivenPillBackground,
-                        iconColor: colors.accentRed,
+                        iconColor: colors.kmDrivenPillText,
                         textColor: colors.kmDrivenPillText
                     )
                 }
@@ -1098,6 +1229,7 @@ struct DetailedFuelEntryRow: View {
 struct FuelEntriesGroupedView: View {
     let fuelUsages: [FuelUsage]
     let vehicle: Vehicle
+    let isUsingMetric: Bool
     let onPartialFillTapped: (FuelUsage) -> Void
     let onEdit: (FuelUsage) -> Void
     
@@ -1216,6 +1348,7 @@ struct FuelEntriesGroupedView: View {
                     usage: usage,
                     nextUsage: previousUsage,
                     isClosingEntry: isClosingEntry,
+                    isUsingMetric: isUsingMetric,
                     onPartialFillTapped: {
                         onPartialFillTapped(usage)
                     },
@@ -1227,7 +1360,7 @@ struct FuelEntriesGroupedView: View {
         }
     }
     
-    private func groupSummaryStats(for group: [FuelUsage]) -> (totalFuel: Double, totalCost: Double, totalDistance: Int, consumption: Double?) {
+    private func groupSummaryStats(for group: [FuelUsage], isUsingMetric: Bool) -> (totalFuel: Double, totalCost: Double, totalDistance: Int, consumption: Double?) {
         let sortedGroup = group.sorted { $0.date < $1.date }
         let totalFuel = group.reduce(0.0) { $0 + $1.liters }
         let totalCost = group.reduce(0.0) { $0 + $1.cost }
@@ -1250,7 +1383,12 @@ struct FuelEntriesGroupedView: View {
         }
         
         let totalDistance = max(0, endMileage - startMileage)
-        let consumption = totalFuel > 0 && totalDistance > 0 ? Double(totalDistance) / totalFuel : nil
+        let fuelType = vehicle.fuelType ?? .liquid
+        let consumption: Double? = totalFuel > 0 && totalDistance > 0 ? fuelType.calculateConsumption(
+            distance: Double(totalDistance),
+            fuelAmount: totalFuel,
+            isUsingMetric: isUsingMetric
+        ) : nil
         
         return (totalFuel, totalCost, totalDistance, consumption)
     }
@@ -1264,7 +1402,9 @@ struct FuelEntriesGroupedView: View {
                     group.entries.firstIndex { $0.persistentModelID == close.persistentModelID }
                 }
                 
-                let summaryStats = groupSummaryStats(for: group.entries)
+                let entries = group.entries
+                let summaryStats = groupSummaryStats(for: entries, isUsingMetric: isUsingMetric)
+                let vehicleFuelType = vehicle.fuelType
                 
                 VStack(alignment: .leading, spacing: Theme.dimensions.spacingM) {
                     // Combined Stats Summary Card
@@ -1272,16 +1412,19 @@ struct FuelEntriesGroupedView: View {
                         totalFuel: summaryStats.totalFuel,
                         totalCost: summaryStats.totalCost,
                         totalDistance: summaryStats.totalDistance,
-                        consumption: summaryStats.consumption
+                        consumption: summaryStats.consumption,
+                        fuelType: vehicleFuelType,
+                        isUsingMetric: isUsingMetric
                     )
                     
                     ZStack(alignment: .leading) {
                         // Continuous vertical line connecting all entries
-                        connectingLineView(closingIndex: closingIndex, entryCount: group.entries.count)
+                        let entryCount = entries.count
+                        connectingLineView(closingIndex: closingIndex, entryCount: entryCount)
                         
                         // Entries with spacing
                         entriesView(
-                            entries: group.entries,
+                            entries: entries,
                             closingEntry: closingEntry,
                             onPartialFillTapped: onPartialFillTapped,
                             onEdit: onEdit
@@ -1316,6 +1459,7 @@ struct FuelEntriesGroupedView: View {
                     usage: singleUsage,
                     nextUsage: previousUsage,
                     isClosingEntry: false,
+                    isUsingMetric: isUsingMetric,
                     onPartialFillTapped: {
                         onPartialFillTapped(singleUsage)
                     },
@@ -1337,6 +1481,8 @@ struct GroupSummaryCard: View {
     let totalCost: Double
     let totalDistance: Int
     let consumption: Double?
+    let fuelType: FuelType?
+    let isUsingMetric: Bool
     
     @Environment(\.colorScheme) private var colorScheme
     
@@ -1378,33 +1524,36 @@ struct GroupSummaryCard: View {
             
             // First Row of Pills: Liters, Price/L, Total Cost
             HStack(spacing: 8) {
-                // Total Fuel (Red/purple pill matching ActiveVehicleContent)
+                // Total Fuel (Red/purple pill matching FuelConsumptionEntryView)
+                let fuelTypeToUse = fuelType ?? .liquid
+                let fuelText = fuelTypeToUse.formatFuelAmount(totalFuel, isUsingMetric: isUsingMetric)
                 FuelPill(
                     icon: "car.fill",
-                    text: String(format: "%.2f", totalFuel).replacingOccurrences(of: ".", with: ",") + "L",
+                    text: fuelText.replacingOccurrences(of: ".", with: ","),
                     backgroundColor: colors.accentRedLight,
-                    iconColor: hexColor("#E63946"), // Red icon
-                    textColor: hexColor("#613E8D") // Dark purple for text
+                    iconColor: colors.accentRed,
+                    textColor: colorScheme == .dark ? colors.accentRed : hexColor("#613E8D") // Adaptive: red in dark mode, dark purple in light
                 )
                 
-                // Price per liter (Green pill matching ActiveVehicleContent)
+                // Price per unit (Green pill matching FuelConsumptionEntryView)
                 if totalFuel > 0 {
+                    let priceText = fuelTypeToUse.formatPricePerUnit(pricePerLiter, isUsingMetric: isUsingMetric)
                     FuelPill(
                         icon: "fuelpump.fill",
-                        text: formatPricePerLiter(pricePerLiter),
+                        text: priceText.replacingOccurrences(of: ".", with: ","),
                         backgroundColor: colors.accentGreenLight,
-                        iconColor: hexColor("#00C864"), // Green icon
-                        textColor: hexColor("#306B42") // Dark green for text
+                        iconColor: colors.accentGreen,
+                        textColor: colorScheme == .dark ? colors.accentGreen : hexColor("#306B42") // Adaptive: green in dark mode, dark green in light
                     )
                 }
                 
-                // Total Cost (Orange pill matching ActiveVehicleContent)
+                // Total Cost (Orange pill matching FuelConsumptionEntryView)
                 FuelPill(
                     icon: "dollarsign.circle.fill",
                     text: formatCurrency(totalCost),
                     backgroundColor: colors.accentOrangeLight,
-                    iconColor: hexColor("#FFB400"), // Orange icon
-                    textColor: hexColor("#8F6126") // Dark orange for text
+                    iconColor: colors.accentOrange,
+                    textColor: colorScheme == .dark ? colors.accentOrange : hexColor("#8F6126") // Adaptive: orange in dark mode, dark orange in light
                 )
                 
                 Spacer()
@@ -1414,11 +1563,13 @@ struct GroupSummaryCard: View {
             HStack(spacing: 8) {
                 // Consumption (if available)
                 if let consumption = consumption {
+                    let fuelTypeToUse = fuelType ?? .liquid
+                    let consumptionText = fuelTypeToUse.formatConsumption(consumption, isUsingMetric: isUsingMetric)
                     FuelPill(
                         icon: "fuelpump.fill",
-                        text: String(format: "%.2f", consumption).replacingOccurrences(of: ".", with: ",") + " km/l",
+                        text: consumptionText.replacingOccurrences(of: ".", with: ","),
                         backgroundColor: colors.fuelUsagePillBackground,
-                        iconColor: colors.accentRed,
+                        iconColor: colors.fuelUsagePillText,
                         textColor: colors.fuelUsagePillText
                     )
                 }
@@ -1429,7 +1580,7 @@ struct GroupSummaryCard: View {
                         icon: "speedometer",
                         text: String(format: "%d", totalDistance).replacingOccurrences(of: ".", with: ",") + " km",
                         backgroundColor: colors.kmDrivenPillBackground,
-                        iconColor: colors.accentRed,
+                        iconColor: colors.kmDrivenPillText,
                         textColor: colors.kmDrivenPillText
                     )
                 }

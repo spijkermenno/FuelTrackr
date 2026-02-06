@@ -44,6 +44,15 @@ public struct MonthlyRecapSheet: View {
     private var totalFuelCost: Double { viewModel.getFuelCost(month: selectedMonth, year: selectedYear) }
     private var averageFuelUsage: Double { viewModel.getAverageFuelUsage(month: selectedMonth, year: selectedYear) }
     private var isMetric: Bool { viewModel.isUsingMetric() }
+    
+    private var vehicleFuelType: FuelType? {
+        do {
+            let vehicle = try context.fetch(FetchDescriptor<Vehicle>()).first
+            return vehicle?.fuelType
+        } catch {
+            return nil
+        }
+    }
 
     private var displayedDistance: String {
         if isMetric {
@@ -55,21 +64,13 @@ public struct MonthlyRecapSheet: View {
     }
 
     private var displayedFuelUsed: String {
-        if isMetric {
-            return String(format: "%.2f L", totalFuelUsed)
-        } else {
-            let gallons = totalFuelUsed * 0.264172
-            return String(format: "%.2f gal", gallons)
-        }
+        let fuelType = vehicleFuelType ?? .liquid
+        return fuelType.formatFuelAmount(totalFuelUsed, isUsingMetric: isMetric)
     }
 
     private var displayedAverage: String {
-        if isMetric {
-            return String(format: "%.2f km/L", averageFuelUsage)
-        } else {
-            let mpg = averageFuelUsage * 2.35215
-            return String(format: "%.2f mi/gal", mpg)
-        }
+        let fuelType = vehicleFuelType ?? .liquid
+        return fuelType.formatConsumption(averageFuelUsage, isUsingMetric: isMetric)
     }
 
     private var comparisonText: String? {
@@ -103,7 +104,14 @@ public struct MonthlyRecapSheet: View {
                     RecapCard(
                         displayedDistance: displayedDistance,
                         displayedFuelUsed: displayedFuelUsed,
-                        displayedFuelCost: String(format: "€%.2f", totalFuelCost),
+                        displayedFuelCost: {
+                            let formatter = NumberFormatter()
+                            formatter.numberStyle = .currency
+                            formatter.locale = Locale.current
+                            formatter.maximumFractionDigits = 2
+                            formatter.minimumFractionDigits = 0
+                            return formatter.string(from: NSNumber(value: totalFuelCost)) ?? String(format: "%.2f", totalFuelCost)
+                        }(),
                         displayedAverage: displayedAverage,
                         comparisonText: comparisonText
                     )

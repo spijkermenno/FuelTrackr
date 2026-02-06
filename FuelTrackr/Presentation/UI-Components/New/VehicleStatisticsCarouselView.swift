@@ -36,9 +36,17 @@ struct CustomPagingBehavior: ScrollTargetBehavior {
 
 struct VehicleStatisticsCarouselView: View {
     let items: [VehicleStatisticsUiModel]
+    let fuelType: FuelType?
+    let isUsingMetric: Bool
 
     private let spacing: CGFloat = 16
     @State private var currentIndex: Int? = 0
+    
+    init(items: [VehicleStatisticsUiModel], fuelType: FuelType? = nil, isUsingMetric: Bool = true) {
+        self.items = items
+        self.fuelType = fuelType
+        self.isUsingMetric = isUsingMetric
+    }
 
     var body: some View {
         GeometryReader { geometry in
@@ -55,7 +63,7 @@ struct VehicleStatisticsCarouselView: View {
                                 let scale   = scaleValue(container: geometry, item: itemGeo)
                                 let opacity = opacityValue(container: geometry, item: itemGeo)
 
-                                VehicleStatisticCardView(uiModel: item)
+                                VehicleStatisticCardView(uiModel: item, fuelType: fuelType, isUsingMetric: isUsingMetric)
                                     .frame(width: cardWidth)
                                     .padding(.horizontal, spacing / 2)
                                     .padding(.vertical, 5)

@@ -39,7 +39,9 @@ public struct VehicleImageCarouselView: View {
     @Environment(\.colorScheme) private var colorScheme
     
     let photoData: Data?
-    let licensePlate: String
+    let vehicleName: String?
+    let licensePlate: String?
+    let fuelType: FuelType?
     let currentMileage: Int
     let purchaseDate: Date
     let productionDate: Date
@@ -63,7 +65,9 @@ public struct VehicleImageCarouselView: View {
         
         // Item 1: Vehicle Details Card
         items.append(.details(
+            vehicleName: vehicleName,
             licensePlate: licensePlate,
+            fuelType: fuelType,
             currentMileage: currentMileage,
             purchaseDate: purchaseDate,
             productionDate: productionDate,
@@ -104,9 +108,11 @@ public struct VehicleImageCarouselView: View {
                                                         .stroke(colors.border, lineWidth: 1)
                                                 )
                                         }
-                                    case .details(let licensePlate, let currentMileage, let purchaseDate, let productionDate, let isUsingMetric):
+                                    case .details(let vehicleName, let licensePlate, let fuelType, let currentMileage, let purchaseDate, let productionDate, let isUsingMetric):
                                         VehicleDetailsCard(
+                                            vehicleName: vehicleName,
                                             licensePlate: licensePlate,
+                                            fuelType: fuelType,
                                             currentMileage: currentMileage,
                                             purchaseDate: purchaseDate,
                                             productionDate: productionDate,
@@ -158,7 +164,7 @@ public struct VehicleImageCarouselView: View {
 
 private enum CarouselItem {
     case image(Data?)
-    case details(licensePlate: String, currentMileage: Int, purchaseDate: Date, productionDate: Date, isUsingMetric: Bool)
+    case details(vehicleName: String?, licensePlate: String?, fuelType: FuelType?, currentMileage: Int, purchaseDate: Date, productionDate: Date, isUsingMetric: Bool)
 }
 
 struct VehicleImagePageControl: View {

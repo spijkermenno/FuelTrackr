@@ -10,6 +10,7 @@ import SwiftUI
 import Domain
 import SwiftData
 import ScovilleKit
+@preconcurrency import Foundation
 
 public final class AddFuelUsageViewModel: ObservableObject {
     @Published public var liters = ""
@@ -131,6 +132,9 @@ public final class AddFuelUsageViewModel: ObservableObject {
                 context: context
             )
             
+            // Capture fuel count before async task to avoid data race
+            let fuelCount = vehicle.fuelUsages.count
+            
             Task { @MainActor in
                 Scoville.track(
                     FuelTrackrEvents.trackedFuel,
@@ -140,6 +144,9 @@ public final class AddFuelUsageViewModel: ObservableObject {
                         "amount": litersValue!
                     ]
                 )
+                
+                // Trigger review prompt based on fuel tracking count
+                ReviewPrompter.shared.handleFuelTracked(trackCount: fuelCount)
             }
             
             // Clear any warnings/errors on successful save

@@ -18,8 +18,9 @@ public struct FuelConsumptionEntryUiModel: Identifiable {
     public let fuelVolume: Double
     public let pricePerLiter: Double
     public let totalCost: Double
-    public let consumptionRate: Double // km/l
+    public let consumptionRate: Double // Consumption value (unit depends on fuel type)
     public let distanceDriven: Int // km
+    public let fuelType: FuelType? // Vehicle fuel type
     public let containsPartialFills: Bool // True if this merged entry contains partial fills
     
     public init(
@@ -33,6 +34,7 @@ public struct FuelConsumptionEntryUiModel: Identifiable {
         totalCost: Double,
         consumptionRate: Double,
         distanceDriven: Int,
+        fuelType: FuelType? = nil,
         containsPartialFills: Bool = false
     ) {
         self.id = id
@@ -45,6 +47,7 @@ public struct FuelConsumptionEntryUiModel: Identifiable {
         self.totalCost = totalCost
         self.consumptionRate = consumptionRate
         self.distanceDriven = distanceDriven
+        self.fuelType = fuelType
         self.containsPartialFills = containsPartialFills
     }
 }
@@ -82,15 +85,15 @@ public struct FuelConsumptionEntryView: View {
                 .font(.system(size: 14, weight: .regular))
                 .foregroundColor(colors.onSurface)
             
-            // Pills row 1 - 3 pills with colored backgrounds and dark text
-            HStack(spacing: 8) {
+            // All pills in a flow layout (wraps to multiple lines if needed, but tries to stay on one line)
+            FlowLayout(spacing: 8, lineSpacing: 8) {
                 SummaryPillView(
                     icon: "car.fill",
                     label: "",
                     value: formatFuel(entry.fuelVolume),
                     backgroundColor: colors.accentRedLight,
-                    iconColor: hexColor("#E63946"), // Red icon
-                    textColor: hexColor("#613E8D") // Dark purple for text
+                    iconColor: colors.accentRed,
+                    textColor: colorScheme == .dark ? colors.accentRed : hexColor("#613E8D") // Adaptive: red in dark mode, dark purple in light
                 )
                 
                 SummaryPillView(
@@ -98,8 +101,8 @@ public struct FuelConsumptionEntryView: View {
                     label: "",
                     value: formatPrice(entry.pricePerLiter),
                     backgroundColor: colors.accentGreenLight,
-                    iconColor: hexColor("#00C864"), // Green icon
-                    textColor: hexColor("#306B42") // Dark green for text
+                    iconColor: colors.accentGreen,
+                    textColor: colorScheme == .dark ? colors.accentGreen : hexColor("#306B42") // Adaptive: green in dark mode, dark green in light
                 )
                 
                 SummaryPillView(
@@ -107,19 +110,16 @@ public struct FuelConsumptionEntryView: View {
                     label: "",
                     value: formatCost(entry.totalCost),
                     backgroundColor: colors.accentOrangeLight,
-                    iconColor: hexColor("#FFB400"), // Orange icon
-                    textColor: hexColor("#8F6126") // Dark orange for text
+                    iconColor: colors.accentOrange,
+                    textColor: colorScheme == .dark ? colors.accentOrange : hexColor("#8F6126") // Adaptive: orange in dark mode, dark orange in light
                 )
-            }
-            
-            // Pills row 2 - fuel usage and km driven pills with specific colors
-            HStack(spacing: 8) {
+                
                 SummaryPillView(
                     icon: "fuelpump.fill",
                     label: "",
                     value: formatConsumption(entry.consumptionRate),
                     backgroundColor: colors.fuelUsagePillBackground,
-                    iconColor: colors.accentRed,
+                    iconColor: colors.fuelUsagePillText,
                     textColor: colors.fuelUsagePillText
                 )
                 
@@ -128,7 +128,7 @@ public struct FuelConsumptionEntryView: View {
                     label: "",
                     value: formatDistance(entry.distanceDriven),
                     backgroundColor: colors.kmDrivenPillBackground,
-                    iconColor: colors.accentRed,
+                    iconColor: colors.kmDrivenPillText,
                     textColor: colors.kmDrivenPillText
                 )
             }
@@ -158,51 +158,44 @@ public struct FuelConsumptionEntryView: View {
     
     private func formatOdometerRange(_ start: Int, _ end: Int) -> String {
         if settings.isUsingMetric {
-            return String(format: "%@ → %@ km", start.formattedWithSeparator, end.formattedWithSeparator)
+            return String(format: "%@ → %@ %@", start.formattedWithSeparator, end.formattedWithSeparator, NSLocalizedString("unit_km", comment: ""))
         } else {
             let startMi = Int(Double(start) * 0.621371)
             let endMi = Int(Double(end) * 0.621371)
-            return String(format: "%@ → %@ mi", startMi.formattedWithSeparator, endMi.formattedWithSeparator)
+            return String(format: "%@ → %@ %@", startMi.formattedWithSeparator, endMi.formattedWithSeparator, NSLocalizedString("unit_mi", comment: ""))
         }
     }
     
-    private func formatFuel(_ liters: Double) -> String {
-        if settings.isUsingMetric {
-            return String(format: "%.2fL", liters)
-        } else {
-            let gallons = liters * 0.264172
-            return String(format: "%.2fG", gallons)
-        }
+    private func formatFuel(_ amount: Double) -> String {
+        let fuelType = entry.fuelType ?? .liquid
+        return fuelType.formatFuelAmount(amount, isUsingMetric: settings.isUsingMetric)
     }
     
-    private func formatPrice(_ pricePerLiter: Double) -> String {
-        if settings.isUsingMetric {
-            return String(format: "€%.2f/L", pricePerLiter)
-        } else {
-            let pricePerGallon = pricePerLiter * 3.78541
-            return String(format: "$%.2f/G", pricePerGallon)
-        }
+    private func formatPrice(_ pricePerUnit: Double) -> String {
+        let fuelType = entry.fuelType ?? .liquid
+        return fuelType.formatPricePerUnit(pricePerUnit, isUsingMetric: settings.isUsingMetric)
     }
     
     private func formatCost(_ cost: Double) -> String {
-        return cost.formatted(.currency(code: Locale.current.currency?.identifier ?? "EUR"))
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = Locale.current.currency?.identifier ?? "EUR"
+        formatter.maximumFractionDigits = 2
+        formatter.minimumFractionDigits = 0 // Allow no decimals if .00
+        return formatter.string(from: NSNumber(value: cost)) ?? String(format: "%.2f", cost)
     }
     
-    private func formatConsumption(_ kmPerLiter: Double) -> String {
-        if settings.isUsingMetric {
-            return String(format: "%.2f km/l", kmPerLiter)
-        } else {
-            let mpg = kmPerLiter * 2.35215
-            return String(format: "%.2f mpg", mpg)
-        }
+    private func formatConsumption(_ consumption: Double) -> String {
+        let fuelType = entry.fuelType ?? .liquid
+        return fuelType.formatConsumption(consumption, isUsingMetric: settings.isUsingMetric)
     }
     
     private func formatDistance(_ km: Int) -> String {
         if settings.isUsingMetric {
-            return String(format: "%d km", km)
+            return String(format: "%d %@", km, NSLocalizedString("unit_km", comment: ""))
         } else {
             let miles = Int(Double(km) * 0.621371)
-            return String(format: "%d mi", miles)
+            return String(format: "%d %@", miles, NSLocalizedString("unit_mi", comment: ""))
         }
     }
 }

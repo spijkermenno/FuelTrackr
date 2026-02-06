@@ -114,8 +114,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:nl-pepperTechnologies/ScovilleKit.git",
       "state" : {
-        "revision" : "0d8bc6797e362390ed92c9c82946b3d80c9d4ae7",
-        "version" : "1.0.1"
+        "revision" : "3322e495fbc20d9a6d29bd67b3ffbae9a62c9809",
+        "version" : "1.0.4"
       }
     },
     {

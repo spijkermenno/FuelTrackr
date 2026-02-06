@@ -42,14 +42,21 @@ public extension Vehicle {
                 }
             }
             
-            // Calculate consumption for merged group
+            // Calculate consumption for merged group using fuel type-aware calculation
             let economy: Double
             if let currentMileage = lastUsage.mileage?.value,
                currentMileage > startMileage {
                 let totalFuel = group.reduce(0.0) { $0 + $1.liters }
                 if totalFuel > 0 {
                     let kmDriven = currentMileage - startMileage
-                    economy = Double(kmDriven) / totalFuel
+                    let fuelType = self.fuelType ?? .liquid
+                    // Note: This will be formatted correctly in UI based on settings
+                    // For preview, we calculate in metric (km/L equivalent) and UI will convert
+                    economy = fuelType.calculateConsumption(
+                        distance: Double(kmDriven),
+                        fuelAmount: totalFuel,
+                        isUsingMetric: true
+                    ) ?? .zero
                 } else {
                     economy = .zero
                 }
@@ -67,7 +74,8 @@ public extension Vehicle {
                     date: lastUsage.date,
                     liters: totalFuel,
                     cost: totalCost,
-                    economy: economy
+                    economy: economy,
+                    fuelType: self.fuelType
                 )
             )
             
@@ -171,7 +179,12 @@ public extension Vehicle {
             }
             
             // Calculate consumption for merged group
-            let consumptionRate = FuelUsageMergingHelper.calculateConsumptionForGroup(group, previousMileage: startMileage) ?? 0
+            let consumptionRate = FuelUsageMergingHelper.calculateConsumptionForGroup(
+                group,
+                previousMileage: startMileage,
+                fuelType: self.fuelType,
+                isUsingMetric: true // Will be formatted correctly in UI based on settings
+            ) ?? 0
             
             // Sum fuel and cost for the group
             let totalFuel = group.reduce(0.0) { $0 + $1.liters }
@@ -197,6 +210,7 @@ public extension Vehicle {
                     totalCost: totalCost,
                     consumptionRate: consumptionRate,
                     distanceDriven: distanceDriven,
+                    fuelType: self.fuelType,
                     containsPartialFills: hasPartialFills
                 )
             )

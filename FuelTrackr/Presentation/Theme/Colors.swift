@@ -62,10 +62,10 @@ public struct DarkColors: Sendable, ColorsProtocol {
     public let accentOrange = hexColor("#FFB400") // Orange for costs
     public let accentOrangeLight = hexColor("#FFB400").opacity(0.20) // 20% opacity
     public let accentGrey = hexColor("#3E3E41") // Dark grey for consumption/range pills
-    public let fuelUsagePillBackground = hexColor("#CFFAFE") // Very light cyan for fuel usage per km pill
+    public let fuelUsagePillBackground = hexColor("#5AC8FA").opacity(0.20) // Semi-transparent cyan for dark mode
     public let fuelUsagePillText = hexColor("#5AC8FA") // Light blue text for fuel usage per km pill
-    public let kmDrivenPillBackground = hexColor("#DBEAFE") // Light periwinkle for km driven pill
-    public let kmDrivenPillText = hexColor("#1E40AF") // Medium blue text for km driven pill
+    public let kmDrivenPillBackground = hexColor("#1E40AF").opacity(0.20) // Semi-transparent blue for dark mode
+    public let kmDrivenPillText = hexColor("#60A5FA") // Lighter blue text for dark mode (more visible)
     public let border = hexColor("#2D2D2D") // Border color for carousel items (dark mode)
     public let divider = hexColor("#3E3E41") // Divider color between entries
 }

@@ -30,7 +30,7 @@ public struct OnboardingVehicleFuelTypeView: View {
                     isSelected: viewModel.vehicleFuelType == .liquid,
                     action: {
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                            viewModel.updateMetricSystem(true)
+                            viewModel.updateVehicleFuelType(.liquid)
                         }
                         // Auto-advance after selection
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -46,7 +46,7 @@ public struct OnboardingVehicleFuelTypeView: View {
                     isSelected: viewModel.vehicleFuelType == .electric,
                     action: {
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                            viewModel.updateMetricSystem(false)
+                            viewModel.updateVehicleFuelType(.electric)
                         }
                         // Auto-advance after selection
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -62,7 +62,7 @@ public struct OnboardingVehicleFuelTypeView: View {
                     isSelected: viewModel.vehicleFuelType == .hydrogen,
                     action: {
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                            viewModel.updateMetricSystem(false)
+                            viewModel.updateVehicleFuelType(.hydrogen)
                         }
                         // Auto-advance after selection
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {

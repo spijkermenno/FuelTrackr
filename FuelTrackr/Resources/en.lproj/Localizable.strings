@@ -46,11 +46,20 @@
 "add_fuel_usage_description" = "Record every fuel stop to keep a complete fuel history and monitor consumption trends over time.";
 "fuel_entry_details" = "Fuel Entry Details";
 "liters_label" = "How many liters did you refuel?";
+"gallons_label" = "How many gallons did you refuel?";
+"kwh_label" = "How many kWh did you charge?";
+"kg_h2_label" = "How many kg H₂ did you refuel?";
+"fuel_amount_label" = "How much fuel did you add?";
 "cost_label" = "Total cost (€)";
-"liters_placeholder" = "Enter amount (e.g., 12)";
 "cost_placeholder" = "Enter price (e.g., 100)";
+"liters_placeholder" = "Enter amount (e.g., 12)";
+"gallons_placeholder" = "Enter amount (e.g., 3.5)";
+"kwh_placeholder" = "Enter amount (e.g., 50)";
+"kg_h2_placeholder" = "Enter amount (e.g., 5)";
+"fuel_amount_placeholder" = "Enter amount";
 "price_per_liter" = "Price per liter";
 "price_per_gallon" = "Price per gallon";
+"fuel_type" = "Fuel Type";
 "fuel_usage_title" = "Fuel Usage";
 "fuel_usage_no_content" = "To gain insights into your fuel usage, add data using the button with the '+' symbol";
 "fuel_usage_saved_success" = "Fuel usage saved successfully.";
@@ -78,6 +87,10 @@
 "other_notes_placeholder" = "Enter description for 'Other'";
 "all_fields_required_error" = "All fields must be filled with valid data.";
 "invalid_liters_error" = "Please enter a valid number of liters greater than 0.";
+"invalid_gallons_error" = "Please enter a valid number of gallons greater than 0.";
+"invalid_kwh_error" = "Please enter a valid number of kWh greater than 0.";
+"invalid_kg_h2_error" = "Please enter a valid number of kg H₂ greater than 0.";
+"invalid_fuel_amount_error" = "Please enter a valid fuel amount greater than 0.";
 "invalid_cost_error" = "Please enter a valid cost greater than 0.";
 "invalid_mileage_error" = "The mileage must be higher than the current mileage.";
 "invalid_cost_error_generic" = "Invalid cost. Please check the input format.";
@@ -89,12 +102,25 @@
 
 /* Notifications */
 "notifications_section" = "Notifications";
-"notifications_disclaimer" = "We’re working on notifications so you don’t miss any updates. They aren’t available yet—stay tuned!";
+"notifications_disclaimer" = "We're working on notifications so you don't miss any updates. They aren't available yet—stay tuned!";
 "enable_notifications" = "Enable Notifications";
 "enable_notifications_description" = "Enable or disable notifications for maintenance reminders.";
 "notification_permission_error" = "Please enable notifications in your device settings.";
 "notifications_disabled_title" = "Notifications Disabled";
 "notifications_disabled_message" = "Enable notifications in settings for reminders.";
+"notifications_toggle" = "Notifications";
+"notifications_toggle_description" = "Allow notifications for maintenance reminders and updates.";
+"notification_status_authorized" = "Authorized";
+"notification_status_denied" = "Denied";
+"notification_status_not_determined" = "Not Determined";
+"tracking_toggle" = "Tracking";
+"tracking_toggle_description" = "Allow tracking to help improve the app experience.";
+"tracking_status_authorized" = "Authorized";
+"tracking_status_denied" = "Denied";
+"tracking_status_restricted" = "Restricted";
+"tracking_status_not_determined" = "Not Determined";
+"open_settings" = "Open Settings";
+"pro_grant_debug" = "Grant Pro (Debug)";
 "ok" = "OK";
 
 /* Units and Settings */
@@ -208,8 +234,21 @@
 "onboarding_welcome_title" = "Welcome to FuelTrackr 👋";
 "onboarding_welcome_description" = "Let's set up your vehicle so you can easily track your fuel usage and maintenance.";
 "onboarding_setup_vehicle_button" = "Set up my vehicle";
+"onboarding_notifications_title" = "Stay Updated";
+"onboarding_notifications_description" = "Enable notifications to receive reminders about fuel tracking and monthly recaps.";
+"onboarding_notifications_allow" = "Enable Notifications";
+"onboarding_notifications_skip" = "Not Now";
+"onboarding_tracking_title" = "Help Improve FuelTrackr";
+"onboarding_tracking_description" = "We use anonymous tracking to improve the app. We will never track you with personal data or share your information.";
+"onboarding_tracking_allow" = "Allow Tracking";
+"onboarding_tracking_skip" = "Ask App Not to Track";
 "onboarding_unit_selection_title" = "Distance & Consumption";
 "onboarding_unit_selection_question" = "Which units do you use for distance and fuel consumption?";
+"onboarding_vehicle_name_title" = "Vehicle Name";
+"onboarding_vehicle_name_description" = "Give your vehicle a name to easily identify it.";
+"onboarding_vehicle_name_placeholder" = "Enter vehicle name";
+"onboarding_vehicle_name_default" = "My Car";
+"onboarding_vehicle_name_use_default" = "Use \"%@\"";
 "kilometers_liters" = "Kilometers & Liters";
 "miles_gallons" = "Miles & Gallons";
 "metric" = "(Metric)";
@@ -228,7 +267,7 @@
 "fuel_liquid" = "Petrol or Diesel";
 "fuel_electric" = "Electric";
 "fuel_hydrogen" = "Hydrogen";
-"fuel_unknown" = "Unknown";
+"fuel_unknown" = "Different";
 
 "onboarding_vehicle_brand_title" = "Vehicle brand";
 "onboarding_vehicle_brand_question" = "What brand is your vehicle?";
@@ -244,9 +283,10 @@
 "onboarding_select_date_placeholder" = "Select date";
 "onboarding_skip_for_now" = "Skip for now";
 "onboarding_current_mileage_title" = "Current mileage";
-"onboarding_current_mileage_question" = "What's your vehicle's current mileage?";
+"onboarding_current_mileage_question" = "What's your vehicle's current mileage?\n\nWe need this to accurately calculate your fuel consumption and track your vehicle's performance over time.";
 "onboarding_mileage_placeholder_km" = "e.g. 125,000 km";
 "onboarding_mileage_placeholder_miles" = "e.g. 77,671 mi";
+"onboarding_mileage_new_car" = "Start from 0";
 "onboarding_add_photo_title" = "Add a photo of your vehicle";
 "onboarding_add_photo_description" = "This helps you recognize it quickly in your overview.";
 "onboarding_take_photo" = "Take photo";
@@ -279,12 +319,15 @@
 
 /* Fuel Detail Page */
 "consumption_overview" = "Consumption Overview";
+"consumption_over_time" = "Consumption Over Time";
 "average_consumption" = "average consumption";
 "total_cost_label" = "Total cost";
 "last_refueling" = "Last refueling";
 "fuel_entries_last_months" = "Fuel entries last %d months (%d)";
 "fuel_entries_last_month" = "Fuel entries last month (%d)";
-"add_new_refueling" = "+ Add new refueling";
+"fuel_entries_all" = "All fuel entries (%d)";
+"add_new_refueling" = "Add new refueling";
+"timeframe_all" = "All";
 "timeframe_1m" = "1M";
 "timeframe_3m" = "3M";
 "timeframe_1y" = "1Y";
@@ -320,3 +363,82 @@
 "current" = "Current";
 "closing_fill" = "Full Tank";
 "combined_stats" = "Combined Statistics";
+
+/* In-App Purchase / Pro */
+"pro_title" = "FuelTrackr Pro";
+"pro_subtitle" = "The Future of Vehicle Intelligence";
+"pro_feature_unlimited_history_title" = "Unlimited History";
+"pro_feature_unlimited_history_subtitle" = "Total expense transparency";
+"pro_feature_smart_maintenance_title" = "Smart Maintenance";
+"pro_feature_smart_maintenance_subtitle" = "Smart service alerts";
+"pro_feature_smart_refill_title" = "Smart Refill Logic";
+"pro_feature_smart_refill_subtitle" = "Predictive range & cost insights";
+"restore_purchase" = "Restore Purchase";
+"privacy_policy" = "Privacy Policy";
+"terms_of_service" = "Terms of Service";
+"pro_lifetime_title" = "Lifetime Pro";
+"pro_yearly_title" = "Yearly Access";
+"pro_monthly_title" = "Monthly Access";
+"pro_one_time_payment" = "One-time payment";
+"pro_billed_annually" = "Billed annually";
+"pro_billed_monthly" = "Billed monthly";
+"pro_unlock_lifetime" = "Unlock Lifetime Pro";
+"pro_processing_purchase" = "Processing Purchase...";
+"pro_purchase_successful" = "Purchase Successful!";
+"pro_thank_you_message" = "Thank you for upgrading to Pro";
+"continue_button" = "Continue";
+"pro_status" = "Pro Status";
+"pro_purchased" = "Purchased: %@";
+"pro_renews" = "Renews: %@";
+"pro_never_expires" = "Never expires";
+"pro_manage_subscription" = "Manage Subscription";
+"pro_remove_debug" = "Remove Pro (Debug)";
+"pro_upgrade" = "Upgrade to Pro";
+"unit_km" = "km";
+"unit_mi" = "mi";
+"unit_l" = "L";
+"unit_g" = "G";
+"unit_kwh" = "kWh";
+"unit_kg_h2" = "kg H₂";
+
+/* Review & Feedback */
+"help_feedback_section" = "Help & Feedback";
+"help_feedback_footer" = "Share your feedback or suggestions to help us improve";
+"review_app" = "Rate the App";
+"review_share_opinion" = "Let us know what you think";
+"review_recent_feedback" = "You recently submitted feedback";
+"review_title" = "How do you like FuelTrackr?";
+"review_subtitle" = "Your opinion really matters";
+"review_description" = "Are you enjoying the app? Or is something missing?\nWith your feedback, we can improve FuelTrackr step by step, for you and other users.";
+"review_star_rating" = "%d star";
+"review_feedback_prompt" = "What can we improve?";
+"review_feedback_placeholder" = "Tell us what we can do better...";
+"review_feedback_min_chars" = "At least %d characters required";
+"review_feedback_max_chars" = "Maximum %d characters allowed";
+"review_go_to_app_store" = "Go to App Store";
+"review_submit_feedback" = "Submit Feedback";
+"review_feedback_required" = "Please let us know what we can improve before you can submit";
+"review_maybe_later" = "Maybe Later";
+"review_cooldown_recent" = "You recently submitted feedback";
+"review_cooldown_days" = "You can submit feedback again in %d day(s)";
+"app_suggestion" = "App Suggestion";
+"app_suggestion_subtitle" = "Share your idea for improvement";
+"suggestion_title" = "App Suggestion";
+"suggestion_subtitle" = "Have an idea to improve the app? Share it with us!";
+"suggestion_field_label" = "Your suggestion";
+"suggestion_field_placeholder" = "Describe your idea for a new feature or improvement...";
+"suggestion_min_chars" = "At least %d characters required";
+"suggestion_max_chars" = "Maximum %d characters allowed";
+"suggestion_submit" = "Submit";
+
+/* Edit Vehicle */
+"fuel_type_title" = "Fuel Type";
+"purchase_status_title" = "Purchase Status";
+"vehicle_purchased" = "Vehicle Purchased";
+"latest_mileage_title" = "Latest Mileage";
+"select_photo_source" = "Select Photo Source";
+"camera" = "Camera";
+"photo_library" = "Photo Library";
+"remove_photo" = "Remove Photo";
+"manufacturing_date_before_purchase_error" = "Manufacturing date must be before or equal to purchase date.";
+"vehicle_not_found_error" = "Vehicle not found. Please try again.";

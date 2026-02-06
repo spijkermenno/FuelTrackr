@@ -21,12 +21,6 @@ struct InAppPurchasePayWall: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 32) {
-                    // Debug buttons (only in DEBUG builds)
-                    #if DEBUG
-                    DebugPurchaseButtons(manager: inAppPurchaseManager)
-                        .padding(.top, 8)
-                    #endif
-                    
                     // 1. Header Section
                     VStack(spacing: 16) {
                         ResizableAppIconView(size: 90)
@@ -34,11 +28,11 @@ struct InAppPurchasePayWall: View {
                             .shadow(color: .blue.opacity(0.15), radius: 20, y: 10)
                         
                         VStack(spacing: 6) {
-                            Text("FuelTrackr Pro")
+                            Text(NSLocalizedString("pro_title", comment: ""))
                                 .font(.system(size: 34, weight: .heavy, design: .rounded))
                                 .tracking(-0.5)
                             
-                            Text("The Future of Vehicle Intelligence")
+                            Text(NSLocalizedString("pro_subtitle", comment: ""))
                                 .font(.system(size: 16, weight: .medium))
                                 .foregroundColor(.secondary)
                         }
@@ -47,9 +41,9 @@ struct InAppPurchasePayWall: View {
 
                     // 2. Feature Cards Section
                     VStack(spacing: 14) {
-                        CleanFeatureCard(title: "Unlimited History", subtitle: "Total expense transparency", icon: "chart.line.uptrend.xyaxis", accentColor: .purple)
-                        CleanFeatureCard(title: "Smart Maintenance", subtitle: "AI-driven service alerts", icon: "wrench.and.screwdriver.fill", accentColor: .teal)
-                        CleanFeatureCard(title: "AI Refill Logic", subtitle: "Predictive range & cost insights", icon: "brain.fill", accentColor: .orange)
+                        CleanFeatureCard(title: NSLocalizedString("pro_feature_unlimited_history_title", comment: ""), subtitle: NSLocalizedString("pro_feature_unlimited_history_subtitle", comment: ""), icon: "chart.line.uptrend.xyaxis", accentColor: .purple)
+                        CleanFeatureCard(title: NSLocalizedString("pro_feature_smart_maintenance_title", comment: ""), subtitle: NSLocalizedString("pro_feature_smart_maintenance_subtitle", comment: ""), icon: "wrench.and.screwdriver.fill", accentColor: .teal)
+                        CleanFeatureCard(title: NSLocalizedString("pro_feature_smart_refill_title", comment: ""), subtitle: NSLocalizedString("pro_feature_smart_refill_subtitle", comment: ""), icon: "brain.fill", accentColor: .orange)
                     }
                     .opacity(inAppPurchaseManager.purchaseState == .purchasing ? 0.5 : 1.0)
                     .animation(.easeInOut(duration: 0.3), value: inAppPurchaseManager.purchaseState)
@@ -85,7 +79,7 @@ struct InAppPurchasePayWall: View {
                                     .progressViewStyle(CircularProgressViewStyle(tint: .blue))
                                     .padding(.trailing, 8)
                             }
-                            Button("Restore Purchase") {
+                            Button(NSLocalizedString("restore_purchase", comment: "")) {
                                 Task {
                                     await inAppPurchaseManager.restorePurchases()
                                 }
@@ -106,13 +100,17 @@ struct InAppPurchasePayWall: View {
                         }
                         
                         HStack(spacing: 12) {
-                            Button("Privacy Policy") {
-                                // Action for Privacy Policy
+                            Button(NSLocalizedString("privacy_policy", comment: "")) {
+                                if let url = URL(string: "https://pepper-technologies.nl/privacy-statement/") {
+                                    UIApplication.shared.open(url)
+                                }
                             }
                             Text("•")
                                 .foregroundColor(.secondary)
-                            Button("Terms of Service") {
-                                // Action for TOS
+                            Button(NSLocalizedString("terms_of_service", comment: "")) {
+                                if let url = URL(string: "https://pepper-technologies.nl/terms-of-use/") {
+                                    UIApplication.shared.open(url)
+                                }
                             }
                         }
                         .font(.caption)
@@ -236,16 +234,16 @@ struct ProPurchaseButton: View {
     }
     
     private var cleanTitle: String {
-        if product.id.contains("lifetime") { return "Lifetime Pro" }
-        if product.id.contains("yearly") { return "Yearly Access" }
-        if product.id.contains("monthly") { return "Monthly Access" }
+        if product.id.contains("lifetime") { return NSLocalizedString("pro_lifetime_title", comment: "") }
+        if product.id.contains("yearly") { return NSLocalizedString("pro_yearly_title", comment: "") }
+        if product.id.contains("monthly") { return NSLocalizedString("pro_monthly_title", comment: "") }
         return product.displayName
     }
     
     private var billingDescription: String {
-        if product.type == .nonConsumable { return "One-time payment" }
-        if product.id.contains("yearly") { return "Billed annually" }
-        return "Billed monthly"
+        if product.type == .nonConsumable { return NSLocalizedString("pro_one_time_payment", comment: "") }
+        if product.id.contains("yearly") { return NSLocalizedString("pro_billed_annually", comment: "") }
+        return NSLocalizedString("pro_billed_monthly", comment: "")
     }
     
     private var buttonColor: Color {
@@ -265,7 +263,7 @@ struct ProPurchaseButton: View {
 struct FakeProPurchaseButton: View {
     var body: some View {
         HStack {
-            Text("Unlock Lifetime Pro")
+            Text(NSLocalizedString("pro_unlock_lifetime", comment: ""))
                 .font(.system(size: 18, weight: .bold, design: .rounded))
             Spacer()
             Text("$24.99")
@@ -337,17 +335,17 @@ struct PurchaseOverlay: View {
                 // Text Content - maintain consistent height
                 VStack(spacing: 8) {
                     if state == .purchasing {
-                        Text("Processing Purchase...")
+                        Text(NSLocalizedString("pro_processing_purchase", comment: ""))
                             .font(.system(size: 18, weight: .semibold, design: .rounded))
                             .foregroundColor(.white)
                             .frame(height: 22) // Match approximate height of success title
                     } else if state == .success {
                         VStack(spacing: 8) {
-                            Text("Purchase Successful!")
+                            Text(NSLocalizedString("pro_purchase_successful", comment: ""))
                                 .font(.system(size: 18, weight: .semibold, design: .rounded))
                                 .foregroundColor(.white)
                             
-                            Text("Thank you for upgrading to Pro")
+                            Text(NSLocalizedString("pro_thank_you_message", comment: ""))
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundColor(.white.opacity(0.9))
                         }
@@ -359,7 +357,7 @@ struct PurchaseOverlay: View {
                 // Continue Button (only for success)
                 if state == .success {
                     Button(action: onDismiss) {
-                        Text("Continue")
+                        Text(NSLocalizedString("continue_button", comment: ""))
                             .font(.system(size: 17, weight: .semibold, design: .rounded))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -388,63 +386,6 @@ struct PurchaseOverlay: View {
         }
     }
 }
-
-// MARK: - Debug Purchase Buttons
-#if DEBUG
-struct DebugPurchaseButtons: View {
-    @ObservedObject var manager: InAppPurchaseManager
-    
-    var body: some View {
-        VStack(spacing: 8) {
-            Text("DEBUG MODE")
-                .font(.caption2)
-                .foregroundColor(.orange)
-                .fontWeight(.bold)
-            
-            HStack(spacing: 8) {
-                Button("Success") {
-                    manager.setDebugPurchaseState(.success)
-                }
-                .buttonStyle(DebugButtonStyle(color: .green))
-                
-                Button("Failed") {
-                    manager.setDebugPurchaseState(.failed("Debug: Purchase failed"))
-                }
-                .buttonStyle(DebugButtonStyle(color: .red))
-                
-                Button("Cancelled") {
-                    manager.setDebugPurchaseState(.cancelled)
-                }
-                .buttonStyle(DebugButtonStyle(color: .orange))
-            }
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(Color(UIColor.secondarySystemBackground))
-        )
-    }
-}
-
-struct DebugButtonStyle: ButtonStyle {
-    let color: Color
-    
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.system(size: 12, weight: .semibold))
-            .foregroundColor(.white)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
-            .background(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(color)
-                    .opacity(configuration.isPressed ? 0.7 : 1.0)
-            )
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
-    }
-}
-#endif
 
 #Preview {
     InAppPurchasePayWall()

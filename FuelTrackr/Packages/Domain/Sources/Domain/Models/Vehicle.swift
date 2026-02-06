@@ -12,9 +12,6 @@ import Foundation
 public class Vehicle: Hashable {
     // MARK: - Properties
     @Attribute public var name: String
-    @Attribute public var brand: String?
-    @Attribute public var model: String?
-    @Attribute public var licensePlate: String
     @Attribute public var fuelType: FuelType?
     @Attribute public var purchaseDate: Date
     @Attribute public var manufacturingDate: Date
@@ -29,9 +26,6 @@ public class Vehicle: Hashable {
     // MARK: - Initializer
     public init(
         name: String,
-        brand: String? = nil,
-        model: String? = nil,
-        licensePlate: String,
         fuelType: FuelType? = nil,
         purchaseDate: Date,
         manufacturingDate: Date,
@@ -39,9 +33,6 @@ public class Vehicle: Hashable {
         isPurchased: Bool? = nil
     ) {
         self.name = name
-        self.brand = brand
-        self.model = model
-        self.licensePlate = licensePlate
         self.fuelType = fuelType
         self.purchaseDate = purchaseDate
         self.manufacturingDate = manufacturingDate
@@ -50,11 +41,8 @@ public class Vehicle: Hashable {
     }
     
     // MARK: - Computed Properties
-    /// Returns a display name constructed from brand and model, or falls back to name
+    /// Returns the vehicle name
     public var displayName: String {
-        if let brand = brand, let model = model, !brand.isEmpty, !model.isEmpty {
-            return "\(brand) \(model)"
-        }
         return name
     }
 
@@ -65,9 +53,6 @@ public class Vehicle: Hashable {
     // MARK: - Hashable
     public static func == (lhs: Vehicle, rhs: Vehicle) -> Bool {
         return lhs.name == rhs.name &&
-            lhs.brand == rhs.brand &&
-            lhs.model == rhs.model &&
-            lhs.licensePlate == rhs.licensePlate &&
             lhs.purchaseDate == rhs.purchaseDate &&
             lhs.manufacturingDate == rhs.manufacturingDate &&
             lhs.isPurchased == rhs.isPurchased
@@ -75,9 +60,6 @@ public class Vehicle: Hashable {
 
     public func hash(into hasher: inout Hasher) {
         hasher.combine(name)
-        hasher.combine(brand)
-        hasher.combine(model)
-        hasher.combine(licensePlate)
         hasher.combine(purchaseDate)
         hasher.combine(manufacturingDate)
         hasher.combine(isPurchased)
@@ -87,9 +69,6 @@ public class Vehicle: Hashable {
     public func toJSON(prettyPrinted: Bool = true) -> String? {
         struct VehicleDTO: Codable {
             let name: String
-            let brand: String?
-            let model: String?
-            let licensePlate: String
             let purchaseDate: Date
             let manufacturingDate: Date
             let isPurchased: Bool?
@@ -122,9 +101,6 @@ public class Vehicle: Hashable {
         // Map to DTOs
         let dto = VehicleDTO(
             name: name,
-            brand: brand,
-            model: model,
-            licensePlate: licensePlate,
             purchaseDate: purchaseDate,
             manufacturingDate: manufacturingDate,
             isPurchased: isPurchased,

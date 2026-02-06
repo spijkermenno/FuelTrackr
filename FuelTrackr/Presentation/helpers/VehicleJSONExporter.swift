@@ -31,7 +31,6 @@ final class VehicleJSONExporter {
 
     private struct VehicleDTO: Codable {
         let name: String
-        let licensePlate: String
         let purchaseDate: Date?
         let manufacturingDate: Date?
         let mileages: [MileageDTO]
@@ -42,7 +41,6 @@ final class VehicleJSONExporter {
     func export(_ vehicle: Vehicle) throws -> String {
         let dto = VehicleDTO(
             name: vehicle.name,
-            licensePlate: vehicle.licensePlate,
             purchaseDate: vehicle.purchaseDate,
             manufacturingDate: vehicle.manufacturingDate,
             mileages: vehicle.mileages.map { MileageDTO(date: $0.date, value: $0.value) },

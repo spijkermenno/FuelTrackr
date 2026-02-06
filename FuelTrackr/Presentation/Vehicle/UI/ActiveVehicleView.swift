@@ -43,8 +43,7 @@ public struct ActiveVehicleView: View {
                 .onAppear {
                     // TODO: Analytics wrapper
                     Analytics.logEvent("active_vehicle_found", parameters: [
-                        "vehicle_name": vehicle.name,
-                        "license_plate": vehicle.licensePlate
+                        "vehicle_name": vehicle.name
                     ])
                     scheduleNextRecapNotification()
                 }

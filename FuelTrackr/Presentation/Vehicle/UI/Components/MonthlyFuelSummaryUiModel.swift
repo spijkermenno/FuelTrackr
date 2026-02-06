@@ -11,6 +11,8 @@ public enum MonthlySummaryPeriod {
     case month(month: Int, year: Int)
     case yearToDate(year: Int)
     case year(year: Int)
+    case allTime
+    case projectedYear(year: Int)
 }
 
 public struct MonthlyFuelSummaryUiModel: Identifiable {
@@ -73,6 +75,12 @@ public struct MonthlyFuelSummaryUiModel: Identifiable {
             
         case .year(let year):
             return "\(year)"
+            
+        case .allTime:
+            return NSLocalizedString("all_time", comment: "All Time")
+            
+        case .projectedYear(let year):
+            return NSLocalizedString("projected_year", comment: "Projected Year") + " \(year)"
         }
     }
     
@@ -91,6 +99,10 @@ public struct MonthlyFuelSummaryUiModel: Identifiable {
         case .yearToDate(let year):
             return year
         case .year(let year):
+            return year
+        case .allTime:
+            return Calendar.current.component(.year, from: Date())
+        case .projectedYear(let year):
             return year
         }
     }

@@ -31,7 +31,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             FirebaseApp.configure()
         }
         
-        // Notifications
+        // Notifications - delegate setup only, permission will be requested during onboarding
         setUpNotifications(application)
         
         print("🚀 FuelTrackr launched with Firebase + Scoville")
@@ -85,9 +85,14 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     // MARK: Notifications
     private func setUpNotifications(_ application: UIApplication) {
         UNUserNotificationCenter.current().delegate = self
-        let options: UNAuthorizationOptions = [.alert, .badge, .sound]
-        
-        UNUserNotificationCenter.current().requestAuthorization(options: options) { _, _ in }
-        application.registerForRemoteNotifications()
+        // Note: Permission request moved to onboarding flow
+        // Only register for remote notifications if already authorized (for returning users)
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            if settings.authorizationStatus == .authorized {
+                DispatchQueue.main.async {
+                    application.registerForRemoteNotifications()
+                }
+            }
+        }
     }
 }

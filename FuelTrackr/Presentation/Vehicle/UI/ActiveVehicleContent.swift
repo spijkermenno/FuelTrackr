@@ -48,16 +48,37 @@ public struct ActiveVehicleContent: View {
     public var body: some View {
         ScrollView {
             if let vehicle = vehicleViewModel.resolvedVehicle(context: context) {
-                VStack(alignment: .leading, spacing: 20) {
-                    // Vehicle Image Carousel
-                    VehicleImageCarouselView(
-                        photoData: vehicle.photo,
-                        licensePlate: vehicle.licensePlate,
-                        currentMileage: vehicle.mileages.sorted(by: { $0.date < $1.date }).last?.value ?? 0,
-                        purchaseDate: vehicle.purchaseDate,
-                        productionDate: vehicle.manufacturingDate,
-                        isUsingMetric: settingsViewModel.isUsingMetric
-                    )
+                VStack(alignment: .leading, spacing: 12) {
+                    // Vehicle Image Carousel (only if photo exists) or Vehicle Details Card
+                    if let photoData = vehicle.photo, !photoData.isEmpty {
+                        VehicleImageCarouselView(
+                            photoData: photoData,
+                            vehicleName: vehicle.name,
+                            licensePlate: nil,
+                            fuelType: vehicle.fuelType,
+                            currentMileage: vehicle.mileages.sorted(by: { $0.date < $1.date }).last?.value ?? 0,
+                            purchaseDate: vehicle.purchaseDate,
+                            productionDate: vehicle.manufacturingDate,
+                            isUsingMetric: settingsViewModel.isUsingMetric
+                        )
+                    } else {
+                        // Show only vehicle details card when no photo
+                        VehicleDetailsCard(
+                            vehicleName: vehicle.name,
+                            licensePlate: nil,
+                            fuelType: vehicle.fuelType,
+                            currentMileage: vehicle.mileages.sorted(by: { $0.date < $1.date }).last?.value ?? 0,
+                            purchaseDate: vehicle.purchaseDate,
+                            productionDate: vehicle.manufacturingDate,
+                            isUsingMetric: settingsViewModel.isUsingMetric
+                        )
+                        .onAppear {
+                            print("BLA \(vehicle.fuelType)")
+                            dump(vehicle)
+                        }
+                        .frame(height: 190)
+                        .padding(.horizontal, Theme.dimensions.spacingL)
+                    }
                     
                     // Monthly Fuel Summary Carousel
                     MonthlyFuelSummaryCarouselView(
@@ -88,7 +109,6 @@ public struct ActiveVehicleContent: View {
                     // Maintenance History Section
                     MaintenanceHistorySectionView(
                         entries: vehicle.maintenanceEntries(limit: 10),
-                        isVehicleActive: vehicle.isPurchased ?? false,
                         onAdd: {
                             // Check premium status before adding maintenance
                             if InAppPurchaseManager.shared.hasActiveSubscription {

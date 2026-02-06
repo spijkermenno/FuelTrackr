@@ -78,7 +78,7 @@ class InAppPurchaseManager: ObservableObject {
         
         // Listen for transaction updates
         Task {
-            for await update in Transaction.updates {
+            for await update in StoreKit.Transaction.updates {
                 if case .verified(let transaction) = update {
                     // Check if this is one of our products
                     let productIds = InAppPurchaseItems.allCases.map { $0.getProductId() }
@@ -132,6 +132,8 @@ class InAppPurchaseManager: ObservableObject {
                     
                     Task { @MainActor in
                         Scoville.track(FuelTrackrEvents.IAPFullPremiumBought)
+                        // Trigger review prompt after purchase
+                        ReviewPrompter.shared.maybeRequestReview(reason: .purchaseDone)
                     }
                     
                     // Don't auto-reset - let user dismiss the success overlay
@@ -186,7 +188,7 @@ class InAppPurchaseManager: ObservableObject {
             
             // Verify current entitlements
             var foundActivePurchase = false
-            for await result in Transaction.currentEntitlements {
+            for await result in StoreKit.Transaction.currentEntitlements {
                 if case .verified(let transaction) = result {
                     // Check if this is one of our premium products
                     let productIds = InAppPurchaseItems.allCases.map { $0.getProductId() }
@@ -227,10 +229,10 @@ class InAppPurchaseManager: ObservableObject {
         var expirationDate: Date?
         
         // Get the most recent active entitlement
-        var latestTransaction: Transaction?
+        var latestTransaction: StoreKit.Transaction?
         var latestTransactionDate: Date?
         
-        for await result in Transaction.currentEntitlements {
+        for await result in StoreKit.Transaction.currentEntitlements {
             if case .verified(let transaction) = result {
                 let productIds = InAppPurchaseItems.allCases.map { $0.getProductId() }
                 if productIds.contains(transaction.productID) {
@@ -294,6 +296,17 @@ class InAppPurchaseManager: ObservableObject {
     func removeProStatus() {
         hasActiveSubscription = false
         currentPurchaseInfo = PurchaseInfo(type: .none, productID: "", transactionID: nil, purchaseDate: nil, expirationDate: nil)
+    }
+    
+    func grantProStatus() {
+        hasActiveSubscription = true
+        currentPurchaseInfo = PurchaseInfo(
+            type: .lifetime,
+            productID: "debug_lifetime_pro",
+            transactionID: nil,
+            purchaseDate: Date(),
+            expirationDate: nil
+        )
     }
     #endif
     

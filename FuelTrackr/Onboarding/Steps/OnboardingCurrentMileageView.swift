@@ -110,27 +110,48 @@ public struct OnboardingCurrentMileageView: View {
 
             Spacer()
 
-            // Continue Button
-            Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                    viewModel.nextStep()
+            // Action Buttons
+            VStack(spacing: 16) {
+                Button {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                        viewModel.nextStep()
+                    }
+                } label: {
+                    Text(NSLocalizedString("continue", comment: "Continue"))
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(OnboardingColors.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 56)
+                        .background(
+                            viewModel.canProceedFromCurrentStep()
+                                ? OnboardingColors.primaryBlue
+                                : OnboardingColors.mediumGray
+                        )
+                        .cornerRadius(16)
                 }
-            } label: {
-                Text(NSLocalizedString("continue", comment: "Continue"))
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(OnboardingColors.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 56)
-                    .background(
-                        viewModel.canProceedFromCurrentStep()
-                            ? OnboardingColors.primaryBlue
-                            : OnboardingColors.mediumGray
-                    )
-                    .cornerRadius(16)
-                    .padding(.horizontal, 24)
+                .buttonStyle(ScaleButtonStyle())
+                .disabled(!viewModel.canProceedFromCurrentStep())
+                
+                Button {
+                    viewModel.currentMileage = "0"
+                    isTextFieldFocused = false
+                    // Auto-advance after setting mileage to 0
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            viewModel.nextStep()
+                        }
+                    }
+                } label: {
+                    Text(NSLocalizedString("onboarding_mileage_new_car", comment: "Start from 0"))
+                        .font(.system(size: 17, weight: .regular))
+                        .foregroundColor(OnboardingColors.primaryBlue)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 56)
+                        .background(Color.clear)
+                }
+                .buttonStyle(ScaleButtonStyle())
             }
-            .buttonStyle(ScaleButtonStyle())
-            .disabled(!viewModel.canProceedFromCurrentStep())
+            .padding(.horizontal, 24)
             .padding(.bottom, 24)
         }
         .contentShape(Rectangle())

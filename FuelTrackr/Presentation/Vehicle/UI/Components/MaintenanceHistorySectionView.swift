@@ -10,9 +10,10 @@ import SwiftUI
 public struct MaintenanceHistorySectionView: View {
     @Environment(\.colorScheme) private var colorScheme
     let entries: [MaintenanceEntryUiModel]
-    let isVehicleActive: Bool
     let onAdd: () -> Void
     let onShowMore: () -> Void
+    
+    let doesMaintenanceOverviewExist = false
     
     private var colors: ColorsProtocol {
         Theme.colors(for: colorScheme)
@@ -34,10 +35,9 @@ public struct MaintenanceHistorySectionView: View {
                         .foregroundColor(colors.onPrimary)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
-                        .background(isVehicleActive ? colors.primary : Color.gray.opacity(0.5))
+                        .background(colors.primary)
                         .cornerRadius(20)
                 }
-                .disabled(!isVehicleActive)
             }
             
             // Entries
@@ -56,7 +56,7 @@ public struct MaintenanceHistorySectionView: View {
             }
             
             // Show more button
-            if entries.count > 3 {
+            if entries.count > 3 && doesMaintenanceOverviewExist {
                 Button(action: onShowMore) {
                     Text(NSLocalizedString("show_more", comment: "Show More"))
                         .font(.system(size: 14, weight: .semibold))

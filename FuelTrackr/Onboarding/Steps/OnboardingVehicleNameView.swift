@@ -1,22 +1,26 @@
 //
-//  OnboardingLicensePlateView.swift
+//  OnboardingVehicleNameView.swift
 //  FuelTrackr
 //
-//  Step 3: License plate input
+//  Step 5: Vehicle name input
 //
 
 import SwiftUI
 
-public struct OnboardingLicensePlateView: View {
+public struct OnboardingVehicleNameView: View {
     @ObservedObject var viewModel: OnboardingViewModel
     @FocusState private var isTextFieldFocused: Bool
+    
+    private var defaultVehicleName: String {
+        NSLocalizedString("onboarding_vehicle_name_default", comment: "My Car")
+    }
     
     public var body: some View {
         VStack {
             // Header
             OnboardingHeader(
-                title: NSLocalizedString("onboarding_license_plate_title", comment: "License plate"),
-                description: NSLocalizedString("onboarding_license_plate_description", comment: "Enter your vehicle's license plate to automatically fetch public specs.")
+                title: NSLocalizedString("onboarding_vehicle_name_title", comment: "Vehicle Name"),
+                description: NSLocalizedString("onboarding_vehicle_name_description", comment: "Give your vehicle a name to easily identify it.")
             )
             .padding(.top, 116)
             
@@ -25,11 +29,11 @@ public struct OnboardingLicensePlateView: View {
             // Input Field
             VStack(spacing: 16) {
                 TextField(
-                    NSLocalizedString("onboarding_license_plate_placeholder", comment: "Fill in license plate"),
-                    text: $viewModel.licensePlate
+                    NSLocalizedString("onboarding_vehicle_name_placeholder", comment: "Enter vehicle name"),
+                    text: $viewModel.vehicleName
                 )
                 .font(.system(size: 17, weight: .regular))
-                .textInputAutocapitalization(.characters)
+                .textInputAutocapitalization(.words)
                 .autocorrectionDisabled()
                 .focused($isTextFieldFocused)
                 .padding()
@@ -49,20 +53,12 @@ public struct OnboardingLicensePlateView: View {
                         isTextFieldFocused = true
                     }
                 }
-                
-                // Info Text
-                Text(NSLocalizedString("onboarding_license_plate_info", comment: "When available, FuelTrackr will use public vehicle data to pre-fill details. This only works for supported regions and plate formats."))
-                    .font(.system(size: 13, weight: .regular))
-                    .foregroundColor(OnboardingColors.lightGray)
-                    .lineSpacing(6)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
             }
             
             Spacer()
             
             // Action Buttons - 24pt above progress bar
-            VStack {
+            VStack(spacing: 16) {
                 Button(action: {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                         viewModel.nextStep()
@@ -75,24 +71,30 @@ public struct OnboardingLicensePlateView: View {
                         .frame(height: 56)
                         .background(viewModel.canProceedFromCurrentStep() ? OnboardingColors.primaryBlue : OnboardingColors.mediumGray)
                         .cornerRadius(16)
-                        .padding(.horizontal, 24)
                 }
                 .buttonStyle(ScaleButtonStyle())
                 .disabled(!viewModel.canProceedFromCurrentStep())
                 
                 Button(action: {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                        viewModel.nextStep()
+                    viewModel.vehicleName = defaultVehicleName
+                    isTextFieldFocused = false
+                    // Auto-advance after setting the default name
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            viewModel.nextStep()
+                        }
                     }
                 }) {
-                    Text(NSLocalizedString("onboarding_add_later", comment: "I'll add this later"))
+                    Text(String(format: NSLocalizedString("onboarding_vehicle_name_use_default", comment: "Use \"%@\""), defaultVehicleName))
                         .font(.system(size: 17, weight: .regular))
                         .foregroundColor(OnboardingColors.primaryBlue)
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
+                        .background(Color.clear)
                 }
                 .buttonStyle(ScaleButtonStyle())
             }
+            .padding(.horizontal, 24)
             .padding(.bottom, 24)
         }
         .contentShape(Rectangle())
