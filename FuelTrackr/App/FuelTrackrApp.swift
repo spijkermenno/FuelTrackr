@@ -28,6 +28,12 @@ struct FuelTrackrApp: App {
         WindowGroup {
             ContentView()
                 .modelContainer(container)
+                .onAppear {
+                    // Preload IAP products early
+                    Task {
+                        await InAppPurchaseManager.shared.fetchAllProducts()
+                    }
+                }
         }
     }
 }

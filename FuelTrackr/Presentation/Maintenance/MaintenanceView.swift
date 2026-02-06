@@ -48,10 +48,14 @@ public struct MaintenanceView: View {
         .background(Color(.systemGray6))
         .cornerRadius(10)
         .sheet(isPresented: $showAllMaintenanceEntries) {
-            if let vehicleID = viewModel.activeVehicleID {
-                AllMaintenanceView(vehicleID: vehicleID)
+            if InAppPurchaseManager.shared.hasActiveSubscription {
+                if let vehicleID = viewModel.activeVehicleID {
+                    AllMaintenanceView(vehicleID: vehicleID)
+                } else {
+                    EmptyView()
+                }
             } else {
-                EmptyView()
+                InAppPurchasePayWall()
             }
         }
         .onAppear {

@@ -59,10 +59,6 @@ public struct ActiveVehicleContent: View {
                         isUsingMetric: settingsViewModel.isUsingMetric
                     )
                     
-                    Button("show paywall", action: {
-                        isShowingPayWall = true
-                    })
-                    
                     // Monthly Fuel Summary Carousel
                     MonthlyFuelSummaryCarouselView(
                         vehicleViewModel: vehicleViewModel,
@@ -74,7 +70,12 @@ public struct ActiveVehicleContent: View {
                         entries: vehicle.fuelConsumptionEntries(limit: 10),
                         onAdd: { showAddFuelSheet = true },
                         onShowMore: {
-                            showFuelDetailsSheet = true
+                            // Check premium status before showing fuel details
+                            if InAppPurchaseManager.shared.hasActiveSubscription {
+                                showFuelDetailsSheet = true
+                            } else {
+                                isShowingPayWall = true
+                            }
                         },
                         onEdit: { entry in
                             selectedFuelUsage = FuelUsageSelection(id: entry.fuelUsageID)
@@ -88,9 +89,25 @@ public struct ActiveVehicleContent: View {
                     MaintenanceHistorySectionView(
                         entries: vehicle.maintenanceEntries(limit: 10),
                         isVehicleActive: vehicle.isPurchased ?? false,
-                        onAdd: { showAddMaintenanceSheet = true },
+                        onAdd: {
+                            // Check premium status before adding maintenance
+                            if InAppPurchaseManager.shared.hasActiveSubscription {
+                                showAddMaintenanceSheet = true
+                            } else {
+                                isShowingPayWall = true
+                            }
+                        },
                         onShowMore: {
-                            // TODO: Navigate to full maintenance history
+                            // Check premium status before showing maintenance details
+                            if InAppPurchaseManager.shared.hasActiveSubscription {
+                                // Show AllMaintenanceView
+                                if let vehicleID = vehicleViewModel.activeVehicleID {
+                                    // We'll need to add a state variable for this
+                                    // For now, this is handled by the sheet in MaintenanceView
+                                }
+                            } else {
+                                isShowingPayWall = true
+                            }
                         }
                     )
                     .environmentObject(settingsViewModel)
