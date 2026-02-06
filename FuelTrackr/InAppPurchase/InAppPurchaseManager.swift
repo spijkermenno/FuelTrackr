@@ -99,10 +99,7 @@ class InAppPurchaseManager: ObservableObject {
             let productIdentifiers = Set(ids)
 
             products = try await Product.products(for: productIdentifiers)
-            
-            print("Products fetched... \(products)")
         } catch {
-            print("Failed to load products. \(error)")
             
             Task { @MainActor in
                 Scoville.track(FuelTrackrEvents.failedToLoadProducts)
@@ -119,8 +116,6 @@ class InAppPurchaseManager: ObservableObject {
             switch result {
             case .success(let verification):
                 if case .verified(let transaction) = verification {
-                    print("Purchase successful: \(transaction)")
-                    
                     // Update purchase status
                     await checkPurchaseStatus()
                     
@@ -144,7 +139,6 @@ class InAppPurchaseManager: ObservableObject {
                     }
                 }
             case .userCancelled:
-                print("Purchase cancelled by user")
                 purchaseState = .cancelled
                 Task { @MainActor in
                     Scoville.track(FuelTrackrEvents.IAPCancelled)
@@ -168,7 +162,6 @@ class InAppPurchaseManager: ObservableObject {
                 purchaseState = .idle
             }
         } catch {
-            print("Purchase failed: \(error)")
             purchaseState = .failed(error.localizedDescription)
             Task { @MainActor in
                 Scoville.track(FuelTrackrEvents.IAPFailed)
@@ -194,7 +187,6 @@ class InAppPurchaseManager: ObservableObject {
                     let productIds = InAppPurchaseItems.allCases.map { $0.getProductId() }
                     if productIds.contains(transaction.productID) {
                         foundActivePurchase = true
-                        print("Found active purchase: \(transaction.productID)")
                     }
                 }
             }
@@ -211,7 +203,6 @@ class InAppPurchaseManager: ObservableObject {
                 purchaseState = .idle
             }
         } catch {
-            print("Restore purchases failed: \(error)")
             purchaseState = .failed("Failed to restore purchases: \(error.localizedDescription)")
             try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds
             purchaseState = .idle

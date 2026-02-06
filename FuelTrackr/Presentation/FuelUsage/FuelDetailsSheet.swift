@@ -10,6 +10,7 @@ import SwiftUI
 import Domain
 import Charts
 import SwiftData
+import ScovilleKit
 
 public enum FuelDetailTimeframe: String, CaseIterable {
     case all = "All"
@@ -335,6 +336,17 @@ public struct FuelDetailsSheet: View {
             }
             .onAppear {
                 resolvedVehicle = viewModel.resolvedVehicle(context: context)
+                
+                // Track fuel details viewed
+                Task { @MainActor in
+                    Scoville.track(
+                        FuelTrackrEvents.fuelDetailsViewed,
+                        parameters: [
+                            "timeframe": selectedTimeframe.rawValue,
+                            "fuel_entry_count": String(filteredFuelUsages.count)
+                        ]
+                    )
+                }
             }
         }
     }

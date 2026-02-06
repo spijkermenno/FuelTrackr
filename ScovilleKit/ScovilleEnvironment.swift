@@ -26,8 +26,6 @@ enum ScovilleEnvironment {
                ? "BkO0IuH69i39DYCrkGfS2TgqRsS8jYt9gU4DqYib"
                : override)
         
-        print("🌶️ [ScovilleEnvironment] FuelTrackr configured for \(env.uppercased()) → \(baseURL)")
-        
         await MainActor.run {
             Scoville.configure(apiKey: apiKey)
         }

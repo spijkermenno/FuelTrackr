@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 import Domain
 import Data
+import ScovilleKit
 
 struct ContentView: View {
     @Environment(\.modelContext) private var context
@@ -36,6 +37,16 @@ struct ContentView: View {
         }
         .onAppear {
             vehicleViewModel.loadActiveVehicle(context: context)
+            
+            // Track app start
+            Task { @MainActor in
+                Scoville.track(
+                    FuelTrackrEvents.appStarted,
+                    parameters: [
+                        "has_vehicle": vehicleViewModel.hasActiveVehicle ? "true" : "false"
+                    ]
+                )
+            }
         }
     }
 }

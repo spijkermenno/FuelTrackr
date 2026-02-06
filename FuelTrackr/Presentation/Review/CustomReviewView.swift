@@ -297,13 +297,11 @@ struct CustomReviewView: View {
     private func handleRatingSubmission() {
         // Prevent double submission
         guard !isSubmitting else {
-            print("[Review] ⚠️ Submission already in progress")
             return
         }
         
         // Check cooldown
         guard !isOnCooldown else {
-            print("[Review] ⚠️ Still on cooldown period")
             return
         }
         
@@ -311,7 +309,6 @@ struct CustomReviewView: View {
         if selectedRating < 4 {
             let trimmedFeedback = feedbackText.trimmingCharacters(in: .whitespacesAndNewlines)
             guard trimmedFeedback.count >= minCharacterCount && trimmedFeedback.count <= maxCharacterCount else {
-                print("[Review] ⚠️ Feedback validation failed")
                 return
             }
         }
@@ -334,8 +331,6 @@ struct CustomReviewView: View {
         Scoville.submitReview(rating: selectedRating, feedback: feedback) { result in
             switch result {
             case .success(let response):
-                print("[Review] ✅ Review submitted: ID \(response.data.id)")
-                
                 // Save submission date for cooldown
                 UserDefaults.standard.set(Date(), forKey: "lastFeedbackSubmissionDate")
                 
@@ -358,8 +353,6 @@ struct CustomReviewView: View {
                 }
                 
             case .failure(let error):
-                print("[Review] ❌ Review submission failed: \(error.localizedDescription)")
-                
                 DispatchQueue.main.async {
                     isSubmitting = false
                     

@@ -139,7 +139,6 @@ public extension Vehicle {
     /// Returns fuel consumption entries for the new design
     /// Partial fills are merged until a full fill is reached
     func fuelConsumptionEntries(limit: Int = 3) -> [FuelConsumptionEntryUiModel] {
-        Swift.print("📊 [Vehicle] Calculating fuel consumption entries (limit: \(limit))")
         let groups = FuelUsageMergingHelper.groupMergedFuelUsages(fuelUsages)
         var entries: [FuelConsumptionEntryUiModel] = []
         
@@ -148,14 +147,10 @@ public extension Vehicle {
         let sortedAllUsages = fuelUsages.sorted { $0.date < $1.date }
         var previousMileage: Int?
         
-        Swift.print("📊 [Vehicle] Processing \(groups.count) merged group(s)...")
-        
-        for (groupIndex, group) in groups.enumerated() {
-            Swift.print("   📦 Processing group \(groupIndex + 1)/\(groups.count)...")
+        for group in groups {
             guard let firstUsage = group.first,
                   let lastUsage = group.last,
                   let endMileage = lastUsage.mileage?.value else {
-                Swift.print("   ❌ Skipping group: missing mileage data")
                 continue
             }
             
@@ -163,18 +158,15 @@ public extension Vehicle {
             let startMileage: Int
             if let prevMileage = previousMileage {
                 startMileage = prevMileage
-                Swift.print("   📍 Using previous group's end mileage: \(startMileage) km")
             } else {
                 // For the first group, find the mileage before the first usage in this group
                 if let firstIndex = sortedAllUsages.firstIndex(where: { $0.persistentModelID == firstUsage.persistentModelID }),
                    firstIndex > 0 {
                     // Use the mileage from the previous fuel usage entry
                     startMileage = sortedAllUsages[firstIndex - 1].mileage?.value ?? (firstUsage.mileage?.value ?? endMileage)
-                    Swift.print("   📍 Using previous entry's mileage: \(startMileage) km (from entry \(firstIndex))")
                 } else {
                     // This is the very first fuel usage - use the first entry's mileage in the group as start
                     startMileage = firstUsage.mileage?.value ?? endMileage
-                    Swift.print("   ⚠️  First fuel usage - using first entry's mileage as start: \(startMileage) km")
                 }
             }
             
@@ -192,8 +184,6 @@ public extension Vehicle {
             let pricePerLiter = totalFuel > 0 ? totalCost / totalFuel : 0
             
             let distanceDriven = max(0, endMileage - startMileage)
-            
-            Swift.print("   ✅ Entry created: \(String(format: "%.2f", consumptionRate)) km/L, \(distanceDriven) km, \(String(format: "%.2f", totalFuel))L")
             
             // Check if this group contains any partial fills
             let hasPartialFills = group.contains { $0.isPartialFill }
@@ -220,9 +210,7 @@ public extension Vehicle {
         }
         
         // Reverse to show newest first, then limit
-        let result = Array(entries.reversed().prefix(limit))
-        Swift.print("📊 [Vehicle] Returning \(result.count) entry/entries")
-        return result
+        return Array(entries.reversed().prefix(limit))
     }
     
     /// Returns maintenance entries for the new design

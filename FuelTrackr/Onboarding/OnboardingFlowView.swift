@@ -8,6 +8,7 @@
 import SwiftUI
 import Domain
 import SwiftData
+import ScovilleKit
 
 public struct OnboardingFlowView: View {
     @StateObject private var viewModel: OnboardingViewModel
@@ -92,6 +93,24 @@ public struct OnboardingFlowView: View {
                     .padding(.bottom, 24)
                     .transition(.opacity)
                 }
+            }
+        }
+        .onAppear {
+            // Track onboarding started
+            Task { @MainActor in
+                Scoville.track(FuelTrackrEvents.onboardingStarted)
+            }
+        }
+        .onChange(of: viewModel.currentStep) { _, newStep in
+            // Track each onboarding step viewed
+            Task { @MainActor in
+                Scoville.track(
+                    FuelTrackrEvents.onboardingStepViewed,
+                    parameters: [
+                        "step": newStep.rawValue.description,
+                        "step_name": newStep.title
+                    ]
+                )
             }
         }
     }

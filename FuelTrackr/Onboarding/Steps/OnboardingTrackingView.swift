@@ -106,8 +106,6 @@ public struct OnboardingTrackingView: View {
         
         // Request tracking authorization
         ATTrackingManager.requestTrackingAuthorization { status in
-            print("Tracking authorization status: \(status.rawValue)")
-            
             // Proceed to next step regardless of permission result
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 isRequesting = false

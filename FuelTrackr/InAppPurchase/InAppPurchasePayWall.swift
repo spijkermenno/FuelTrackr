@@ -7,6 +7,7 @@
 
 import SwiftUI
 import StoreKit
+import ScovilleKit
 
 struct InAppPurchasePayWall: View {
     @Environment(\.colorScheme) private var colorScheme
@@ -139,6 +140,24 @@ struct InAppPurchasePayWall: View {
             // Only fetch if products haven't been preloaded
             if inAppPurchaseManager.products.isEmpty {
                 await inAppPurchaseManager.fetchAllProducts()
+            }
+        }
+        .onAppear {
+            // Track paywall shown
+            Task { @MainActor in
+                Scoville.track(
+                    FuelTrackrEvents.paywallShown,
+                    parameters: [
+                        "has_active_subscription": inAppPurchaseManager.hasActiveSubscription ? "true" : "false",
+                        "product_count": String(inAppPurchaseManager.products.count)
+                    ]
+                )
+            }
+        }
+        .onDisappear {
+            // Track paywall dismissed
+            Task { @MainActor in
+                Scoville.track(FuelTrackrEvents.paywallDismissed)
             }
         }
     }

@@ -18,19 +18,12 @@ struct FuelUsageMergingHelper {
         var groups: [[FuelUsage]] = []
         var currentGroup: [FuelUsage] = []
         
-        print("🔄 [FuelUsageMergingHelper] Grouping \(sorted.count) fuel usages...")
-        
-        for (index, usage) in sorted.enumerated() {
-            let isPartial = usage.isPartialFill
-            print("   Entry \(index + 1): \(String(format: "%.2f", usage.liters))L @ \(usage.mileage?.value ?? 0)km - \(isPartial ? "PARTIAL" : "FULL")")
-            
+        for usage in sorted {
             currentGroup.append(usage)
             
             // If this is not a partial fill, close the current group
             if !usage.isPartialFill {
                 if !currentGroup.isEmpty {
-                    let totalFuel = currentGroup.reduce(0.0) { $0 + $1.liters }
-                    print("   → Closing group with \(currentGroup.count) entries, total: \(String(format: "%.2f", totalFuel))L")
                     groups.append(currentGroup)
                     currentGroup = []
                 }
@@ -40,12 +33,9 @@ struct FuelUsageMergingHelper {
         // If there are remaining partial fills at the end, add them as a group
         // (they'll show 0 consumption until a full fill is added)
         if !currentGroup.isEmpty {
-            let totalFuel = currentGroup.reduce(0.0) { $0 + $1.liters }
-            print("   → Final group (partial fills only) with \(currentGroup.count) entries, total: \(String(format: "%.2f", totalFuel))L")
             groups.append(currentGroup)
         }
         
-        print("🔄 [FuelUsageMergingHelper] Created \(groups.count) merged group(s)")
         return groups
     }
     
@@ -64,24 +54,20 @@ struct FuelUsageMergingHelper {
     ) -> Double? {
         guard let lastUsage = group.last,
               let endMileage = lastUsage.mileage?.value else {
-            print("   ❌ [FuelUsageMergingHelper] Cannot calculate: missing end mileage")
             return nil
         }
         
         guard let startMileage = previousMileage else {
-            print("   ❌ [FuelUsageMergingHelper] Cannot calculate: missing start mileage")
             return nil
         }
         
         guard endMileage > startMileage else {
-            print("   ❌ [FuelUsageMergingHelper] Cannot calculate: end (\(endMileage)) <= start (\(startMileage))")
             return nil
         }
         
         // Sum all fuel in the group
         let totalFuel = group.reduce(0.0) { $0 + $1.liters }
         guard totalFuel > 0 else {
-            print("   ❌ [FuelUsageMergingHelper] Cannot calculate: total fuel is 0")
             return nil
         }
         
@@ -89,22 +75,11 @@ struct FuelUsageMergingHelper {
         
         // Use fuel type-aware calculation if available, otherwise fall back to liquid (km/L)
         let fuelTypeToUse = fuelType ?? .liquid
-        guard let consumption = fuelTypeToUse.calculateConsumption(
+        return fuelTypeToUse.calculateConsumption(
             distance: distance,
             fuelAmount: totalFuel,
             isUsingMetric: isUsingMetric
-        ) else {
-            print("   ❌ [FuelUsageMergingHelper] Cannot calculate: fuel type calculation failed")
-            return nil
-        }
-        
-        print("   ✅ [FuelUsageMergingHelper] Consumption calculated:")
-        print("      - Distance: \(distance) km (\(startMileage) → \(endMileage))")
-        print("      - Total fuel: \(String(format: "%.2f", totalFuel))")
-        print("      - Fuel type: \(fuelTypeToUse)")
-        print("      - Consumption: \(fuelTypeToUse.formatConsumption(consumption, isUsingMetric: isUsingMetric))")
-        
-        return consumption
+        )
     }
 }
 

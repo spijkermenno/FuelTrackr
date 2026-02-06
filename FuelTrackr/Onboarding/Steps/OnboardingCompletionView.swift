@@ -8,6 +8,7 @@
 import SwiftUI
 import SwiftData
 import Domain
+import ScovilleKit
 
 public struct OnboardingCompletionView: View {
     @ObservedObject var viewModel: OnboardingViewModel
@@ -69,6 +70,19 @@ public struct OnboardingCompletionView: View {
         
         let vehicleViewModel = VehicleViewModel()
         vehicleViewModel.saveVehicle(vehicle: vehicle, initialMileage: initialMileage, context: context)
+        
+        // Track vehicle creation and onboarding completion
+        Task { @MainActor in
+            Scoville.track(FuelTrackrEvents.onboardingCompleted)
+            Scoville.track(
+                FuelTrackrEvents.vehicleCreated,
+                parameters: [
+                    "fuel_type": vehicle.fuelType?.rawValue ?? "unknown",
+                    "has_photo": vehicle.photo != nil ? "true" : "false",
+                    "initial_mileage": String(initialMileage)
+                ]
+            )
+        }
         
         withAnimation {
             onComplete()

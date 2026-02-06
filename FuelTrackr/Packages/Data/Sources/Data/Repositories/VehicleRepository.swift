@@ -72,29 +72,14 @@ public class VehicleRepository: VehicleRepositoryProtocol {
             
             // Migrate existing fuel usages to detect partial fills
             // Only detect if not manually set and we have enough data
-            print("🔄 [VehicleRepository] Migrating vehicle: \(vehicle.name)")
-            print("   Total fuel usages: \(vehicle.fuelUsages.count)")
-            
             if PartialFillDetector.canDetectPartialFills(vehicle: vehicle) {
-                print("   ✅ Can detect partial fills - processing \(vehicle.fuelUsages.count) entries...")
-                var detectedCount = 0
                 for fuelUsage in vehicle.fuelUsages {
                     // Only auto-detect if not manually set
                     if !fuelUsage.isPartialFillManuallySet {
-                        let wasPartial = fuelUsage.isPartialFill
                         let isPartialFill = PartialFillDetector.detectPartialFill(liters: fuelUsage.liters, vehicle: vehicle)
                         fuelUsage.isPartialFill = isPartialFill
-                        if isPartialFill && !wasPartial {
-                            detectedCount += 1
-                            print("   🔍 Detected partial fill: \(String(format: "%.2f", fuelUsage.liters))L")
-                        }
-                    } else {
-                        print("   ⏭️  Skipping manually set entry: \(String(format: "%.2f", fuelUsage.liters))L (isPartial: \(fuelUsage.isPartialFill))")
                     }
                 }
-                print("   ✅ Migration complete: \(detectedCount) new partial fills detected")
-            } else {
-                print("   ⚠️  Not enough data for detection (need \(PartialFillDetector.minimumRefillsForDetection) refills)")
             }
         }
         try context.save()
@@ -117,7 +102,6 @@ public class VehicleRepository: VehicleRepositoryProtocol {
         )
         
         // Detect if this is a partial fill (only if not manually set before)
-        print("💾 [VehicleRepository] Saving fuel usage: \(liters)L @ \(mileageValue)km")
         let isPartialFill = PartialFillDetector.detectPartialFill(liters: liters, vehicle: vehicle)
         
         let fuelUsage = FuelUsage(
@@ -131,7 +115,6 @@ public class VehicleRepository: VehicleRepositoryProtocol {
         )
         vehicle.fuelUsages.append(fuelUsage)
         
-        print("💾 [VehicleRepository] Fuel usage saved: \(isPartialFill ? "MARKED AS PARTIAL" : "MARKED AS FULL")")
         try context.save()
     }
     
@@ -323,23 +306,3 @@ public class VehicleRepository: VehicleRepositoryProtocol {
     
 }
 
-extension Vehicle {
- public func print() {
-        let mileages     = self.mileages.map { "\($0.value)" }
-        let fuelUsages   = self.fuelUsages
-            .map { "Liters: \($0.liters), Cost: \($0.cost), Date: \($0.date)" }
-        let maintenances = self.maintenances
-            .map { "\($0.type.rawValue), Cost: \($0.cost), Date: \($0.date)" }
-
-     Swift.print("--- Active Vehicle Info ---")
-     Swift.print("Name: \(self.name)")
-     Swift.print("Purchase Date: \(self.purchaseDate)")
-     Swift.print("Manufacturing Date: \(self.manufacturingDate)")
-     Swift.print("Is Purchased: \(self.isPurchased.map(String.init) ?? "nil")")
-     Swift.print("Photo size: \(self.photo?.count ?? 0) bytes")
-     Swift.print("Mileages: \(mileages)")
-     Swift.print("Fuel Usages: \(fuelUsages)")
-     Swift.print("Maintenances: \(maintenances)")
-     Swift.print("--------------------------")
-    }
-}

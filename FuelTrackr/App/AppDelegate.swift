@@ -22,8 +22,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         Task {
             await configureScovilleAndRegisterDevice()
         }
-#else
-        print("[Scoville] skipping registering device because we're in DEBUG mode")
 #endif
         
         // Firebase
@@ -34,7 +32,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         // Notifications - delegate setup only, permission will be requested during onboarding
         setUpNotifications(application)
         
-        print("🚀 FuelTrackr launched with Firebase + Scoville")
         return true
     }
     
@@ -43,19 +40,15 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         await ScovilleEnvironment.configureFromDefaults()
 
         let cachedToken = UserDefaults.standard.string(forKey: apnsDefaultsKey) ?? ""
-        print("[Scoville] 🧩 Registering device after full configuration (token: \(cachedToken.isEmpty ? "none" : "exists"))")
 
         Scoville.registerDevice(token: cachedToken) { result in
             switch result {
             case .success:
-                print("✅ [Scoville] Device registration success")
-
                 Task { @MainActor in
                     Scoville.track(StandardEvent.appOpened)
                 }
 
             case .failure(let error):
-                print("❌ [Scoville] Device registration failed: \(error.localizedDescription)")
                 Crashlytics.crashlytics().record(error: error)
             }
         }
@@ -73,11 +66,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     
     private func registerWithScovilleIfChanged(newToken: String, cached: String?) {
         guard newToken != cached else {
-            print("[token] same APNs token, skipping Scoville update")
             return
         }
         
-        print("[token] new APNs token, sending to Scoville")
         Scoville.registerDevice(token: newToken)
         UserDefaults.standard.set(newToken, forKey: apnsDefaultsKey)
     }

@@ -8,6 +8,7 @@
 
 import Foundation
 import Domain
+import ScovilleKit
 
 public class SettingsViewModel: ObservableObject {
     // MARK: - UseCases
@@ -79,8 +80,21 @@ public class SettingsViewModel: ObservableObject {
     }
 
     public func updateMetricSystem(_ isMetric: Bool) {
+        let previousValue = isUsingMetric
         isUsingMetric = isMetric
         setIsUsingMetric(isMetric)
+        
+        // Track unit preference change
+        if previousValue != isMetric {
+            Task { @MainActor in
+                Scoville.track(
+                    FuelTrackrEvents.unitPreferenceChanged,
+                    parameters: [
+                        "unit_system": isMetric ? "metric" : "imperial"
+                    ]
+                )
+            }
+        }
     }
 
     public func updateTireInterval(_ interval: Int) {

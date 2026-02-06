@@ -8,6 +8,7 @@
 import SwiftUI
 import Domain
 import SwiftData
+import ScovilleKit
 
 struct EditFuelUsageSheet: View {
     @StateObject var vehicleViewModel: VehicleViewModel
@@ -131,6 +132,17 @@ struct EditFuelUsageSheet: View {
             isPartialFill: viewModel.isPartialFill,
             context: context
         )
+        
+        // Track fuel usage edited
+        Task { @MainActor in
+            Scoville.track(
+                FuelTrackrEvents.fuelUsageEdited,
+                parameters: [
+                    "is_partial_fill": viewModel.isPartialFill ? "true" : "false"
+                ]
+            )
+        }
+        
         dismiss()
     }
 

@@ -9,6 +9,7 @@
 import SwiftUI
 import SwiftData
 import Domain
+import ScovilleKit
 
 public struct EditVehicleSheet: View {
     public var viewModel: VehicleViewModel
@@ -329,6 +330,17 @@ public struct EditVehicleSheet: View {
             isPurchased: true,
             context: context
         )
+
+        // Track vehicle edit
+        Task { @MainActor in
+            Scoville.track(
+                FuelTrackrEvents.vehicleEdited,
+                parameters: [
+                    "fuel_type": selectedFuelType?.rawValue ?? "unknown",
+                    "has_photo": photo != nil ? "true" : "false"
+                ]
+            )
+        }
 
         dismiss()
     }

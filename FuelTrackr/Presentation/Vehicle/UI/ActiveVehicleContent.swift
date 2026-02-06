@@ -72,10 +72,6 @@ public struct ActiveVehicleContent: View {
                             productionDate: vehicle.manufacturingDate,
                             isUsingMetric: settingsViewModel.isUsingMetric
                         )
-                        .onAppear {
-                            print("BLA \(vehicle.fuelType)")
-                            dump(vehicle)
-                        }
                         .frame(height: 190)
                         .padding(.horizontal, Theme.dimensions.spacingL)
                     }

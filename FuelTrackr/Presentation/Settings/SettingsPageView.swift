@@ -312,6 +312,12 @@ public struct SettingsPageView: View {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                         do {
                             try vehicleViewModel.deleteVehicle(context: context)
+                            
+                            // Track vehicle deletion
+                            Task { @MainActor in
+                                Scoville.track(FuelTrackrEvents.vehicleDeleted)
+                            }
+                            
                             vehicleViewModel.loadActiveVehicle(context: context)
                         } catch {
                             print("Delete failed: \(error)")

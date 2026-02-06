@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Domain
+import ScovilleKit
 
 struct CustomPagingBehavior: ScrollTargetBehavior {
     let pageWidth: CGFloat
@@ -83,6 +84,17 @@ struct VehicleStatisticsCarouselView: View {
                 .frame(height: 213)
 
                 PageControl(numberOfPages: items.count, currentPage: currentIndex ?? 0)
+            }
+            .onAppear {
+                // Track statistics viewed
+                Task { @MainActor in
+                    Scoville.track(
+                        FuelTrackrEvents.statisticsViewed,
+                        parameters: [
+                            "statistics_count": String(items.count)
+                        ]
+                    )
+                }
             }
         }
         .frame(height: 203 + PageControl.Height)

@@ -49,7 +49,6 @@ final class ReviewPrompter: ObservableObject {
     func maybeRequestReview(reason: ReviewTriggerReason) {
         // Check if feedback submission is on cooldown - don't show sheet if user recently submitted feedback
         if isFeedbackOnCooldown {
-            print("⏳ Skipped review prompt — feedback submission is on cooldown")
             Scoville.track(FuelTrackrEvents.reviewPromptSkippedCooldown, parameters: ["reason": reason.rawValue])
             return
         }
@@ -62,7 +61,6 @@ final class ReviewPrompter: ObservableObject {
             if let lastPrompt = UserDefaults.standard.object(forKey: key) as? Date {
                 let daysSince = now.timeIntervalSince(lastPrompt) / 86400
                 guard daysSince >= cooldownDays else {
-                    print("⏳ Skipped review prompt — only \(Int(daysSince)) days since last prompt")
                     Scoville.track(FuelTrackrEvents.reviewPromptSkipped, parameters: [
                         "reason": reason.rawValue,
                         "days_since": String(Int(daysSince))
@@ -74,7 +72,6 @@ final class ReviewPrompter: ObservableObject {
             // Avoid spamming same reason too often
             let reasonKey = "didAskReview_\(reason.rawValue)"
             if UserDefaults.standard.bool(forKey: reasonKey) {
-                print("⚠️ Already asked review for reason: \(reason.rawValue)")
                 return
             }
             UserDefaults.standard.set(true, forKey: reasonKey)
