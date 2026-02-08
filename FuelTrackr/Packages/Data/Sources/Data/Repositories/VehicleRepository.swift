@@ -209,30 +209,72 @@ public class VehicleRepository: VehicleRepositoryProtocol {
         year: Int?,
         context: ModelContext
     ) -> Int {
-        guard
-            let vehicle = try? loadActiveVehicle(context: context),
-            let range = dateRange(forMonth: month, year: year)
-        else { return 0 }
+        let actualYear = year ?? Calendar.current.component(.year, from: Date())
+        print("[getKmDriven] 🔍 Starting calculation for month: \(month), year: \(actualYear)")
+        
+        guard let vehicle = try? loadActiveVehicle(context: context) else {
+            print("[getKmDriven] ❌ No active vehicle found")
+            return 0
+        }
+        print("[getKmDriven] ✅ Vehicle found: \(vehicle.name ?? "Unnamed")")
+        
+        guard let range = dateRange(forMonth: month, year: year) else {
+            print("[getKmDriven] ❌ Failed to calculate date range for month: \(month), year: \(actualYear)")
+            return 0
+        }
+        print("[getKmDriven] 📅 Date range: \(range.start) to \(range.end)")
         
         let allMileages = vehicle.mileages.sorted { $0.date < $1.date }
+        print("[getKmDriven] 📊 Total mileages found: \(allMileages.count)")
+        
+        if allMileages.isEmpty {
+            print("[getKmDriven] ⚠️ No mileage records available")
+            return 0
+        }
+        
+        // Log all mileages for debugging
+        print("[getKmDriven] 📋 All mileages:")
+        for (index, mileage) in allMileages.enumerated() {
+            let isInRange = mileage.date >= range.start && mileage.date <= range.end
+            print("[getKmDriven]   [\(index)] Date: \(mileage.date), Value: \(mileage.value), InRange: \(isInRange)")
+        }
         
         // First mileage in the month
         guard let firstInMonth = allMileages.first(where: { $0.date >= range.start && $0.date <= range.end }) else {
+            print("[getKmDriven] ❌ No mileage found within the month range")
             return 0
         }
+        print("[getKmDriven] ✅ First mileage in month: Date: \(firstInMonth.date), Value: \(firstInMonth.value)")
         
         // Last mileage in the month
         guard let lastInMonth = allMileages.last(where: { $0.date >= range.start && $0.date <= range.end }) else {
+            print("[getKmDriven] ❌ Failed to find last mileage in month (should not happen if first was found)")
             return 0
         }
+        print("[getKmDriven] ✅ Last mileage in month: Date: \(lastInMonth.date), Value: \(lastInMonth.value)")
         
         // Latest mileage BEFORE the first one in the month
-        guard let previousMileage = allMileages.last(where: { $0.date < firstInMonth.date }) else {
-            return 0 // Or assume 0 km if there's no earlier entry
+        let startMileage: Int
+        if let previousMileage = allMileages.last(where: { $0.date < firstInMonth.date }) {
+            print("[getKmDriven] ✅ Previous mileage (before month): Date: \(previousMileage.date), Value: \(previousMileage.value)")
+            startMileage = previousMileage.value
+        } else {
+            // No mileage before the month - use the first mileage in the month as starting point
+            // This calculates distance driven within the month itself
+            print("[getKmDriven] ⚠️ No mileage found before the first mileage in month - using first mileage in month as starting point")
+            startMileage = firstInMonth.value
         }
         
-        let driven = lastInMonth.value - previousMileage.value
-        return max(0, driven) // Avoid negative values
+        let driven = lastInMonth.value - startMileage
+        let result = max(0, driven) // Avoid negative values
+        
+        print("[getKmDriven] 🧮 Calculation: \(lastInMonth.value) - \(startMileage) = \(driven)")
+        if driven < 0 {
+            print("[getKmDriven] ⚠️ Negative value detected, returning 0 instead")
+        }
+        print("[getKmDriven] ✅ Final result: \(result) km driven")
+        
+        return result
     }
     
     public func getAverageFuelUsage(

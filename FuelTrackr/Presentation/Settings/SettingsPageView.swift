@@ -12,6 +12,7 @@ import Domain
 import UserNotifications
 import AppTrackingTransparency
 import ScovilleKit
+import Data
 
 public struct SettingsPageView: View {
     @StateObject public var viewModel: SettingsViewModel
@@ -301,6 +302,28 @@ public struct SettingsPageView: View {
                             .foregroundColor(colors.error)
                     }
                 }
+                
+                #if DEBUG
+                // Debug Section - Notification Testing
+                Section(header: Text("Debug")
+                    .foregroundColor(colors.onSurface)) {
+                    Button(action: {
+                        let notificationManager = NotificationManager(settingsRepository: SettingsRepository())
+                        notificationManager.scheduleTestNotification()
+                        print("🔔 Debug: Test notification scheduled to arrive in 1 minute")
+                    }) {
+                        HStack {
+                            Text("Test Notification (1 min)")
+                                .foregroundColor(colors.primary)
+                                .font(Theme.typography.bodyFont)
+                            Spacer()
+                            Image(systemName: "bell.badge")
+                                .foregroundColor(colors.primary)
+                        }
+                    }
+                    .padding(.vertical, Theme.dimensions.spacingXS)
+                }
+                #endif
             }
             .confirmationDialog(
                 NSLocalizedString("delete_vehicle_confirmation_title", comment: ""),

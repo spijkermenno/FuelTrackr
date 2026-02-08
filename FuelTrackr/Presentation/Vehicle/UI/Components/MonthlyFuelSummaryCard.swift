@@ -87,6 +87,7 @@ public struct MonthlyFuelSummaryCard: View {
     }
     
     private func formatDistance(_ km: Double) -> String {
+        print("KM: \(km)")
         if isUsingMetric {
             return String(format: "%.0f %@", km, NSLocalizedString("unit_km", comment: ""))
         } else {

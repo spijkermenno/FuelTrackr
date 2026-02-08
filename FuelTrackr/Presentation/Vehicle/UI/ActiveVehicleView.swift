@@ -8,6 +8,7 @@
 import SwiftUI
 import Domain
 import SwiftData
+import Data
 import FirebaseAnalytics
 
 public struct ActiveVehicleView: View {
@@ -75,7 +76,13 @@ public struct ActiveVehicleView: View {
         components.second = 0
 
         if let next1st = calendar.date(from: components) {
-            // Schedule monthly recap notification
+            let notificationManager = NotificationManager(settingsRepository: SettingsRepository())
+            notificationManager.scheduleMonthlyRecapNotification(for: next1st)
+            
+            let formatter = DateFormatter()
+            formatter.dateStyle = .full
+            formatter.timeStyle = .short
+            print("📅 Scheduled monthly recap notification for \(formatter.string(from: next1st))")
         }
     }
 }
