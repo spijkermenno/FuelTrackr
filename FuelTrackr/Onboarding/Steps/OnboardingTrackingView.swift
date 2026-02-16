@@ -51,22 +51,6 @@ public struct OnboardingTrackingView: View {
                     .buttonStyle(ScaleButtonStyle())
                     .disabled(isRequesting)
                 }
-                
-                Button(action: {
-                    // Skip - proceed to next step
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                        viewModel.nextStep()
-                    }
-                }) {
-                    Text(NSLocalizedString("onboarding_tracking_skip", comment: "Ask App Not to Track"))
-                        .font(.system(size: 17, weight: .regular))
-                        .foregroundColor(OnboardingColors.primaryBlue)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .background(Color.clear)
-                }
-                .buttonStyle(ScaleButtonStyle())
-                .disabled(isRequesting)
             }
             .padding(.horizontal, 24)
             .padding(.bottom, 24)

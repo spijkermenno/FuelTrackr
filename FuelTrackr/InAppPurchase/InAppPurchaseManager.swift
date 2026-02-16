@@ -56,6 +56,17 @@ struct PurchaseInfo: Equatable {
     }
 }
 
+// MARK: - Scoville IAP Type Mapping
+private func scovilleIAPType(for productId: String) -> InAppPurchaseType {
+    if productId.contains("lifetime") || productId.contains("debug") {
+        return .permanent
+    }
+    if productId.contains("yearly") || productId.contains("monthly") {
+        return .subscription
+    }
+    return .permanent
+}
+
 @MainActor
 class InAppPurchaseManager: ObservableObject {
     static let shared = InAppPurchaseManager()
@@ -76,7 +87,7 @@ class InAppPurchaseManager: ObservableObject {
             hasPreloadedProducts = true
         }
         
-        // Listen for transaction updates
+        // Listen for transaction updates (e.g. purchases completed in background, from other devices)
         Task {
             for await update in StoreKit.Transaction.updates {
                 if case .verified(let transaction) = update {
@@ -87,6 +98,17 @@ class InAppPurchaseManager: ObservableObject {
                         await checkPurchaseStatus()
                         // Finish the transaction
                         await transaction.finish()
+                        // Report IAP to ScovilleKit
+                        Task { @MainActor in
+                            Scoville.reportInAppPurchase(
+                                productId: transaction.productID,
+                                type: scovilleIAPType(for: transaction.productID)
+                            ) { result in
+                                if case .failure(let error) = result {
+                                    print("IAP report failed:", error)
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -126,7 +148,14 @@ class InAppPurchaseManager: ObservableObject {
                     purchaseState = .success
                     
                     Task { @MainActor in
-                        Scoville.track(FuelTrackrEvents.IAPFullPremiumBought)
+                        Scoville.reportInAppPurchase(
+                            productId: transaction.productID,
+                            type: scovilleIAPType(for: transaction.productID)
+                        ) { result in
+                            if case .failure(let error) = result {
+                                print("IAP report failed:", error)
+                            }
+                        }
                         // Trigger review prompt after purchase
                         ReviewPrompter.shared.maybeRequestReview(reason: .purchaseDone)
                     }
@@ -134,38 +163,23 @@ class InAppPurchaseManager: ObservableObject {
                     // Don't auto-reset - let user dismiss the success overlay
                 } else {
                     purchaseState = .failed("Purchase verification failed")
-                    Task { @MainActor in
-                        Scoville.track(FuelTrackrEvents.IAPFailed)
-                    }
                 }
             case .userCancelled:
                 purchaseState = .cancelled
-                Task { @MainActor in
-                    Scoville.track(FuelTrackrEvents.IAPCancelled)
-                }
                 // Reset to idle after a short delay
                 try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
                 purchaseState = .idle
             case .pending:
                 purchaseState = .failed("Purchase is pending approval")
-                Task { @MainActor in
-                    Scoville.track(FuelTrackrEvents.IAPFailed)
-                }
                 try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds
                 purchaseState = .idle
             @unknown default:
                 purchaseState = .failed("Unknown purchase result")
-                Task { @MainActor in
-                    Scoville.track(FuelTrackrEvents.IAPFailed)
-                }
                 try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds
                 purchaseState = .idle
             }
         } catch {
             purchaseState = .failed(error.localizedDescription)
-            Task { @MainActor in
-                Scoville.track(FuelTrackrEvents.IAPFailed)
-            }
             // Reset to idle after a delay
             try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds
             purchaseState = .idle
@@ -196,6 +210,20 @@ class InAppPurchaseManager: ObservableObject {
             
             if foundActivePurchase {
                 purchaseState = .success
+                // Report restored purchase to ScovilleKit
+                let productId = currentPurchaseInfo.productID
+                if !productId.isEmpty {
+                    Task { @MainActor in
+                        Scoville.reportInAppPurchase(
+                            productId: productId,
+                            type: scovilleIAPType(for: productId)
+                        ) { result in
+                            if case .failure(let error) = result {
+                                print("IAP report failed:", error)
+                            }
+                        }
+                    }
+                }
                 // Don't auto-reset - let user dismiss the success overlay
             } else {
                 purchaseState = .failed("No previous purchases found")
@@ -290,14 +318,24 @@ class InAppPurchaseManager: ObservableObject {
     }
     
     func grantProStatus() {
+        let debugProductId = "debug_lifetime_pro"
         hasActiveSubscription = true
         currentPurchaseInfo = PurchaseInfo(
             type: .lifetime,
-            productID: "debug_lifetime_pro",
+            productID: debugProductId,
             transactionID: nil,
             purchaseDate: Date(),
             expirationDate: nil
         )
+        // Report debug purchase to ScovilleKit
+        Scoville.reportInAppPurchase(
+            productId: debugProductId,
+            type: .permanent
+        ) { result in
+            if case .failure(let error) = result {
+                print("IAP report failed:", error)
+            }
+        }
     }
     #endif
     

@@ -240,7 +240,7 @@
 "onboarding_notifications_skip" = "Not Now";
 "onboarding_tracking_title" = "Help Improve FuelTrackr";
 "onboarding_tracking_description" = "We use anonymous tracking to improve the app. We will never track you with personal data or share your information.";
-"onboarding_tracking_allow" = "Allow Tracking";
+"onboarding_tracking_allow" = "Continue";
 "onboarding_tracking_skip" = "Ask App Not to Track";
 "onboarding_unit_selection_title" = "Distance & Consumption";
 "onboarding_unit_selection_question" = "Which units do you use for distance and fuel consumption?";

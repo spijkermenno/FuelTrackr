@@ -239,7 +239,7 @@
 "onboarding_notifications_skip" = "Niet Nu";
 "onboarding_tracking_title" = "Help FuelTrackr Verbeteren";
 "onboarding_tracking_description" = "We gebruiken anonieme tracking om de app te verbeteren. We zullen je nooit volgen met persoonlijke gegevens of je informatie delen.";
-"onboarding_tracking_allow" = "Tracking Toestaan";
+"onboarding_tracking_allow" = "Doorgaan";
 "onboarding_tracking_skip" = "Vraag App Niet te Volgen";
 "onboarding_unit_selection_title" = "Afstand & Verbruik";
 "onboarding_unit_selection_question" = "Welke eenheden gebruik je voor afstand en brandstofverbruik?";
