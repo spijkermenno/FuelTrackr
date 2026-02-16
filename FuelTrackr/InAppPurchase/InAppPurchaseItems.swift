@@ -5,6 +5,8 @@
 //  Created by Menno Spijker on 15/01/2026.
 //
 
+import Foundation
+
 enum InAppPurchaseItems: CaseIterable {
     case FullPremiumLifeTime
     case PremiumMonthly
@@ -24,22 +26,22 @@ enum InAppPurchaseItems: CaseIterable {
     func getTitle() -> String {
         switch self {
         case .FullPremiumLifeTime:
-            return "Full Premium Unlock" // Replace with L18N
+            return NSLocalizedString("pro_lifetime_title", comment: "")
         case .PremiumMonthly:
-            return "Montly"
+            return NSLocalizedString("pro_monthly_title", comment: "")
         case .PremiumYearly:
-            return "Yearly"
+            return NSLocalizedString("pro_yearly_title", comment: "")
         }
     }
     
     func getDescription() -> String {
         switch self {
         case .FullPremiumLifeTime:
-            return "Unlock all features" // Replace with L18N
+            return NSLocalizedString("pro_feature_unlimited_history_subtitle", comment: "")
         case .PremiumMonthly:
-            return "Monthly Des"
+            return NSLocalizedString("pro_billed_monthly", comment: "")
         case .PremiumYearly:
-            return "Yearly Des"
+            return NSLocalizedString("pro_billed_annually", comment: "")
         }
     }
 }

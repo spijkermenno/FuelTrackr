@@ -10,216 +10,416 @@
 import SwiftUI
 import Domain
 import UserNotifications
-
+import AppTrackingTransparency
+import ScovilleKit
+import Data
 
 public struct SettingsPageView: View {
     @StateObject public var viewModel: SettingsViewModel
     @StateObject public var vehicleViewModel: VehicleViewModel
+    @StateObject private var purchaseManager = InAppPurchaseManager.shared
     
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
-        
-    @State private var showResetConfirmation = false
-    @State private var resetType: ResetType = .none
-    @State private var resetMessage: String?
-    @State private var showNotification = false
+    @Environment(\.colorScheme) private var colorScheme
+    
     @State private var showAlert = false
     @State private var alertTitle = ""
     @State private var alertMessage = ""
     @State private var showDeleteConfirmation = false
+    @State private var showPayWall = false
+    @State private var notificationAuthorizationStatus: UNAuthorizationStatus = .notDetermined
+    @State private var trackingAuthorizationStatus: ATTrackingManager.AuthorizationStatus = .notDetermined
+    @StateObject private var reviewPrompter = ReviewPrompter.shared
+    @State private var showAppSuggestion = false
     
-    private enum ResetType {
-        case maintenance
-        case fuelUsage
-        case none
+    private var colors: ColorsProtocol {
+        Theme.colors(for: colorScheme)
     }
     
     public var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
-                if showNotification, let message = resetMessage {
-                    Text(message)
-                        .font(Theme.typography.footnoteFont)
-                        .foregroundColor(.white)
-                        .padding(Theme.dimensions.spacingM)
-                        .frame(maxWidth: .infinity)
-                        .background(Theme.colors.onSurface.opacity(0.7))
-                        .cornerRadius(Theme.dimensions.radiusCard)
-                        .padding([.leading, .trailing, .top], Theme.dimensions.spacingM)
-                        .transition(.slide)
-                        .zIndex(1)
-                }
-                
-                Form {
-                    // Notifications
-                    Section(header: Text(NSLocalizedString("notifications_section", comment: ""))) {
-                        Toggle(NSLocalizedString("enable_notifications", comment: ""), isOn: $viewModel.isNotificationsEnabled)
-                            .onChange(of: viewModel.isNotificationsEnabled) { newValue in
-                                viewModel.updateNotifications(newValue)
-                                if newValue {
-                                    requestNotificationPermission()
-                                }
+            List {
+                // Subscription/Purchase Status
+                Section(header: Text(NSLocalizedString("pro_status", comment: ""))
+                    .foregroundColor(colors.onSurface)) {
+                    if purchaseManager.hasActiveSubscription {
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text(purchaseManager.currentPurchaseInfo.displayName)
+                                    .font(Theme.typography.bodyFont)
+                                    .foregroundColor(colors.onBackground)
+                                Spacer()
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(colors.success)
                             }
+                            
+                            if let purchaseDate = purchaseManager.currentPurchaseInfo.purchaseDate {
+                                Text(String(format: NSLocalizedString("pro_purchased", comment: ""), formatDate(purchaseDate)))
+                                    .font(Theme.typography.footnoteFont)
+                                    .foregroundColor(colors.onSurface)
+                            }
+                            
+                            if let expirationDate = purchaseManager.currentPurchaseInfo.expirationDate,
+                               purchaseManager.currentPurchaseInfo.type != .lifetime {
+                                Text(String(format: NSLocalizedString("pro_renews", comment: ""), formatDate(expirationDate)))
+                                    .font(Theme.typography.footnoteFont)
+                                    .foregroundColor(colors.onSurface)
+                            }
+                            
+                            if purchaseManager.currentPurchaseInfo.type == .lifetime {
+                                Text(NSLocalizedString("pro_never_expires", comment: ""))
+                                    .font(Theme.typography.footnoteFont)
+                                    .foregroundColor(colors.onSurface)
+                            }
+                        }
+                        .padding(.vertical, Theme.dimensions.spacingXS)
                         
-                        Text(NSLocalizedString("notifications_disclaimer", comment: ""))
-                            .font(Theme.typography.footnoteFont)
-                            .foregroundColor(Theme.colors.onSurface)
-                            .padding(.vertical, Theme.dimensions.spacingS)
+                        // Cancel subscription button (only for subscriptions)
+                        if purchaseManager.currentPurchaseInfo.type != .lifetime {
+                            Button(action: {
+                                purchaseManager.openSubscriptionManagement()
+                            }) {
+                                    HStack {
+                                        Text(NSLocalizedString("pro_manage_subscription", comment: ""))
+                                            .foregroundColor(colors.primary)
+                                            .font(Theme.typography.bodyFont)
+                                        Spacer()
+                                        Image(systemName: "arrow.up.right.square")
+                                            .foregroundColor(colors.primary)
+                                    }
+                            }
+                            .padding(.vertical, Theme.dimensions.spacingXS)
+                        }
                         
+                        #if DEBUG
                         Button(action: {
-                            resetMessage = NSLocalizedString("test_notification_success", comment: "")
-                            showNotification = true
-                            hideNotificationAfterDelay()
+                            purchaseManager.removeProStatus()
                         }) {
-                            Text(NSLocalizedString("test_notification", comment: ""))
-                                .foregroundColor(Theme.colors.primary)
+                            Text(NSLocalizedString("pro_remove_debug", comment: ""))
+                                .foregroundColor(colors.error)
                                 .font(Theme.typography.bodyFont)
                         }
                         .padding(.vertical, Theme.dimensions.spacingXS)
-                        .disabled(!viewModel.isNotificationsEnabled)
-                    }
-                    
-                    // Currency
-                    Section(header: Text(NSLocalizedString("currency_section", comment: ""))) {
-                        Menu {
-                            ForEach(Currency.allCases, id: \.self) { currency in
-                                Button(action: {
-                                    viewModel.updateCurrency(currency)
-                                }) {
-                                    Text(currency.displayName)
-                                        .font(Theme.typography.bodyFont)
-                                }
-                            }
-                        } label: {
+                        #endif
+                    } else {
+                        Button(action: {
+                            showPayWall = true
+                        }) {
                             HStack {
-                                Text(NSLocalizedString("select_currency", comment: ""))
+                                Text(NSLocalizedString("pro_upgrade", comment: ""))
+                                    .foregroundColor(colors.primary)
                                     .font(Theme.typography.bodyFont)
                                 Spacer()
-                                Text(viewModel.selectedCurrency.symbol)
-                                    .foregroundColor(Theme.colors.onSurface)
-                                    .font(Theme.typography.bodyFont)
+                                Image(systemName: "arrow.right.circle.fill")
+                                    .foregroundColor(colors.primary)
                             }
                         }
-                    }
-                    
-                    // Units
-                    Section(header: Text(NSLocalizedString("units_section", comment: ""))) {
-                        Toggle(NSLocalizedString("use_metric_units", comment: ""), isOn: $viewModel.isUsingMetric)
-                            .onChange(of: viewModel.isUsingMetric) { newValue in
-                                viewModel.updateMetricSystem(newValue)
-                            }
+                        .padding(.vertical, Theme.dimensions.spacingXS)
                         
-                        Toggle(NSLocalizedString("use_imperial_units", comment: ""), isOn: Binding(
-                            get: { !viewModel.isUsingMetric },
-                            set: { newValue in
-                                viewModel.updateMetricSystem(!newValue)
-                            }
-                        ))
-                    }
-                    
-                    // Maintenance Intervals
-                    Section(header: Text(NSLocalizedString("default_maintenance_intervals", comment: ""))) {
-                        Text(NSLocalizedString("maintenance_interval_description", comment: ""))
-                            .font(Theme.typography.footnoteFont)
-                            .foregroundColor(Theme.colors.onBackground)
-                            .padding(.vertical, Theme.dimensions.spacingS)
-                        
-                        MaintenanceIntervalRow(
-                            title: NSLocalizedString("tires", comment: ""),
-                            value: $viewModel.defaultTireInterval,
-                            unit: viewModel.isUsingMetric ? "km" : "mi"
-                        ) { viewModel.updateTireInterval($0) }
-                        
-                        MaintenanceIntervalRow(
-                            title: NSLocalizedString("oil_change", comment: ""),
-                            value: $viewModel.defaultOilChangeInterval,
-                            unit: viewModel.isUsingMetric ? "km" : "mi"
-                        ) { viewModel.updateOilChangeInterval($0) }
-                        
-                        MaintenanceIntervalRow(
-                            title: NSLocalizedString("brakes", comment: ""),
-                            value: $viewModel.defaultBrakeCheckInterval,
-                            unit: viewModel.isUsingMetric ? "km" : "mi"
-                        ) { viewModel.updateBrakeCheckInterval($0) }
-                    }
-                    
-                    // Reset
-                    Section(header: Text(NSLocalizedString("reset_section", comment: ""))) {
+                        #if DEBUG
                         Button(action: {
-                            resetType = .maintenance
-                            showResetConfirmation = true
+                            purchaseManager.grantProStatus()
                         }) {
-                            Text(NSLocalizedString("reset_maintenance_button", comment: ""))
-                                .foregroundColor(Theme.colors.error)
+                            Text(NSLocalizedString("pro_grant_debug", comment: ""))
+                                .foregroundColor(colors.primary)
+                                .font(Theme.typography.bodyFont)
                         }
-                        
-                        Button(action: {
-                            resetType = .fuelUsage
-                            showResetConfirmation = true
-                        }) {
-                            Text(NSLocalizedString("reset_fuel_button", comment: ""))
-                                .foregroundColor(Theme.colors.error)
+                        .padding(.vertical, Theme.dimensions.spacingXS)
+                        #endif
+                    }
+                }
+                
+                // Notifications Section
+                Section(header: Text(NSLocalizedString("notifications_section", comment: ""))
+                    .foregroundColor(colors.onSurface)) {
+                    Toggle(isOn: Binding(
+                        get: { notificationAuthorizationStatus == .authorized },
+                        set: { newValue in
+                            if newValue {
+                                // Request permission if not determined
+                                if notificationAuthorizationStatus == .notDetermined {
+                                    requestNotificationPermission()
+                                } else if notificationAuthorizationStatus == .denied {
+                                    // Open settings if denied
+                                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                                        UIApplication.shared.open(url)
+                                    }
+                                }
+                            } else {
+                                // If trying to disable, open settings
+                                if let url = URL(string: UIApplication.openSettingsURLString) {
+                                    UIApplication.shared.open(url)
+                                }
+                            }
+                            viewModel.updateNotifications(newValue)
                         }
-                        
-                        Button(action: {
-                            showDeleteConfirmation = true
-                        }) {
-                            Text(NSLocalizedString("delete_vehicle_button", comment: ""))
-                                .foregroundColor(Theme.colors.error)
+                    )) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(NSLocalizedString("notifications_toggle", comment: ""))
+                                .font(Theme.typography.bodyFont)
+                                .foregroundColor(colors.onBackground)
+                            Text(NSLocalizedString("notifications_toggle_description", comment: ""))
+                                .font(Theme.typography.captionFont)
+                                .foregroundColor(colors.onSurface)
                         }
                     }
                 }
-                .confirmationDialog(
-                    NSLocalizedString("delete_vehicle_confirmation_title", comment: ""),
-                    isPresented: $showDeleteConfirmation,
-                    titleVisibility: .visible
+                
+                // Tracking Section
+                Section(header: Text(NSLocalizedString("tracking_toggle", comment: ""))
+                    .foregroundColor(colors.onSurface)) {
+                    Toggle(isOn: Binding(
+                        get: { trackingAuthorizationStatus == .authorized },
+                        set: { newValue in
+                            if newValue {
+                                // Request permission if not determined
+                                if trackingAuthorizationStatus == .notDetermined {
+                                    requestTrackingPermission()
+                                } else if trackingAuthorizationStatus == .denied || trackingAuthorizationStatus == .restricted {
+                                    // Open settings if denied or restricted
+                                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                                        UIApplication.shared.open(url)
+                                    }
+                                }
+                            } else {
+                                // If trying to disable, open settings
+                                if let url = URL(string: UIApplication.openSettingsURLString) {
+                                    UIApplication.shared.open(url)
+                                }
+                            }
+                        }
+                    )) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(NSLocalizedString("tracking_toggle", comment: ""))
+                                .font(Theme.typography.bodyFont)
+                                .foregroundColor(colors.onBackground)
+                            Text(NSLocalizedString("tracking_toggle_description", comment: ""))
+                                .font(Theme.typography.captionFont)
+                                .foregroundColor(colors.onSurface)
+                        }
+                    }
+                }
+                
+                // Help & Feedback Section
+                Section(
+                    header: Text(NSLocalizedString("help_feedback_section", comment: ""))
+                        .foregroundColor(colors.onSurface),
+                    footer: Text(NSLocalizedString("help_feedback_footer", comment: ""))
+                        .font(Theme.typography.captionFont)
+                        .foregroundColor(colors.onSurface)
                 ) {
-                    Button(NSLocalizedString("delete_confirmation_delete", comment: ""), role: .destructive) {
+                    Button(action: {
+                        Scoville.track(FuelTrackrEvents.reviewButtonClicked)
                         dismiss()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                            do {
-                                try vehicleViewModel.deleteVehicle(context: context)
-                                vehicleViewModel.loadActiveVehicle(context: context)
-                            } catch {
-                                print("Delete failed: \(error)")
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            ReviewPrompter.shared.maybeRequestReview(reason: .debug)
+                        }
+                    }) {
+                        HStack(spacing: 12) {
+                            Image(systemName: "star.fill")
+                                .font(.title3)
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: reviewPrompter.isFeedbackOnCooldown ? [colors.onSurface, colors.onSurface.opacity(0.7)] : [.yellow, .orange],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .frame(width: 32, height: 32)
+                            
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(NSLocalizedString("review_app", comment: ""))
+                                    .font(Theme.typography.bodyFont)
+                                    .foregroundColor(reviewPrompter.isFeedbackOnCooldown ? colors.onSurface : colors.onBackground)
+                                if reviewPrompter.isFeedbackOnCooldown {
+                                    Text(NSLocalizedString("review_recent_feedback", comment: ""))
+                                        .font(Theme.typography.captionFont)
+                                        .foregroundColor(colors.onSurface)
+                                } else {
+                                    Text(NSLocalizedString("review_share_opinion", comment: ""))
+                                        .font(Theme.typography.captionFont)
+                                        .foregroundColor(colors.onSurface)
+                                }
+                            }
+                            
+                            Spacer()
+                            
+                            if !reviewPrompter.isFeedbackOnCooldown {
+                                Image(systemName: "chevron.right")
+                                    .font(.caption)
+                                    .foregroundColor(colors.onSurface)
                             }
                         }
+                        .padding(.vertical, 4)
                     }
-                    Button(NSLocalizedString("cancel", comment: ""), role: .cancel) {}
-                }
-                .confirmationDialog(
-                    NSLocalizedString("reset_confirmation_title", comment: ""),
-                    isPresented: $showResetConfirmation,
-                    titleVisibility: .visible
-                ) {
-                    Button(NSLocalizedString("reset_confirmation_confirm", comment: ""), role: .destructive) {
-                        // Implement reset logic
+                    .disabled(reviewPrompter.isFeedbackOnCooldown)
+                    .accessibilityLabel(NSLocalizedString("review_app", comment: ""))
+                    
+                    Button(action: {
+                        Scoville.track(FuelTrackrEvents.suggestionButtonClicked)
+                        showAppSuggestion = true
+                    }) {
+                        HStack(spacing: 12) {
+                            Image(systemName: "lightbulb.fill")
+                                .font(.title3)
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [.yellow, .orange],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .frame(width: 32, height: 32)
+                            
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(NSLocalizedString("app_suggestion", comment: ""))
+                                    .font(Theme.typography.bodyFont)
+                                    .foregroundColor(colors.onBackground)
+                                Text(NSLocalizedString("app_suggestion_subtitle", comment: ""))
+                                    .font(Theme.typography.captionFont)
+                                    .foregroundColor(colors.onSurface)
+                            }
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundColor(colors.onSurface)
+                        }
+                        .padding(.vertical, 4)
                     }
-                    Button(NSLocalizedString("cancel", comment: ""), role: .cancel) {}
+                    .accessibilityLabel(NSLocalizedString("app_suggestion", comment: ""))
                 }
+                
+                // Reset Vehicle
+                Section(header: Text(NSLocalizedString("reset_section", comment: ""))
+                    .foregroundColor(colors.onSurface)) {
+                    Button(action: {
+                        showDeleteConfirmation = true
+                    }) {
+                        Text(NSLocalizedString("delete_vehicle_button", comment: ""))
+                            .foregroundColor(colors.error)
+                    }
+                }
+                
+                #if DEBUG
+                // Debug Section - Notification Testing
+                Section(header: Text("Debug")
+                    .foregroundColor(colors.onSurface)) {
+                    Button(action: {
+                        let notificationManager = NotificationManager(settingsRepository: SettingsRepository())
+                        notificationManager.scheduleTestNotification()
+                        print("🔔 Debug: Test notification scheduled to arrive in 1 minute")
+                    }) {
+                        HStack {
+                            Text("Test Notification (1 min)")
+                                .foregroundColor(colors.primary)
+                                .font(Theme.typography.bodyFont)
+                            Spacer()
+                            Image(systemName: "bell.badge")
+                                .foregroundColor(colors.primary)
+                        }
+                    }
+                    .padding(.vertical, Theme.dimensions.spacingXS)
+                }
+                #endif
+            }
+            .confirmationDialog(
+                NSLocalizedString("delete_vehicle_confirmation_title", comment: ""),
+                isPresented: $showDeleteConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button(NSLocalizedString("delete_confirmation_delete", comment: ""), role: .destructive) {
+                    dismiss()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        do {
+                            try vehicleViewModel.deleteVehicle(context: context)
+                            
+                            // Track vehicle deletion
+                            Task { @MainActor in
+                                Scoville.track(FuelTrackrEvents.vehicleDeleted)
+                            }
+                            
+                            vehicleViewModel.loadActiveVehicle(context: context)
+                        } catch {
+                            print("Delete failed: \(error)")
+                        }
+                    }
+                }
+                Button(NSLocalizedString("cancel", comment: ""), role: .cancel) {}
+            }
+            .navigationTitle(NSLocalizedString("settings_title", comment: ""))
+            .navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented: $showPayWall) {
+                InAppPurchasePayWall()
+            }
+            .sheet(isPresented: $showAppSuggestion) {
+                AppSuggestionView(isPresented: $showAppSuggestion)
+            }
+            .alert(isPresented: $showAlert) {
+                Alert(
+                    title: Text(alertTitle),
+                    message: Text(alertMessage),
+                    dismissButton: .default(Text(NSLocalizedString("ok", comment: "")))
+                )
             }
         }
-        .background(Theme.colors.background)
-        .navigationTitle(NSLocalizedString("settings_title", comment: ""))
-        .navigationBarTitleDisplayMode(.inline)
-        .alert(isPresented: $showAlert) {
-            Alert(
-                title: Text(alertTitle),
-                message: Text(alertMessage),
-                dismissButton: .default(Text(NSLocalizedString("ok", comment: "")))
-            )
+        .background(colors.background)
+        .task {
+            await purchaseManager.checkPurchaseStatus()
+            checkNotificationStatus()
+            checkTrackingStatus()
+        }
+        .onAppear {
+            checkNotificationStatus()
+            checkTrackingStatus()
+            // Reset review sheet state when view appears to prevent auto-opening
+            if reviewPrompter.showCustomReview {
+                reviewPrompter.showCustomReview = false
+            }
         }
     }
     
-    private func hideNotificationAfterDelay() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            withAnimation {
-                showNotification = false
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        formatter.locale = Locale.current
+        return formatter.string(from: date)
+    }
+    
+    private func checkNotificationStatus() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            let status = settings.authorizationStatus
+            Task { @MainActor in
+                self.notificationAuthorizationStatus = status
             }
         }
+    }
+    
+    private func checkTrackingStatus() {
+        trackingAuthorizationStatus = ATTrackingManager.trackingAuthorizationStatus
     }
     
     private func requestNotificationPermission() {
-        // Notification permission request implementation
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+            if granted {
+                DispatchQueue.main.async {
+                    UIApplication.shared.registerForRemoteNotifications()
+                }
+            }
+            Task { @MainActor in
+                checkNotificationStatus()
+            }
+        }
+    }
+    
+    private func requestTrackingPermission() {
+        ATTrackingManager.requestTrackingAuthorization { status in
+            Task { @MainActor in
+                checkTrackingStatus()
+            }
+        }
     }
 }

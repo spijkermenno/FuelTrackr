@@ -9,6 +9,7 @@
 
 import SwiftUI
 import Domain
+import ScovilleKit
 
 
  struct AddMaintenanceSheet: View {
@@ -222,6 +223,20 @@ import Domain
         )
         
         viewModel.saveMaintenance(maintenance: maintenance, context: context)
+        
+        // Track maintenance creation
+        Task { @MainActor in
+            Scoville.track(
+                FuelTrackrEvents.maintenanceTracked,
+                parameters: [
+                    "type": selectedType.rawValue,
+                    "cost": String(costValue),
+                    "is_free": isFree ? "true" : "false",
+                    "has_notes": (selectedType == .other && !notes.isEmpty) ? "true" : "false"
+                ]
+            )
+        }
+        
         dismiss()
     }
     

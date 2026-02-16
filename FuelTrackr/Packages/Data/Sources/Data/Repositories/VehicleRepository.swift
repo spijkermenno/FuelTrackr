@@ -72,29 +72,14 @@ public class VehicleRepository: VehicleRepositoryProtocol {
             
             // Migrate existing fuel usages to detect partial fills
             // Only detect if not manually set and we have enough data
-            print("🔄 [VehicleRepository] Migrating vehicle: \(vehicle.name)")
-            print("   Total fuel usages: \(vehicle.fuelUsages.count)")
-            
             if PartialFillDetector.canDetectPartialFills(vehicle: vehicle) {
-                print("   ✅ Can detect partial fills - processing \(vehicle.fuelUsages.count) entries...")
-                var detectedCount = 0
                 for fuelUsage in vehicle.fuelUsages {
                     // Only auto-detect if not manually set
                     if !fuelUsage.isPartialFillManuallySet {
-                        let wasPartial = fuelUsage.isPartialFill
                         let isPartialFill = PartialFillDetector.detectPartialFill(liters: fuelUsage.liters, vehicle: vehicle)
                         fuelUsage.isPartialFill = isPartialFill
-                        if isPartialFill && !wasPartial {
-                            detectedCount += 1
-                            print("   🔍 Detected partial fill: \(String(format: "%.2f", fuelUsage.liters))L")
-                        }
-                    } else {
-                        print("   ⏭️  Skipping manually set entry: \(String(format: "%.2f", fuelUsage.liters))L (isPartial: \(fuelUsage.isPartialFill))")
                     }
                 }
-                print("   ✅ Migration complete: \(detectedCount) new partial fills detected")
-            } else {
-                print("   ⚠️  Not enough data for detection (need \(PartialFillDetector.minimumRefillsForDetection) refills)")
             }
         }
         try context.save()
@@ -117,7 +102,6 @@ public class VehicleRepository: VehicleRepositoryProtocol {
         )
         
         // Detect if this is a partial fill (only if not manually set before)
-        print("💾 [VehicleRepository] Saving fuel usage: \(liters)L @ \(mileageValue)km")
         let isPartialFill = PartialFillDetector.detectPartialFill(liters: liters, vehicle: vehicle)
         
         let fuelUsage = FuelUsage(
@@ -131,7 +115,6 @@ public class VehicleRepository: VehicleRepositoryProtocol {
         )
         vehicle.fuelUsages.append(fuelUsage)
         
-        print("💾 [VehicleRepository] Fuel usage saved: \(isPartialFill ? "MARKED AS PARTIAL" : "MARKED AS FULL")")
         try context.save()
     }
     
@@ -226,30 +209,72 @@ public class VehicleRepository: VehicleRepositoryProtocol {
         year: Int?,
         context: ModelContext
     ) -> Int {
-        guard
-            let vehicle = try? loadActiveVehicle(context: context),
-            let range = dateRange(forMonth: month, year: year)
-        else { return 0 }
+        let actualYear = year ?? Calendar.current.component(.year, from: Date())
+        print("[getKmDriven] 🔍 Starting calculation for month: \(month), year: \(actualYear)")
+        
+        guard let vehicle = try? loadActiveVehicle(context: context) else {
+            print("[getKmDriven] ❌ No active vehicle found")
+            return 0
+        }
+        print("[getKmDriven] ✅ Vehicle found: \(vehicle.name ?? "Unnamed")")
+        
+        guard let range = dateRange(forMonth: month, year: year) else {
+            print("[getKmDriven] ❌ Failed to calculate date range for month: \(month), year: \(actualYear)")
+            return 0
+        }
+        print("[getKmDriven] 📅 Date range: \(range.start) to \(range.end)")
         
         let allMileages = vehicle.mileages.sorted { $0.date < $1.date }
+        print("[getKmDriven] 📊 Total mileages found: \(allMileages.count)")
+        
+        if allMileages.isEmpty {
+            print("[getKmDriven] ⚠️ No mileage records available")
+            return 0
+        }
+        
+        // Log all mileages for debugging
+        print("[getKmDriven] 📋 All mileages:")
+        for (index, mileage) in allMileages.enumerated() {
+            let isInRange = mileage.date >= range.start && mileage.date <= range.end
+            print("[getKmDriven]   [\(index)] Date: \(mileage.date), Value: \(mileage.value), InRange: \(isInRange)")
+        }
         
         // First mileage in the month
         guard let firstInMonth = allMileages.first(where: { $0.date >= range.start && $0.date <= range.end }) else {
+            print("[getKmDriven] ❌ No mileage found within the month range")
             return 0
         }
+        print("[getKmDriven] ✅ First mileage in month: Date: \(firstInMonth.date), Value: \(firstInMonth.value)")
         
         // Last mileage in the month
         guard let lastInMonth = allMileages.last(where: { $0.date >= range.start && $0.date <= range.end }) else {
+            print("[getKmDriven] ❌ Failed to find last mileage in month (should not happen if first was found)")
             return 0
         }
+        print("[getKmDriven] ✅ Last mileage in month: Date: \(lastInMonth.date), Value: \(lastInMonth.value)")
         
         // Latest mileage BEFORE the first one in the month
-        guard let previousMileage = allMileages.last(where: { $0.date < firstInMonth.date }) else {
-            return 0 // Or assume 0 km if there's no earlier entry
+        let startMileage: Int
+        if let previousMileage = allMileages.last(where: { $0.date < firstInMonth.date }) {
+            print("[getKmDriven] ✅ Previous mileage (before month): Date: \(previousMileage.date), Value: \(previousMileage.value)")
+            startMileage = previousMileage.value
+        } else {
+            // No mileage before the month - use the first mileage in the month as starting point
+            // This calculates distance driven within the month itself
+            print("[getKmDriven] ⚠️ No mileage found before the first mileage in month - using first mileage in month as starting point")
+            startMileage = firstInMonth.value
         }
         
-        let driven = lastInMonth.value - previousMileage.value
-        return max(0, driven) // Avoid negative values
+        let driven = lastInMonth.value - startMileage
+        let result = max(0, driven) // Avoid negative values
+        
+        print("[getKmDriven] 🧮 Calculation: \(lastInMonth.value) - \(startMileage) = \(driven)")
+        if driven < 0 {
+            print("[getKmDriven] ⚠️ Negative value detected, returning 0 instead")
+        }
+        print("[getKmDriven] ✅ Final result: \(result) km driven")
+        
+        return result
     }
     
     public func getAverageFuelUsage(
@@ -323,24 +348,3 @@ public class VehicleRepository: VehicleRepositoryProtocol {
     
 }
 
-extension Vehicle {
- public func print() {
-        let mileages     = self.mileages.map { "\($0.value)" }
-        let fuelUsages   = self.fuelUsages
-            .map { "Liters: \($0.liters), Cost: \($0.cost), Date: \($0.date)" }
-        let maintenances = self.maintenances
-            .map { "\($0.type.rawValue), Cost: \($0.cost), Date: \($0.date)" }
-
-     Swift.print("--- Active Vehicle Info ---")
-     Swift.print("Name: \(self.name)")
-     Swift.print("License Plate: \(self.licensePlate)")
-     Swift.print("Purchase Date: \(self.purchaseDate)")
-     Swift.print("Manufacturing Date: \(self.manufacturingDate)")
-     Swift.print("Is Purchased: \(self.isPurchased.map(String.init) ?? "nil")")
-     Swift.print("Photo size: \(self.photo?.count ?? 0) bytes")
-     Swift.print("Mileages: \(mileages)")
-     Swift.print("Fuel Usages: \(fuelUsages)")
-     Swift.print("Maintenances: \(maintenances)")
-     Swift.print("--------------------------")
-    }
-}

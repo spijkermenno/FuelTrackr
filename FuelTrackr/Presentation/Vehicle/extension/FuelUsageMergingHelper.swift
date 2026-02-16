@@ -18,19 +18,12 @@ struct FuelUsageMergingHelper {
         var groups: [[FuelUsage]] = []
         var currentGroup: [FuelUsage] = []
         
-        print("🔄 [FuelUsageMergingHelper] Grouping \(sorted.count) fuel usages...")
-        
-        for (index, usage) in sorted.enumerated() {
-            let isPartial = usage.isPartialFill
-            print("   Entry \(index + 1): \(String(format: "%.2f", usage.liters))L @ \(usage.mileage?.value ?? 0)km - \(isPartial ? "PARTIAL" : "FULL")")
-            
+        for usage in sorted {
             currentGroup.append(usage)
             
             // If this is not a partial fill, close the current group
             if !usage.isPartialFill {
                 if !currentGroup.isEmpty {
-                    let totalFuel = currentGroup.reduce(0.0) { $0 + $1.liters }
-                    print("   → Closing group with \(currentGroup.count) entries, total: \(String(format: "%.2f", totalFuel))L")
                     groups.append(currentGroup)
                     currentGroup = []
                 }
@@ -40,12 +33,9 @@ struct FuelUsageMergingHelper {
         // If there are remaining partial fills at the end, add them as a group
         // (they'll show 0 consumption until a full fill is added)
         if !currentGroup.isEmpty {
-            let totalFuel = currentGroup.reduce(0.0) { $0 + $1.liters }
-            print("   → Final group (partial fills only) with \(currentGroup.count) entries, total: \(String(format: "%.2f", totalFuel))L")
             groups.append(currentGroup)
         }
         
-        print("🔄 [FuelUsageMergingHelper] Created \(groups.count) merged group(s)")
         return groups
     }
     
@@ -53,40 +43,43 @@ struct FuelUsageMergingHelper {
     /// - Parameters:
     ///   - group: Array of fuel usages (partial fills + final full fill)
     ///   - previousMileage: The mileage before this group started
-    /// - Returns: Consumption rate (km/l) or nil if calculation not possible
-    static func calculateConsumptionForGroup(_ group: [FuelUsage], previousMileage: Int?) -> Double? {
+    ///   - fuelType: The vehicle's fuel type
+    ///   - isUsingMetric: Whether to use metric or imperial units
+    /// - Returns: Consumption rate (in appropriate unit for fuel type) or nil if calculation not possible
+    static func calculateConsumptionForGroup(
+        _ group: [FuelUsage],
+        previousMileage: Int?,
+        fuelType: FuelType? = nil,
+        isUsingMetric: Bool = true
+    ) -> Double? {
         guard let lastUsage = group.last,
               let endMileage = lastUsage.mileage?.value else {
-            print("   ❌ [FuelUsageMergingHelper] Cannot calculate: missing end mileage")
             return nil
         }
         
         guard let startMileage = previousMileage else {
-            print("   ❌ [FuelUsageMergingHelper] Cannot calculate: missing start mileage")
             return nil
         }
         
         guard endMileage > startMileage else {
-            print("   ❌ [FuelUsageMergingHelper] Cannot calculate: end (\(endMileage)) <= start (\(startMileage))")
             return nil
         }
         
         // Sum all fuel in the group
         let totalFuel = group.reduce(0.0) { $0 + $1.liters }
         guard totalFuel > 0 else {
-            print("   ❌ [FuelUsageMergingHelper] Cannot calculate: total fuel is 0")
             return nil
         }
         
         let distance = Double(endMileage - startMileage)
-        let consumption = distance / totalFuel
         
-        print("   ✅ [FuelUsageMergingHelper] Consumption calculated:")
-        print("      - Distance: \(distance) km (\(startMileage) → \(endMileage))")
-        print("      - Total fuel: \(String(format: "%.2f", totalFuel)) L")
-        print("      - Consumption: \(String(format: "%.2f", consumption)) km/L")
-        
-        return consumption
+        // Use fuel type-aware calculation if available, otherwise fall back to liquid (km/L)
+        let fuelTypeToUse = fuelType ?? .liquid
+        return fuelTypeToUse.calculateConsumption(
+            distance: distance,
+            fuelAmount: totalFuel,
+            isUsingMetric: isUsingMetric
+        )
     }
 }
 

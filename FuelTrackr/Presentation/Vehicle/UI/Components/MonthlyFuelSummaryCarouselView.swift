@@ -50,6 +50,10 @@ public struct MonthlyFuelSummaryCarouselView: View {
         vehicleViewModel.monthlyFuelSummaries(context: context)
     }
     
+    private var vehicleFuelType: FuelType? {
+        try? vehicleViewModel.resolvedVehicle(context: context)?.fuelType
+    }
+    
     public var body: some View {
         if summaries.isEmpty {
             EmptyView()
@@ -70,7 +74,8 @@ public struct MonthlyFuelSummaryCarouselView: View {
 
                                     MonthlyFuelSummaryCard(
                                         summary: summary,
-                                        isUsingMetric: isUsingMetric
+                                        isUsingMetric: isUsingMetric,
+                                        fuelType: vehicleFuelType
                                     )
                                     .frame(width: cardWidth, height: 210)
                                     .padding(.horizontal, spacing / 2)

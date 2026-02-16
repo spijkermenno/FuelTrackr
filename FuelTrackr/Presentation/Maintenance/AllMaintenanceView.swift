@@ -10,6 +10,7 @@
 import SwiftUI
 import Domain
 import SwiftData
+import ScovilleKit
 
 public struct AllMaintenanceView: View {
     @Environment(\.modelContext) var context
@@ -53,6 +54,16 @@ public struct AllMaintenanceView: View {
             ) {
                 Button(NSLocalizedString("delete_confirmation_delete", comment: ""), role: .destructive) {
                     if let maintenance = maintenanceToDelete {
+                        // Track maintenance deletion
+                        Task { @MainActor in
+                            Scoville.track(
+                                FuelTrackrEvents.maintenanceDeleted,
+                                parameters: [
+                                    "type": maintenance.type.rawValue
+                                ]
+                            )
+                        }
+                        
                         context.delete(maintenance)
                     }
                 }
@@ -61,6 +72,18 @@ public struct AllMaintenanceView: View {
         }
         .onAppear {
             resolveVehicle()
+            
+            // Track maintenance history viewed
+            Task { @MainActor in
+                if let vehicle = vehicle {
+                    Scoville.track(
+                        FuelTrackrEvents.maintenanceHistoryViewed,
+                        parameters: [
+                            "maintenance_count": String(vehicle.maintenances.count)
+                        ]
+                    )
+                }
+            }
         }
     }
 

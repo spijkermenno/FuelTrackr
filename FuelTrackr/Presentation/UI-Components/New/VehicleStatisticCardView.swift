@@ -10,23 +10,36 @@ import Domain
 
 struct VehicleStatisticCardView: View {
     let uiModel: VehicleStatisticsUiModel
+    let fuelType: FuelType?
+    let isUsingMetric: Bool
     
-    private var isMetric: Bool {
-        true // or inject from Environment/ViewModel if needed
+    init(uiModel: VehicleStatisticsUiModel, fuelType: FuelType? = nil, isUsingMetric: Bool = true) {
+        self.uiModel = uiModel
+        self.fuelType = fuelType
+        self.isUsingMetric = isUsingMetric
     }
     
     private var displayedDistance: String {
-        isMetric ? "\(Int(uiModel.distanceDriven).formattedWithSeparator) km" :
-        String(format: "%.0f mi", uiModel.distanceDriven / 1.60934)
+        if isUsingMetric {
+            return "\(Int(uiModel.distanceDriven).formattedWithSeparator) \(NSLocalizedString("unit_km", comment: ""))"
+        } else {
+            let miles = uiModel.distanceDriven / 1.60934
+            return String(format: "%.0f %@", miles, NSLocalizedString("unit_mi", comment: ""))
+        }
     }
     
     private var displayedFuelUsed: String {
-        isMetric ? String(format: "%.2f L", uiModel.fuelUsed) :
-        String(format: "%.2f gal", uiModel.fuelUsed * 0.264172)
+        let fuelTypeToUse = fuelType ?? .liquid
+        return fuelTypeToUse.formatFuelAmount(uiModel.fuelUsed, isUsingMetric: isUsingMetric)
     }
     
     private var displayedFuelCost: String {
-        String(format: "€%.2f", uiModel.totalCost)
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = Locale.current
+        formatter.maximumFractionDigits = 2
+        formatter.minimumFractionDigits = 0
+        return formatter.string(from: NSNumber(value: uiModel.totalCost)) ?? String(format: "%.2f", uiModel.totalCost)
     }
     
     private func title(for period: VehicleStatisticsPeriod) -> String {

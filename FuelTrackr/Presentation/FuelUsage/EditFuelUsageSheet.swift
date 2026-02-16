@@ -8,6 +8,7 @@
 import SwiftUI
 import Domain
 import SwiftData
+import ScovilleKit
 
 struct EditFuelUsageSheet: View {
     @StateObject var vehicleViewModel: VehicleViewModel
@@ -37,20 +38,41 @@ struct EditFuelUsageSheet: View {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: Theme.dimensions.spacingL) {
                     HeaderSection_Edit()
-                    InputSection(
-                        liters: $viewModel.liters,
-                        cost: $viewModel.cost,
-                        mileage: $viewModel.mileage,
-                        mileagePlaceholder: mileagePlaceholder,
-                        errorMessage: viewModel.errorMessage,
-                        mileageWarning: nil,
-                        litersError: viewModel.litersError,
-                        costError: viewModel.costError,
-                        mileageError: viewModel.mileageError,
-                        isPartialFill: $viewModel.isPartialFill,
-                        showPartialFillToggle: existingFuelUsage != nil,
-                        onSave: saveEdits
-                    )
+                    if let vehicle = resolvedVehicle {
+                        InputSection(
+                            liters: $viewModel.liters,
+                            cost: $viewModel.cost,
+                            mileage: $viewModel.mileage,
+                            mileagePlaceholder: mileagePlaceholder,
+                            errorMessage: viewModel.errorMessage,
+                            mileageWarning: nil,
+                            litersError: viewModel.litersError,
+                            costError: viewModel.costError,
+                            mileageError: viewModel.mileageError,
+                            fuelType: vehicle.fuelType,
+                            isUsingMetric: vehicleViewModel.isUsingMetric,
+                            isPartialFill: $viewModel.isPartialFill,
+                            showPartialFillToggle: existingFuelUsage != nil,
+                            onSave: saveEdits
+                        )
+                    } else {
+                        InputSection(
+                            liters: $viewModel.liters,
+                            cost: $viewModel.cost,
+                            mileage: $viewModel.mileage,
+                            mileagePlaceholder: mileagePlaceholder,
+                            errorMessage: viewModel.errorMessage,
+                            mileageWarning: nil,
+                            litersError: viewModel.litersError,
+                            costError: viewModel.costError,
+                            mileageError: viewModel.mileageError,
+                            fuelType: nil,
+                            isUsingMetric: vehicleViewModel.isUsingMetric,
+                            isPartialFill: $viewModel.isPartialFill,
+                            showPartialFillToggle: existingFuelUsage != nil,
+                            onSave: saveEdits
+                        )
+                    }
                     
                     // Merged Group Section
                     if isPartOfMergedGroup {
@@ -110,6 +132,17 @@ struct EditFuelUsageSheet: View {
             isPartialFill: viewModel.isPartialFill,
             context: context
         )
+        
+        // Track fuel usage edited
+        Task { @MainActor in
+            Scoville.track(
+                FuelTrackrEvents.fuelUsageEdited,
+                parameters: [
+                    "is_partial_fill": viewModel.isPartialFill ? "true" : "false"
+                ]
+            )
+        }
+        
         dismiss()
     }
 
@@ -160,6 +193,23 @@ struct MergedGroupSection: View {
         mergedGroup.sorted { $0.date < $1.date }
     }
     
+    private var vehicle: Vehicle? {
+        try? context.fetch(FetchDescriptor<Vehicle>()).first
+    }
+    
+    private var fuelType: FuelType? {
+        vehicle?.fuelType
+    }
+    
+    private var isUsingMetric: Bool {
+        viewModel.isUsingMetric
+    }
+    
+    private func formatFuelAmount(_ amount: Double) -> String {
+        let fuelTypeToUse = fuelType ?? .liquid
+        return fuelTypeToUse.formatFuelAmount(amount, isUsingMetric: isUsingMetric)
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.dimensions.spacingM) {
             headerSection
@@ -203,7 +253,7 @@ struct MergedGroupSection: View {
                 Text(NSLocalizedString("total_fuel", comment: ""))
                     .font(.system(size: 12))
                     .foregroundColor(colors.onSurface)
-                Text(String(format: "%.2f L", totalFuel))
+                Text(formatFuelAmount(totalFuel))
                     .font(.system(size: 16, weight: .bold))
                     .foregroundColor(colors.onBackground)
             }

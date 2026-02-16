@@ -25,7 +25,6 @@ public struct PartialFillDetector {
         let sortedUsages = vehicle.fuelUsages.sorted { $0.date < $1.date }
         
         guard sortedUsages.count >= minimumRefillsForDetection else {
-            print("🔍 [PartialFillDetector] Not enough refills for detection: \(sortedUsages.count) < \(minimumRefillsForDetection)")
             return false
         }
         
@@ -33,15 +32,7 @@ public struct PartialFillDetector {
         let averageLiters = sortedUsages.map { $0.liters }.reduce(0, +) / Double(sortedUsages.count)
         let threshold = averageLiters * partialFillThreshold
         
-        let isPartial = liters < threshold
-        
-        print("🔍 [PartialFillDetector] Detection check:")
-        print("   - Current fill: \(liters) L")
-        print("   - Average refill: \(String(format: "%.2f", averageLiters)) L")
-        print("   - Threshold (70% of avg): \(String(format: "%.2f", threshold)) L")
-        print("   - Result: \(isPartial ? "PARTIAL FILL ⚠️" : "FULL FILL ✓")")
-        
-        return isPartial
+        return liters < threshold
     }
     
     /// Calculates the average refill amount for a vehicle
@@ -49,13 +40,10 @@ public struct PartialFillDetector {
     /// - Returns: Average liters per refill, or nil if not enough data
     public static func averageRefillAmount(vehicle: Vehicle) -> Double? {
         guard vehicle.fuelUsages.count >= minimumRefillsForDetection else {
-            print("📊 [PartialFillDetector] Not enough data for average: \(vehicle.fuelUsages.count) < \(minimumRefillsForDetection)")
             return nil
         }
         
-        let average = vehicle.fuelUsages.map { $0.liters }.reduce(0, +) / Double(vehicle.fuelUsages.count)
-        print("📊 [PartialFillDetector] Average refill amount: \(String(format: "%.2f", average)) L (from \(vehicle.fuelUsages.count) entries)")
-        return average
+        return vehicle.fuelUsages.map { $0.liters }.reduce(0, +) / Double(vehicle.fuelUsages.count)
     }
     
     /// Checks if vehicle has enough data to detect partial fills

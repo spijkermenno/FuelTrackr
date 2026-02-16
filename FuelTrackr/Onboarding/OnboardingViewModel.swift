@@ -13,10 +13,8 @@ public final class OnboardingViewModel: ObservableObject {
     // MARK: - Published State
     @Published public var currentStep: OnboardingStep = .welcome
     @Published public var isUsingMetric: Bool = true
-    @Published public var licensePlate: String = ""
+    @Published public var vehicleName: String = ""
     @Published public var vehicleFuelType: FuelType = .unknown
-    @Published public var vehicleBrand: String = ""
-    @Published public var vehicleModel: String = ""
     @Published public var purchaseDate: Date = Calendar.current.startOfDay(for: Date())
     @Published public var productionDate: Date = Date()
     @Published public var currentMileage: String = ""
@@ -34,22 +32,22 @@ public final class OnboardingViewModel: ObservableObject {
         switch currentStep {
         case .welcome:
             return 0 // Welcome doesn't show progress
-        case .unitSelection:
+        case .notifications:
             return 1 // Shows "1 of 9" in design
-        case .licensePlate:
+        case .tracking:
             return 2 // Shows "2 of 9" in design
+        case .unitSelection:
+            return 3 // Shows "3 of 9" in design
+        case .vehicleName:
+            return 4 // Shows "4 of 9" in design
         case .vehicleFuelType:
-            return 3 // Shows "2 of 9" in design
-        case .vehicleBrand:
-            return 4 // Shows "3 of 9" in design
-        case .vehicleModel:
-            return 5 // Shows "4 of 9" in design
+            return 5 // Shows "5 of 9" in design
         case .optionalDetails:
-            return 6 // Shows "5 of 9" in design
+            return 6 // Shows "6 of 9" in design
         case .currentMileage:
-            return 7 // Shows "6 of 9" in design
+            return 7 // Shows "7 of 9" in design
         case .addPhoto:
-            return 8 // Shows "7 of 9" in design (step 8 is skipped)
+            return 8 // Shows "8 of 9" in design (step 8 is skipped)
         case .completion:
             return 9 // Completion doesn't show progress, but if it did it would be 9
         }
@@ -99,16 +97,16 @@ public final class OnboardingViewModel: ObservableObject {
         switch currentStep {
         case .welcome:
             return true
+        case .notifications:
+            return true // Permission step, can always proceed
+        case .tracking:
+            return true // Permission step, can always proceed
         case .unitSelection:
             return true
-        case .licensePlate:
-            return !licensePlate.trimmingCharacters(in: .whitespaces).isEmpty
+        case .vehicleName:
+            return !vehicleName.trimmingCharacters(in: .whitespaces).isEmpty
         case .vehicleFuelType:
             return vehicleFuelType != .unknown
-        case .vehicleBrand:
-            return !vehicleBrand.trimmingCharacters(in: .whitespaces).isEmpty
-        case .vehicleModel:
-            return !vehicleModel.trimmingCharacters(in: .whitespaces).isEmpty
         case .optionalDetails:
             return true // Optional step, can always proceed
         case .currentMileage:
@@ -140,15 +138,8 @@ public final class OnboardingViewModel: ObservableObject {
     }
     
     public func createVehicle() -> Vehicle {
-        let vehicleName = vehicleBrand.isEmpty && vehicleModel.isEmpty 
-            ? licensePlate 
-            : "\(vehicleBrand) \(vehicleModel)".trimmingCharacters(in: .whitespaces)
-        
         return Vehicle(
             name: vehicleName.isEmpty ? "My Vehicle" : vehicleName,
-            brand: vehicleBrand.isEmpty ? nil : vehicleBrand,
-            model: vehicleModel.isEmpty ? nil : vehicleModel,
-            licensePlate: licensePlate,
             fuelType: vehicleFuelType,
             purchaseDate: purchaseDate,
             manufacturingDate: productionDate,
@@ -160,11 +151,11 @@ public final class OnboardingViewModel: ObservableObject {
 // MARK: - OnboardingStep Enum
 public enum OnboardingStep: Int, CaseIterable {
     case welcome = 1
-    case unitSelection = 2
-    case licensePlate = 3
-    case vehicleFuelType = 4
-    case vehicleBrand = 5
-    case vehicleModel = 6
+    case notifications = 2
+    case tracking = 3
+    case unitSelection = 4
+    case vehicleName = 5
+    case vehicleFuelType = 6
     case optionalDetails = 7
     case currentMileage = 8
     case addPhoto = 9 // Step 8 is skipped in the design
@@ -194,16 +185,16 @@ public enum OnboardingStep: Int, CaseIterable {
         switch self {
         case .welcome:
             return NSLocalizedString("onboarding_welcome_title", comment: "")
+        case .notifications:
+            return NSLocalizedString("onboarding_notifications_title", comment: "")
+        case .tracking:
+            return NSLocalizedString("onboarding_tracking_title", comment: "")
         case .unitSelection:
             return NSLocalizedString("onboarding_unit_selection_title", comment: "")
-        case .licensePlate:
-            return NSLocalizedString("onboarding_license_plate_title", comment: "")
+        case .vehicleName:
+            return NSLocalizedString("onboarding_vehicle_name_title", comment: "")
         case .vehicleFuelType:
             return NSLocalizedString("onboarding_vehicle_fuel_type_title", comment: "")
-        case .vehicleBrand:
-            return NSLocalizedString("onboarding_vehicle_brand_title", comment: "")
-        case .vehicleModel:
-            return NSLocalizedString("onboarding_vehicle_model_title", comment: "")
         case .optionalDetails:
             return NSLocalizedString("onboarding_optional_details_title", comment: "")
         case .currentMileage:

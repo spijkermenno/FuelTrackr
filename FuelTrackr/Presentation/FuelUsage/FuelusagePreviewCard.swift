@@ -14,6 +14,7 @@ public struct FuelUsagePreviewUiModel: Identifiable {
     public let liters: Double
     public let cost: Double
     public let economy: Double
+    public let fuelType: FuelType?
     
     public init(
         id: UUID = UUID(),
@@ -21,7 +22,8 @@ public struct FuelUsagePreviewUiModel: Identifiable {
         date: Date,
         liters: Double,
         cost: Double,
-        economy: Double
+        economy: Double,
+        fuelType: FuelType? = nil
     ) {
         self.id = id
         self.fuelUsageID = fuelUsageID
@@ -29,6 +31,7 @@ public struct FuelUsagePreviewUiModel: Identifiable {
         self.liters = liters
         self.cost = cost
         self.economy = economy
+        self.fuelType = fuelType
     }
 }
 
@@ -149,22 +152,13 @@ private struct FuelUsagePreviewRow: View {
     
     private var volumeCostString: String {
         let costText = model.cost.formatted(.currency(code: Locale.current.currency?.identifier ?? "EUR"))
-        if settings.isUsingMetric {
-            let litersText = String(format: "%.2f L", model.liters)
-            return "\(litersText) - \(costText)"
-        } else {
-            let gallons = model.liters * 0.264172
-            let gallonsText = String(format: "%.2f G", gallons)
-            return "\(gallonsText) - \(costText)"
-        }
+        let fuelType = model.fuelType ?? .liquid
+        let fuelText = fuelType.formatFuelAmount(model.liters, isUsingMetric: settings.isUsingMetric)
+        return "\(fuelText) - \(costText)"
     }
     
     private var economyString: String {
-        if settings.isUsingMetric {
-            return String(format: "%.2f km/l", model.economy)
-        } else {
-            let mpg = model.economy * 2.35215
-            return String(format: "%.2f mpg", mpg)
-        }
+        let fuelType = model.fuelType ?? .liquid
+        return fuelType.formatConsumption(model.economy, isUsingMetric: settings.isUsingMetric)
     }
 }

@@ -8,6 +8,7 @@
 import SwiftUI
 import SwiftData
 import Domain
+import ScovilleKit
 
 public struct OnboardingCompletionView: View {
     @ObservedObject var viewModel: OnboardingViewModel
@@ -34,6 +35,7 @@ public struct OnboardingCompletionView: View {
                 .scaleEffect(isAnimating ? 1 : 0.9)
                 .animation(.spring(response: 0.5, dampingFraction: 0.6).delay(0.1), value: isAnimating)
             }
+            .padding(.horizontal, 24)
             
             Spacer()
             
@@ -48,9 +50,9 @@ public struct OnboardingCompletionView: View {
                     .frame(height: 56)
                     .background(OnboardingColors.primaryBlue)
                     .cornerRadius(16)
-                    .padding(.horizontal, 24)
             }
             .buttonStyle(ScaleButtonStyle())
+            .padding(.horizontal, 24)
             .padding(.bottom, 40)
             .opacity(isAnimating ? 1 : 0)
             .offset(y: isAnimating ? 0 : 20)
@@ -68,6 +70,19 @@ public struct OnboardingCompletionView: View {
         
         let vehicleViewModel = VehicleViewModel()
         vehicleViewModel.saveVehicle(vehicle: vehicle, initialMileage: initialMileage, context: context)
+        
+        // Track vehicle creation and onboarding completion
+        Task { @MainActor in
+            Scoville.track(FuelTrackrEvents.onboardingCompleted)
+            Scoville.track(
+                FuelTrackrEvents.vehicleCreated,
+                parameters: [
+                    "fuel_type": vehicle.fuelType?.rawValue ?? "unknown",
+                    "has_photo": vehicle.photo != nil ? "true" : "false",
+                    "initial_mileage": String(initialMileage)
+                ]
+            )
+        }
         
         withAnimation {
             onComplete()

@@ -60,12 +60,6 @@ public final class NotificationManager: NotificationManagerProtocol {
         center.add(request) { error in
             if let error = error {
                 print("Error scheduling monthly recap notification: \(error.localizedDescription)")
-            } else {
-                let formatter = DateFormatter()
-                formatter.timeZone = TimeZone.current
-                formatter.dateStyle = .full
-                formatter.timeStyle = .short
-                print("Monthly recap notification scheduled for \(formatter.string(from: date))")
             }
         }
     }
@@ -98,8 +92,6 @@ public final class NotificationManager: NotificationManagerProtocol {
         center.add(request) { error in
             if let error = error {
                 print("Error scheduling test notification: \(error.localizedDescription)")
-            } else {
-                print("Test notification scheduled to fire in 1 minute.")
             }
         }
     }
@@ -135,8 +127,6 @@ public final class NotificationManager: NotificationManagerProtocol {
         center.add(request) { error in
             if let error = error {
                 print("Error scheduling notification: \(error.localizedDescription)")
-            } else {
-                print("Notification scheduled for \(components)")
             }
         }
     }

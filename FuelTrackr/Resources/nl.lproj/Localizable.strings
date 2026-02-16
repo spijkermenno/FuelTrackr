@@ -41,18 +41,26 @@
 "delete_confirmation_delete" = "Verwijderen";
 
 /* Brandstof Gebruik */
-"add" = "Toevoegen";
 "fuel_usage_title" = "Brandstofgebruik";
 "add_fuel_usage_description" = "Leg elke tankbeurt vast om een volledige brandstofgeschiedenis bij te houden en trends in je verbruik te analyseren.";
 "fuel_usage_no_content" = "Om inzicht te krijgen in je brandstofgebruik, voeg gegevens toe met de knop met het '+'-symbool.";
 "add_fuel_usage_title" = "Brandstof toevoegen";
 "fuel_entry_details" = "Brandstofgegevens";
 "liters_label" = "Hoeveel liter heb je getankt?";
+"gallons_label" = "Hoeveel gallons heb je getankt?";
+"kwh_label" = "Hoeveel kWh heb je opgeladen?";
+"kg_h2_label" = "Hoeveel kg H₂ heb je getankt?";
+"fuel_amount_label" = "Hoeveel brandstof heb je toegevoegd?";
 "cost_label" = "Totale kosten (€)";
-"liters_placeholder" = "Vul aantal in (bijv. 43,2)";
 "cost_placeholder" = "Vul prijs in (bijv. 76)";
+"liters_placeholder" = "Vul aantal in (bijv. 43,2)";
+"gallons_placeholder" = "Vul aantal in (bijv. 3,5)";
+"kwh_placeholder" = "Vul aantal in (bijv. 50)";
+"kg_h2_placeholder" = "Vul aantal in (bijv. 5)";
+"fuel_amount_placeholder" = "Vul aantal in";
 "price_per_liter" = "Prijs per liter";
 "price_per_gallon" = "Prijs per gallon";
+"fuel_type" = "Brandstoftype";
 "fuel_usage_saved_success" = "Brandstofgegevens succesvol opgeslagen.";
 "fuel_usage_saved_error" = "Opslaan van brandstofgegevens mislukt.";
 "fuel_usage_empty_title" = "Meer gegevens nodig";
@@ -78,6 +86,10 @@
 "other_notes_placeholder" = "Geef een beschrijving op voor 'Overig'";
 "all_fields_required_error" = "Alle velden moeten correct worden ingevuld.";
 "invalid_liters_error" = "Voer een geldig aantal liters in dat groter is dan 0.";
+"invalid_gallons_error" = "Voer een geldig aantal gallons in dat groter is dan 0.";
+"invalid_kwh_error" = "Voer een geldig aantal kWh in dat groter is dan 0.";
+"invalid_kg_h2_error" = "Voer een geldig aantal kg H₂ in dat groter is dan 0.";
+"invalid_fuel_amount_error" = "Voer een geldige brandstofhoeveelheid in die groter is dan 0.";
 "invalid_cost_error" = "Voer een geldige kostenwaarde in die groter is dan 0.";
 "invalid_mileage_error" = "De kilometerstand moet hoger zijn dan de huidige kilometerstand.";
 "invalid_cost_error_generic" = "Ongeldige kosten. Controleer het invoerformaat.";
@@ -95,6 +107,19 @@
 "notification_permission_error" = "Schakel meldingen in via de instellingen van je apparaat.";
 "notifications_disabled_title" = "Meldingen uitgeschakeld";
 "notifications_disabled_message" = "Schakel meldingen in via de instellingen van je iPhone, zonder deze toestemming krijg je geen herinneringen!";
+"notifications_toggle" = "Meldingen";
+"notifications_toggle_description" = "Sta meldingen toe voor onderhoudsherinneringen en updates.";
+"notification_status_authorized" = "Toegestaan";
+"notification_status_denied" = "Geweigerd";
+"notification_status_not_determined" = "Niet Bepaald";
+"tracking_toggle" = "Tracking";
+"tracking_toggle_description" = "Sta tracking toe om de app-ervaring te verbeteren.";
+"tracking_status_authorized" = "Toegestaan";
+"tracking_status_denied" = "Geweigerd";
+"tracking_status_restricted" = "Beperkt";
+"tracking_status_not_determined" = "Niet Bepaald";
+"open_settings" = "Open Instellingen";
+"pro_grant_debug" = "Verleen Pro (Debug)";
 "ok" = "Doorgaan";
 
 /* Eenheden en Instellingen */
@@ -208,8 +233,21 @@
 "onboarding_welcome_title" = "Welkom bij FuelTrackr 👋";
 "onboarding_welcome_description" = "Laten we je voertuig instellen zodat je gemakkelijk je brandstofverbruik en onderhoud kunt bijhouden.";
 "onboarding_setup_vehicle_button" = "Mijn voertuig instellen";
+"onboarding_notifications_title" = "Blijf Op de Hoogte";
+"onboarding_notifications_description" = "Schakel meldingen in om herinneringen te ontvangen over brandstof bijhouden en maandelijkse samenvattingen.";
+"onboarding_notifications_allow" = "Meldingen Inschakelen";
+"onboarding_notifications_skip" = "Niet Nu";
+"onboarding_tracking_title" = "Help FuelTrackr Verbeteren";
+"onboarding_tracking_description" = "We gebruiken anonieme tracking om de app te verbeteren. We zullen je nooit volgen met persoonlijke gegevens of je informatie delen.";
+"onboarding_tracking_allow" = "Doorgaan";
+"onboarding_tracking_skip" = "Vraag App Niet te Volgen";
 "onboarding_unit_selection_title" = "Afstand & Verbruik";
 "onboarding_unit_selection_question" = "Welke eenheden gebruik je voor afstand en brandstofverbruik?";
+"onboarding_vehicle_name_title" = "Voertuignaam";
+"onboarding_vehicle_name_description" = "Geef je voertuig een naam om het gemakkelijk te identificeren.";
+"onboarding_vehicle_name_placeholder" = "Voer voertuignaam in";
+"onboarding_vehicle_name_default" = "Mijn Auto";
+"onboarding_vehicle_name_use_default" = "Gebruik \"%@\"";
 "kilometers_liters" = "Kilometers & Liters";
 "miles_gallons" = "Mijlen & Gallons";
 "metric" = "(Metrisch)";
@@ -228,7 +266,7 @@
 "fuel_liquid" = "Benzine of Diesel";
 "fuel_electric" = "Elektrisch";
 "fuel_hydrogen" = "Waterstof";
-"fuel_unknown" = "Onbekend";
+"fuel_unknown" = "Anders";
 
 "onboarding_vehicle_brand_title" = "Voertuigmerk";
 "onboarding_vehicle_brand_question" = "Welk merk is je voertuig?";
@@ -244,9 +282,10 @@
 "onboarding_select_date_placeholder" = "Selecteer datum";
 "onboarding_skip_for_now" = "Sla nu over";
 "onboarding_current_mileage_title" = "Huidige kilometerstand";
-"onboarding_current_mileage_question" = "Wat is de huidige kilometerstand van je voertuig?";
+"onboarding_current_mileage_question" = "Wat is de huidige kilometerstand van je voertuig?\n\nWe hebben dit nodig om je brandstofverbruik nauwkeurig te berekenen en de prestaties van je voertuig in de loop van de tijd bij te houden.";
 "onboarding_mileage_placeholder_km" = "bijv. 125.000 km";
 "onboarding_mileage_placeholder_miles" = "bijv. 77.671 mi";
+"onboarding_mileage_new_car" = "Start vanaf 0";
 "onboarding_add_photo_title" = "Voeg een foto van je voertuig toe";
 "onboarding_add_photo_description" = "Dit helpt je om het snel te herkennen in je overzicht.";
 "onboarding_take_photo" = "Foto maken";
@@ -279,12 +318,15 @@
 
 /* Fuel Detail Page */
 "consumption_overview" = "Verbruiksoverzicht";
+"consumption_over_time" = "Verbruik over tijd";
 "average_consumption" = "gemiddeld verbruik";
 "total_cost_label" = "Kosten totaal";
 "last_refueling" = "Laatste tankbeurt";
 "fuel_entries_last_months" = "Tankbeurten afgelopen %d maanden (%d)";
 "fuel_entries_last_month" = "Tankbeurten afgelopen maand (%d)";
-"add_new_refueling" = "+ Nieuwe tankbeurt toevoegen";
+"fuel_entries_all" = "Alle tankbeurten (%d)";
+"add_new_refueling" = "Nieuwe tankbeurt toevoegen";
+"timeframe_all" = "Alles";
 "timeframe_1m" = "1M";
 "timeframe_3m" = "3M";
 "timeframe_1y" = "1J";
@@ -320,3 +362,82 @@
 "closing_fill" = "Volle Tank";
 "partial_fill_badge" = "Halve Tank";
 "combined_stats" = "Gecombineerde Statistieken";
+
+/* In-App Purchase / Pro */
+"pro_title" = "FuelTrackr Pro";
+"pro_subtitle" = "De Toekomst van Voertuig Intelligentie";
+"pro_feature_unlimited_history_title" = "Onbeperkte Geschiedenis";
+"pro_feature_unlimited_history_subtitle" = "Totale uitgaventransparantie";
+"pro_feature_smart_maintenance_title" = "Slim Onderhoud";
+"pro_feature_smart_maintenance_subtitle" = "Slimme servicewaarschuwingen";
+"pro_feature_smart_refill_title" = "Slimme Tanklogica";
+"pro_feature_smart_refill_subtitle" = "Voorspellende actieradius & kosteninzichten";
+"restore_purchase" = "Aankoop Herstellen";
+"privacy_policy" = "Privacybeleid";
+"terms_of_service" = "Servicevoorwaarden";
+"pro_lifetime_title" = "Levenslang Pro";
+"pro_yearly_title" = "Jaarlijks Toegang";
+"pro_monthly_title" = "Maandelijks Toegang";
+"pro_one_time_payment" = "Eenmalige betaling";
+"pro_billed_annually" = "Jaarlijks gefactureerd";
+"pro_billed_monthly" = "Maandelijks gefactureerd";
+"pro_unlock_lifetime" = "Ontgrendel Levenslang Pro";
+"pro_processing_purchase" = "Aankoop Verwerken...";
+"pro_purchase_successful" = "Aankoop Succesvol!";
+"pro_thank_you_message" = "Bedankt voor het upgraden naar Pro";
+"continue_button" = "Doorgaan";
+"pro_status" = "Pro Status";
+"pro_purchased" = "Gekocht: %@";
+"pro_renews" = "Verlengt: %@";
+"pro_never_expires" = "Verloopt nooit";
+"pro_manage_subscription" = "Abonnement Beheren";
+"pro_remove_debug" = "Pro Verwijderen (Debug)";
+"pro_upgrade" = "Upgraden naar Pro";
+"unit_km" = "km";
+"unit_mi" = "mi";
+"unit_l" = "L";
+"unit_g" = "G";
+"unit_kwh" = "kWh";
+"unit_kg_h2" = "kg H₂";
+
+/* Review & Feedback */
+"help_feedback_section" = "Hulp & Feedback";
+"help_feedback_footer" = "Deel je feedback of suggesties om ons te helpen verbeteren";
+"review_app" = "Beoordeel de App";
+"review_share_opinion" = "Laat weten wat je ervan vindt";
+"review_recent_feedback" = "Je hebt recent feedback gegeven";
+"review_title" = "Hoe bevalt FuelTrackr?";
+"review_subtitle" = "Jouw mening maakt echt verschil";
+"review_description" = "Gebruik je de app met plezier? Of mis je iets?\nMet jouw feedback kunnen we FuelTrackr stap voor stap verbeteren, voor jou én andere gebruikers.";
+"review_star_rating" = "%d ster";
+"review_feedback_prompt" = "Wat kunnen we verbeteren?";
+"review_feedback_placeholder" = "Vertel ons wat we beter kunnen doen...";
+"review_feedback_min_chars" = "Minimaal %d tekens vereist";
+"review_feedback_max_chars" = "Maximaal %d tekens toegestaan";
+"review_go_to_app_store" = "Ga naar App Store";
+"review_submit_feedback" = "Feedback versturen";
+"review_feedback_required" = "Laat ons alstublieft weten wat we kunnen verbeteren voordat je kunt versturen";
+"review_maybe_later" = "Misschien later";
+"review_cooldown_recent" = "Je hebt recent feedback gegeven";
+"review_cooldown_days" = "Je kunt over %d dag(en) opnieuw feedback geven";
+"app_suggestion" = "App Suggestie";
+"app_suggestion_subtitle" = "Deel je idee voor verbetering";
+"suggestion_title" = "App Suggestie";
+"suggestion_subtitle" = "Heb je een idee om de app te verbeteren? Deel het met ons!";
+"suggestion_field_label" = "Jouw suggestie";
+"suggestion_field_placeholder" = "Beschrijf je idee voor een nieuwe functie of verbetering...";
+"suggestion_min_chars" = "Minimaal %d tekens vereist";
+"suggestion_max_chars" = "Maximaal %d tekens toegestaan";
+"suggestion_submit" = "Versturen";
+
+/* Edit Vehicle */
+"fuel_type_title" = "Brandstoftype";
+"purchase_status_title" = "Aankoopstatus";
+"vehicle_purchased" = "Voertuig Gekocht";
+"latest_mileage_title" = "Nieuwste Kilometerstand";
+"select_photo_source" = "Selecteer Fotobron";
+"camera" = "Camera";
+"photo_library" = "Fotobibliotheek";
+"remove_photo" = "Foto Verwijderen";
+"manufacturing_date_before_purchase_error" = "Productiedatum moet voor of gelijk zijn aan de aankoopdatum.";
+"vehicle_not_found_error" = "Voertuig niet gevonden. Probeer het opnieuw.";

@@ -14,7 +14,6 @@ import Charts
 public struct FuelUsageView: View {
     @ObservedObject var viewModel: VehicleViewModel
     @Binding var showAddFuelSheet: Bool
-    var isVehicleActive: Bool
 
     @Environment(\.modelContext) private var context
     @State private var showAllFuelEntries = false
@@ -37,10 +36,9 @@ public struct FuelUsageView: View {
                         .foregroundColor(.white)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
-                        .background(isVehicleActive ? Color.orange : Color.gray.opacity(0.5))
+                        .background(Color.orange)
                         .cornerRadius(8)
                 }
-                .disabled(!isVehicleActive)
 
                 Button(action: { showAllFuelEntries = true }) {
                     Image(systemName: "chevron.right")
@@ -48,10 +46,9 @@ public struct FuelUsageView: View {
                         .foregroundColor(.white)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
-                        .background(isVehicleActive ? Color.orange : Color.gray.opacity(0.5))
+                        .background(Color.orange)
                         .cornerRadius(8)
                 }
-                .disabled(!isVehicleActive)
             }
 
             if let vehicle = resolvedVehicle {
@@ -80,6 +77,7 @@ public struct FuelUsageView: View {
 
 public struct FuelUsageListView: View {
     public let vehicle: Vehicle
+    @StateObject private var settingsViewModel = SettingsViewModel()
 
     public var body: some View {
         let fuelUsages = vehicle.fuelUsages.sorted(by: { $0.date > $1.date })
@@ -90,7 +88,7 @@ public struct FuelUsageListView: View {
             VStack(alignment: .leading, spacing: 0) {
                 ForEach(Array(latestEntries.enumerated()), id: \.element.id) { index, usage in
                     let nextUsage = index < latestEntries.count - 1 ? latestEntries[index + 1] : nil
-                    FuelUsageRow(usage: usage, nextUsage: nextUsage, colorIndex: index)
+                    FuelUsageRow(usage: usage, nextUsage: nextUsage, colorIndex: index, isUsingMetric: settingsViewModel.isUsingMetric)
                 }
                 if latestEntries.count < 3 {
                     ForEach(latestEntries.count..<3, id: \.self) { index in
@@ -114,6 +112,7 @@ public struct FuelUsageRow: View {
     let usage: FuelUsage
     let nextUsage: FuelUsage?
     let colorIndex: Int
+    let isUsingMetric: Bool
     
     // Get merged group for this usage if it's part of a partial fill group
     private var mergedGroup: [FuelUsage]? {
@@ -121,8 +120,24 @@ public struct FuelUsageRow: View {
         let groups = FuelUsageMergingHelper.groupMergedFuelUsages(vehicle.fuelUsages)
         return groups.first { group in group.contains { $0.persistentModelID == usage.persistentModelID } }
     }
+    
+    private func formatFuelAndCost(usage: FuelUsage) -> String {
+        guard let vehicle = usage.vehicle else {
+            // Fallback: use default formatting
+            let fuelFormatter = NumberFormatter()
+            fuelFormatter.minimumFractionDigits = 0
+            fuelFormatter.maximumFractionDigits = 2
+            let fuelText = fuelFormatter.string(from: NSNumber(value: usage.liters)) ?? String(format: "%.2f", usage.liters)
+            let costText = usage.cost.formatted(.currency(code: Locale.current.currency?.identifier ?? "EUR"))
+            return "\(fuelText) \(NSLocalizedString("unit_l", comment: "")), \(costText)"
+        }
+        let fuelType = vehicle.fuelType ?? .liquid
+        let fuelText = fuelType.formatFuelAmount(usage.liters, isUsingMetric: isUsingMetric)
+        let costText = usage.cost.formatted(.currency(code: Locale.current.currency?.identifier ?? "EUR"))
+        return "\(fuelText), \(costText)"
+    }
 
-    var kmPerLiter: Double? {
+    var consumption: Double? {
         // If this is a partial fill, calculate using merged group
         if usage.isPartialFill, let group = mergedGroup, let vehicle = usage.vehicle {
             let sorted = vehicle.fuelUsages.sorted { $0.date < $1.date }
@@ -137,15 +152,29 @@ public struct FuelUsageRow: View {
             let totalFuel = group.reduce(0.0) { $0 + $1.liters }
             guard totalFuel > 0 else { return nil }
             let distance = Double(endMileage - previousMileage)
-            return distance / totalFuel
+            let fuelType = vehicle.fuelType ?? .liquid
+            return fuelType.calculateConsumption(
+                distance: distance,
+                fuelAmount: totalFuel,
+                isUsingMetric: isUsingMetric
+            )
         }
         
         // Regular calculation for full fills
-        if let current = usage.mileage?.value, let previous = nextUsage?.mileage?.value, usage.liters > 0 {
-            let distance = Double(current - previous)
-            return distance > 0 ? distance / usage.liters : nil
+        guard let vehicle = usage.vehicle,
+              let current = usage.mileage?.value,
+              let previous = nextUsage?.mileage?.value,
+              usage.liters > 0,
+              current > previous else {
+            return nil
         }
-        return nil
+        let distance = Double(current - previous)
+        let fuelType = vehicle.fuelType ?? .liquid
+        return fuelType.calculateConsumption(
+            distance: distance,
+            fuelAmount: usage.liters,
+            isUsingMetric: isUsingMetric
+        )
     }
 
     public var body: some View {
@@ -154,20 +183,23 @@ public struct FuelUsageRow: View {
                 Text(usage.date.formatted(date: .abbreviated, time: .omitted))
                     .font(.footnote)
                     .foregroundColor(.secondary)
-                Text("\(usage.liters, specifier: "%.2f") L, €\(usage.cost, specifier: "%.2f")")
+                Text(formatFuelAndCost(usage: usage))
                     .font(.body)
                     .foregroundColor(.primary)
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 6) {
-                if usage.liters > 0 {
-                    Text("€\(usage.cost / usage.liters, specifier: "%.2f")/L")
+                if usage.liters > 0, let vehicle = usage.vehicle {
+                    let fuelType = vehicle.fuelType ?? .liquid
+                    let pricePerUnit = usage.cost / usage.liters
+                    Text(fuelType.formatPricePerUnit(pricePerUnit, isUsingMetric: isUsingMetric))
                         .font(.subheadline)
                         .fontWeight(.semibold)
                         .foregroundColor(.primary)
                 }
-                if let kmPerLiter = kmPerLiter {
-                    Text("\(kmPerLiter, specifier: "%.2f") km/L")
+                if let consumption = consumption, let vehicle = usage.vehicle {
+                    let fuelType = vehicle.fuelType ?? .liquid
+                    Text(fuelType.formatConsumption(consumption, isUsingMetric: isUsingMetric))
                         .font(.subheadline)
                         .fontWeight(.semibold)
                         .foregroundColor(.primary)

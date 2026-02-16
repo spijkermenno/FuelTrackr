@@ -29,7 +29,6 @@ public struct GetProjectedYearStatsUseCase {
 
     public func callAsFunction(context: ModelContext) throws -> VehicleStatisticsUiModel {
         guard let vehicle = try calc.repository.loadActiveVehicle(context: context) else {
-            print("ProjectedYearStats | 🚫 No active vehicle – returning zeros")
             return VehicleStatisticsUiModel(period: .ProjectedYear, distanceDriven: 0, fuelUsed: 0, totalCost: 0)
         }
 
@@ -45,7 +44,6 @@ public struct GetProjectedYearStatsUseCase {
                 .map   { calendar.component(.month, from: $0.date) })
 
             guard !monthsWithEntries.isEmpty else {
-                print("ProjectedYearStats | 🚫 No mileage in current year – returning zeros")
                 return VehicleStatisticsUiModel(
                     period: .ProjectedYear,
                     distanceDriven: 0,
@@ -55,11 +53,8 @@ public struct GetProjectedYearStatsUseCase {
             }
 
             let monthsCount = Double(monthsWithEntries.count)
-            print("ProjectedYearStats | 🕑 No completed years – averaging \(Int(monthsCount)) months and scaling to 12")
-
             let ytd = calc.yearStat(year: currentYear, period: .YTD, context: context)
             let factor = 12.0 / monthsCount
-            print(String(format: "ProjectedYearStats | Monthly-average factor: ×%.2f", factor))
 
             return VehicleStatisticsUiModel(
                 period: .ProjectedYear,
@@ -91,7 +86,6 @@ public struct GetProjectedYearStatsUseCase {
             }
 
             guard !monthDistances.isEmpty else {
-                print(String(format: "ProjectedYearStats | Month %02d – no data → skipped", month))
                 continue
             }
 
@@ -99,14 +93,10 @@ public struct GetProjectedYearStatsUseCase {
             let avgFuel     = monthFuels.reduce(0, +)     / Double(monthFuels.count)
             let avgCost     = monthCosts.reduce(0, +)     / Double(monthCosts.count)
 
-            print(String(format: "ProjectedYearStats | Month %02d – avgDistance: %.1f km, avgFuel: %.2f L, avgCost: €%.2f", month, avgDistance, avgFuel, avgCost))
-
             projectedDistance += avgDistance
             projectedFuel     += avgFuel
             projectedCost     += avgCost
         }
-
-        print(String(format: "ProjectedYearStats | 📊 Projection – distance: %.0f km, fuel: %.1f L, cost: €%.2f", projectedDistance, projectedFuel, projectedCost))
 
         return VehicleStatisticsUiModel(
             period: .ProjectedYear,

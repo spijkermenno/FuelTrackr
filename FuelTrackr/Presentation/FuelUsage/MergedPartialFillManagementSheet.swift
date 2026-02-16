@@ -59,7 +59,7 @@ struct MergedPartialFillManagementSheet: View {
                                     Text(NSLocalizedString("total_fuel", comment: ""))
                                         .font(.system(size: 14))
                                         .foregroundColor(colors.onSurface)
-                                    Text(String(format: "%.2f L", mergedGroup.reduce(0.0) { $0 + $1.liters }))
+                                    Text(formatFuelAmount(mergedGroup.reduce(0.0) { $0 + $1.liters }))
                                         .font(.system(size: 18, weight: .bold))
                                         .foregroundColor(colors.onBackground)
                                 }
@@ -161,6 +161,19 @@ struct MergedPartialFillManagementSheet: View {
             mergedGroup = group
         }
     }
+    
+    private func formatFuelAmount(_ amount: Double) -> String {
+        guard let vehicle = resolvedVehicle else {
+            // Fallback formatting
+            let formatter = NumberFormatter()
+            formatter.minimumFractionDigits = 0
+            formatter.maximumFractionDigits = 2
+            let formatted = formatter.string(from: NSNumber(value: amount)) ?? String(format: "%.2f", amount)
+            return "\(formatted) \(NSLocalizedString("unit_l", comment: ""))"
+        }
+        let fuelType = vehicle.fuelType ?? .liquid
+        return fuelType.formatFuelAmount(amount, isUsingMetric: viewModel.isUsingMetric)
+    }
 }
 
 // MARK: - Merged Group Entry Row
@@ -216,12 +229,21 @@ struct MergedGroupEntryRow: View {
                 }
                 
                 HStack(spacing: 8) {
-                    Text(String(format: "%.2f L", usage.liters))
-                        .font(.system(size: 12))
-                        .foregroundColor(colors.onSurface)
+                    if let vehicle = usage.vehicle {
+                        let fuelType = vehicle.fuelType ?? .liquid
+                        let fuelText = fuelType.formatFuelAmount(usage.liters, isUsingMetric: viewModel.isUsingMetric)
+                        Text(fuelText)
+                            .font(.system(size: 12))
+                            .foregroundColor(colors.onSurface)
+                    } else {
+                        Text(formatFuelAmount(usage.liters))
+                            .font(.system(size: 12))
+                            .foregroundColor(colors.onSurface)
+                    }
                     
                     if let mileage = usage.mileage?.value {
-                        Text("@ \(mileage) km")
+                        let mileageText = viewModel.isUsingMetric ? "\(mileage) km" : "\(Int(Double(mileage) * 0.621371)) mi"
+                        Text("@ \(mileageText)")
                             .font(.system(size: 12))
                             .foregroundColor(colors.onSurface)
                     }
@@ -271,6 +293,14 @@ struct MergedGroupEntryRow: View {
         formatter.locale = Locale.current
         formatter.dateFormat = "d MMM yyyy"
         return formatter.string(from: date)
+    }
+    
+    private func formatFuelAmount(_ amount: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 2
+        let formatted = formatter.string(from: NSNumber(value: amount)) ?? String(format: "%.2f", amount)
+        return "\(formatted) \(NSLocalizedString("unit_l", comment: ""))"
     }
 }
 

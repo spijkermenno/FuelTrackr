@@ -6,10 +6,13 @@
 //
 
 import SwiftUI
+import Domain
 
 public struct VehicleDetailsCard: View {
     @Environment(\.colorScheme) private var colorScheme
-    let licensePlate: String
+    let vehicleName: String?
+    let licensePlate: String?
+    let fuelType: FuelType?
     let currentMileage: Int
     let purchaseDate: Date
     let productionDate: Date
@@ -34,20 +37,19 @@ public struct VehicleDetailsCard: View {
     public var body: some View {
         GeometryReader { geometry in
             VStack(alignment: .leading, spacing: 16) {
-                // License plate at top right
-                HStack {
-                    Spacer()
-                    Text(licensePlate)
-                        .font(.system(size: 20, weight: .bold))
-                        .foregroundColor(colors.onBackground)
-                }
-                
-                // Three metric rows
+                // Four metric rows
                 MetricRowView(
                     label: NSLocalizedString("mileage", comment: "Mileage"),
                     value: formatMileage(currentMileage),
                     timeAgo: nil
                 )
+                
+                if let fuelType = fuelType {
+                    FuelTypeRowView(
+                        label: NSLocalizedString("fuel_type", comment: "Fuel Type"),
+                        fuelType: fuelType
+                    )
+                }
                 
                 MetricRowView(
                     label: NSLocalizedString("owned", comment: "Owned"),
@@ -132,6 +134,64 @@ private struct MetricRowView: View {
                         .font(.system(size: 12, weight: .regular))
                         .foregroundColor(colors.primary)
                 }
+            }
+        }
+    }
+}
+
+// MARK: - FuelTypeRowView
+
+private struct FuelTypeRowView: View {
+    @Environment(\.colorScheme) private var colorScheme
+    let label: String
+    let fuelType: FuelType
+    
+    private var colors: ColorsProtocol {
+        Theme.colors(for: colorScheme)
+    }
+    
+    private var iconName: String {
+        switch fuelType {
+        case .liquid:
+            return "fuelpump.fill"
+        case .electric:
+            return "bolt.fill"
+        case .hydrogen:
+            return "flame.fill"
+        case .unknown:
+            return "questionmark.circle.fill"
+        }
+    }
+    
+    private var iconColor: Color {
+        switch fuelType {
+        case .liquid:
+            return colors.accentRed
+        case .electric:
+            return .yellow
+        case .hydrogen:
+            return .blue
+        case .unknown:
+            return colors.onSurface.opacity(0.6)
+        }
+    }
+    
+    var body: some View {
+        HStack {
+            Text(label)
+                .font(.system(size: 14, weight: .regular))
+                .foregroundColor(colors.onSurface)
+            
+            Spacer()
+            
+            HStack(spacing: 6) {
+                Image(systemName: iconName)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(iconColor)
+                
+                Text(fuelType.localizedName)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(colors.onBackground)
             }
         }
     }
