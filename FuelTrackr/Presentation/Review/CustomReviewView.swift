@@ -26,7 +26,7 @@ struct CustomReviewView: View {
     
     // TODO: Update with actual App Store URL when app is published
     // Format: https://apps.apple.com/app/[app-name]/id[app-id]?action=write-review
-    private let appStoreURL = "https://apps.apple.com/app/fueltrackr/id6739990000?action=write-review"
+    private let appStoreURL = "https://apps.apple.com/us/app/fueltrackr/id6741074755?action=write-review"
     private let minCharacterCount = 10
     private let maxCharacterCount = 300
     private let cooldownDays: Double = 30 // 1 month
