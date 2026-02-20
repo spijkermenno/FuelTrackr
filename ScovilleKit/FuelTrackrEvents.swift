@@ -48,7 +48,6 @@ public struct FuelTrackrEvents: AnalyticsEventName, Sendable {
     
     // Onboarding
     public static let onboardingStarted = FuelTrackrEvents("onboardingStarted")
-    public static let onboardingStepViewed = FuelTrackrEvents("onboardingStepViewed")
     public static let onboardingCompleted = FuelTrackrEvents("onboardingCompleted")
     
     // App Lifecycle

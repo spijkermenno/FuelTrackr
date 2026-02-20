@@ -101,17 +101,5 @@ public struct OnboardingFlowView: View {
                 Scoville.track(FuelTrackrEvents.onboardingStarted)
             }
         }
-        .onChange(of: viewModel.currentStep) { _, newStep in
-            // Track each onboarding step viewed
-            Task { @MainActor in
-                Scoville.track(
-                    FuelTrackrEvents.onboardingStepViewed,
-                    parameters: [
-                        "step": newStep.rawValue.description,
-                        "step_name": newStep.title
-                    ]
-                )
-            }
-        }
     }
 }
