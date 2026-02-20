@@ -74,11 +74,7 @@ public struct OnboardingNotificationsView: View {
         let center = UNUserNotificationCenter.current()
         let options: UNAuthorizationOptions = [.alert, .badge, .sound]
         
-        center.requestAuthorization(options: options) { granted, error in
-            if let error = error {
-                print("Error requesting notification permission: \(error.localizedDescription)")
-            }
-            
+        center.requestAuthorization(options: options) { granted, _ in
             // Register for remote notifications if granted
             if granted {
                 DispatchQueue.main.async {

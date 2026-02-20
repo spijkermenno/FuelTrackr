@@ -88,7 +88,6 @@ public struct AllMaintenanceView: View {
         do {
             vehicle = try context.model(for: vehicleID) as? Vehicle
         } catch {
-            print("⚠️ Failed to resolve vehicle: \(error)")
             vehicle = nil
         }
     }

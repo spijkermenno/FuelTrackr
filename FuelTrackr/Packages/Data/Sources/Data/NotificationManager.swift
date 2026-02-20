@@ -22,10 +22,7 @@ public final class NotificationManager: NotificationManagerProtocol {
     // MARK: - Authorization
 
     public func requestAuthorization(completion: @escaping @Sendable (Bool) -> Void) {
-        center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            if let error = error {
-                print("Error requesting notifications permission: \(error.localizedDescription)")
-            }
+        center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
             DispatchQueue.main.async {
                 completion(granted)
             }
@@ -57,11 +54,7 @@ public final class NotificationManager: NotificationManagerProtocol {
             trigger: trigger
         )
 
-        center.add(request) { error in
-            if let error = error {
-                print("Error scheduling monthly recap notification: \(error.localizedDescription)")
-            }
-        }
+        center.add(request) { _ in }
     }
 
     public func cancelMonthlyRecapNotification() {
@@ -89,11 +82,7 @@ public final class NotificationManager: NotificationManagerProtocol {
             trigger: trigger
         )
 
-        center.add(request) { error in
-            if let error = error {
-                print("Error scheduling test notification: \(error.localizedDescription)")
-            }
-        }
+        center.add(request) { _ in }
     }
 
     // MARK: - Custom Notifications
@@ -124,11 +113,7 @@ public final class NotificationManager: NotificationManagerProtocol {
             trigger: trigger
         )
 
-        center.add(request) { error in
-            if let error = error {
-                print("Error scheduling notification: \(error.localizedDescription)")
-            }
-        }
+        center.add(request) { _ in }
     }
 
     // MARK: - Cancel All

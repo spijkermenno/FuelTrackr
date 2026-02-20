@@ -351,7 +351,6 @@ public struct SettingsPageView: View {
                     Button(action: {
                         let notificationManager = NotificationManager(settingsRepository: SettingsRepository())
                         notificationManager.scheduleTestNotification()
-                        print("🔔 Debug: Test notification scheduled to arrive in 1 minute")
                     }) {
                         HStack {
                             Text("Test Notification (1 min)")
@@ -384,9 +383,7 @@ public struct SettingsPageView: View {
                             }
                             
                             vehicleViewModel.loadActiveVehicle(context: context)
-                        } catch {
-                            print("Delete failed: \(error)")
-                        }
+                        } catch { }
                     }
                 }
                 Button(NSLocalizedString("cancel", comment: ""), role: .cancel) {}

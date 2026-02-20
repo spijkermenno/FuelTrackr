@@ -128,13 +128,9 @@ public final class VehicleViewModel: ObservableObject {
                     let stats = try getProjectedYearStatsUseCase(context: context)
                     cachedProjectedYearStats = stats
                     cachedProjectedYearStatsVehicleID = vehicle.persistentModelID
-                } catch {
-                    print("Error pre-calculating projected year stats: \(error.localizedDescription)")
-                }
+                } catch { }
             }
-        } catch {
-            print("Error loading active vehicle: \(error.localizedDescription)")
-        }
+        } catch { }
     }
     
     public func saveVehicle(vehicle: Vehicle, initialMileage: Int, context: ModelContext) {
@@ -142,9 +138,7 @@ public final class VehicleViewModel: ObservableObject {
             try saveVehicleUseCase(vehicle: vehicle, initialMileage: initialMileage, context: context)
             activeVehicleID = vehicle.persistentModelID
             refreshID = UUID()
-        } catch {
-            print("Error saving vehicle: \(error.localizedDescription)")
-        }
+        } catch { }
     }
     
     public func confirmPurchase(context: ModelContext) {
@@ -153,9 +147,7 @@ public final class VehicleViewModel: ObservableObject {
             try confirmVehiclePurchaseUseCase(context: context)
             vehicle.isPurchased = true
             refreshID = UUID()
-        } catch {
-            print("Error confirming purchase: \(error.localizedDescription)")
-        }
+        } catch { }
     }
     
     public func updateVehicle(
@@ -180,18 +172,14 @@ public final class VehicleViewModel: ObservableObject {
         do {
             try updateVehicleUseCase(vehicle: vehicle, context: context)
             refreshID = UUID()
-        } catch {
-            print("Error updating vehicle: \(error.localizedDescription)")
-        }
+        } catch { }
     }
     
     public func updateVehicle(vehicle: Vehicle, context: ModelContext) {
         do {
             try updateVehicleUseCase(vehicle: vehicle, context: context)
             refreshID = UUID()
-        } catch {
-            print("Error updating vehicle: \(error.localizedDescription)")
-        }
+        } catch { }
     }
 
     public func updateOdometer(newValue: Int, context: ModelContext) {
@@ -203,9 +191,7 @@ public final class VehicleViewModel: ObservableObject {
             cachedMonthlySummaries = nil
             cachedProjectedYearStats = nil
             refreshID = UUID()
-        } catch {
-            print("Error updating odometer: \(error.localizedDescription)")
-        }
+        } catch { }
     }
     
     public func deleteVehicle(context: ModelContext) throws {
@@ -215,9 +201,7 @@ public final class VehicleViewModel: ObservableObject {
     public func migrateVehicles(context: ModelContext) {
         do {
             try migrateVehiclesUseCase(context: context)
-        } catch {
-            print("Error migrating vehicles: \(error.localizedDescription)")
-        }
+        } catch { }
     }
     
     public func saveFuelUsage(liters: Double, cost: Double, mileageValue: Int, context: ModelContext) {
@@ -227,9 +211,7 @@ public final class VehicleViewModel: ObservableObject {
             cachedMonthlySummaries = nil
             cachedProjectedYearStats = nil
             refreshID = UUID()
-        } catch {
-            print("Error saving fuel usage: \(error.localizedDescription)")
-        }
+        } catch { }
     }
     
     public func deleteFuelUsage(fuelUsage: FuelUsage, context: ModelContext) {
@@ -239,18 +221,14 @@ public final class VehicleViewModel: ObservableObject {
             cachedMonthlySummaries = nil
             cachedProjectedYearStats = nil
             refreshID = UUID()
-        } catch {
-            print("Error deleting fuel usage: \(error.localizedDescription)")
-        }
+        } catch { }
     }
     
     public func resetAllFuelUsage(context: ModelContext) {
         do {
             try resetFuelUsageUseCase(context: context)
             refreshID = UUID()
-        } catch {
-            print("Error resetting fuel usage: \(error.localizedDescription)")
-        }
+        } catch { }
     }
     
     public func fuelUsage(id: PersistentIdentifier, context: ModelContext) -> FuelUsage? {
@@ -271,9 +249,7 @@ public final class VehicleViewModel: ObservableObject {
                 cachedMonthlySummaries = nil
                 cachedProjectedYearStats = nil
                 refreshID = UUID()
-            } catch {
-                print("Error updating fuel usage: \(error.localizedDescription)")
-            }
+            } catch { }
         }
     
     public func updateFuelUsagePartialFillStatus(
@@ -287,36 +263,28 @@ public final class VehicleViewModel: ObservableObject {
             cachedMonthlySummaries = nil
             cachedProjectedYearStats = nil
             refreshID = UUID()
-        } catch {
-            print("Error updating partial fill status: \(error.localizedDescription)")
-        }
+        } catch { }
     }
     
     public func saveMaintenance(maintenance: Maintenance, context: ModelContext) {
         do {
             try saveMaintenanceUseCase(maintenance: maintenance, context: context)
             refreshID = UUID()
-        } catch {
-            print("Error saving maintenance: \(error.localizedDescription)")
-        }
+        } catch { }
     }
     
     public func deleteMaintenance(maintenance: Maintenance, context: ModelContext) {
         do {
             try deleteMaintenanceUseCase(maintenance: maintenance, context: context)
             refreshID = UUID()
-        } catch {
-            print("Error deleting maintenance: \(error.localizedDescription)")
-        }
+        } catch { }
     }
     
     public func resetAllMaintenance(context: ModelContext) {
         do {
             try resetMaintenanceUseCase(context: context)
             refreshID = UUID()
-        } catch {
-            print("Error resetting maintenance: \(error.localizedDescription)")
-        }
+        } catch { }
     }
     
     public func vehicleStatistics(context: ModelContext) -> [VehicleStatisticsUiModel] {
@@ -329,7 +297,6 @@ public final class VehicleViewModel: ObservableObject {
                 try getProjectedYearStatsUseCase(context: context)
             ]
         } catch {
-            print("Error generating statistics: \(error.localizedDescription)")
             return []
         }
     }
@@ -523,7 +490,6 @@ public final class VehicleViewModel: ObservableObject {
             
             return summaries
         } catch {
-            print("Error generating monthly fuel summaries: \(error.localizedDescription)")
             cachedMonthlySummaries = nil
             cachedMonthlySummariesVehicleID = nil
             return []
