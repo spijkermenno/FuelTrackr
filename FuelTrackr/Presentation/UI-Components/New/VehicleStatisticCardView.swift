@@ -34,12 +34,7 @@ struct VehicleStatisticCardView: View {
     }
     
     private var displayedFuelCost: String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = Locale.current
-        formatter.maximumFractionDigits = 2
-        formatter.minimumFractionDigits = 0
-        return formatter.string(from: NSNumber(value: uiModel.totalCost)) ?? String(format: "%.2f", uiModel.totalCost)
+        CurrencyFormatting.format(uiModel.totalCost)
     }
     
     private func title(for period: VehicleStatisticsPeriod) -> String {

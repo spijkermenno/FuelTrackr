@@ -34,7 +34,7 @@ public final class AddFuelUsageViewModel: ObservableObject {
     }
     
     public var decimalSeparator: String {
-        Locale.current.decimalSeparator ?? "."
+        Locale(identifier: GetSelectedCurrencyUseCase()().parsingLocaleIdentifier).decimalSeparator ?? Locale.current.decimalSeparator ?? "."
     }
     
     /// Gets the previous mileage from vehicle (from latest mileage or latest fuel usage)
@@ -163,8 +163,7 @@ public final class AddFuelUsageViewModel: ObservableObject {
     }
     
     private func parseInput(_ input: String) -> Double? {
-        let normalized = input.replacingOccurrences(of: decimalSeparator, with: ".")
-        return Double(normalized)
+        DecimalInputParser.parse(input)
     }
     
     private func convertMilesToKm(miles: Int) -> Int {

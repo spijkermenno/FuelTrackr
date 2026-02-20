@@ -121,7 +121,7 @@ public struct AllMaintenanceRow: View {
                 }
 
                 HStack(spacing: 8) {
-                    CostBadge(text: maintenance.isFree ? NSLocalizedString("free_or_warranty", comment: "") : String(format: "€%.2f", maintenance.cost))
+                    CostBadge(text: maintenance.isFree ? NSLocalizedString("free_or_warranty", comment: "") : CurrencyFormatting.format(maintenance.cost))
                     DaysAgoBadge(date: maintenance.date)
 
                     if let mileage = maintenance.mileage?.value {

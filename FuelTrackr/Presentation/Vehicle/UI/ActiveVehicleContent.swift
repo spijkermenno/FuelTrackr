@@ -284,12 +284,12 @@ private func makePreviewContainer() -> ModelContainer {
     
     // Fuel usages
     let fuel1 = FuelUsage(liters: 42.5, cost: 85.00, date: m2.date, mileage: m2, vehicle: vehicle)
-    let fuel2 = FuelUsage(liters: 38.0, cost: 76.00, date: m3.date, mileage: m3, vehicle: vehicle)
-    let fuel3 = FuelUsage(liters: 45.2, cost: 92.50, date: m4.date, mileage: m4, vehicle: vehicle)
+    //let fuel2 = FuelUsage(liters: 38.0, cost: 76.00, date: m3.date, mileage: m3, vehicle: vehicle)
+   // let fuel3 = FuelUsage(liters: 45.2, cost: 92.50, date: m4.date, mileage: m4, vehicle: vehicle)
     context.insert(fuel1)
-    context.insert(fuel2)
-    context.insert(fuel3)
-    vehicle.fuelUsages = [fuel1, fuel2, fuel3]
+   // context.insert(fuel2)
+   // context.insert(fuel3)
+    vehicle.fuelUsages = [fuel1]
     
     // Maintenances
     let maint1 = Maintenance(type: .oilChange, cost: 89.00, isFree: false, date: calendar.date(byAdding: .month, value: -3, to: Date())!, vehicle: vehicle)

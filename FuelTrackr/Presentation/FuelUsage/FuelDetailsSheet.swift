@@ -516,12 +516,7 @@ struct ConsumptionOverviewCard: View {
     }
     
     private func formatCurrency(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = Locale.current
-        formatter.maximumFractionDigits = 2
-        formatter.minimumFractionDigits = 0
-        return formatter.string(from: NSNumber(value: value)) ?? String(format: "%.2f", value)
+        CurrencyFormatting.format(value)
     }
 }
 
@@ -667,22 +662,15 @@ struct FuelConsumptionGraphView: View {
     
     private var priceUnit: String {
         if isUsingMetric {
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .currency
-            formatter.locale = Locale.current
-            let symbol = formatter.currencySymbol ?? "€"
-            return "\(symbol)/L"
+            let currency = GetSelectedCurrencyUseCase()()
+            return "\(currency.symbol)/L"
         } else {
             return NSLocalizedString("price_per_gallon", comment: "")
         }
     }
     
     private func formatPrice(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = Locale.current
-        formatter.maximumFractionDigits = 2
-        return formatter.string(from: NSNumber(value: value)) ?? String(format: "%.2f", value)
+        CurrencyFormatting.format(value)
     }
     
     private var consumptionData: [(date: Date, value: Double)] {
@@ -1125,7 +1113,7 @@ struct DetailedFuelEntryRow: View {
                     
                     // Price per unit (Green pill matching FuelConsumptionEntryView)
                     if usage.liters > 0 {
-                        let priceText = fuelType.formatPricePerUnit(pricePerLiter, isUsingMetric: isUsingMetric)
+                        let priceText = fuelType.formatPricePerUnit(pricePerLiter, isUsingMetric: isUsingMetric, currency: GetSelectedCurrencyUseCase()())
                         FuelPill(
                             icon: "fuelpump.fill",
                             text: priceText.replacingOccurrences(of: ".", with: ","),
@@ -1214,25 +1202,11 @@ struct DetailedFuelEntryRow: View {
     }
     
     private func formatCurrency(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = Locale.current
-        formatter.maximumFractionDigits = 2
-        formatter.minimumFractionDigits = 2
-        let formatted = formatter.string(from: NSNumber(value: value)) ?? String(format: "€%.2f", value)
-        // Replace decimal separator to match design (comma instead of period)
-        return formatted.replacingOccurrences(of: ".", with: ",")
+        CurrencyFormatting.format(value)
     }
     
     private func formatPricePerLiter(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = Locale.current
-        formatter.maximumFractionDigits = 2
-        formatter.minimumFractionDigits = 2
-        let formatted = formatter.string(from: NSNumber(value: value)) ?? String(format: "€%.2f", value)
-        // Replace decimal separator and add /L
-        return formatted.replacingOccurrences(of: ".", with: ",") + "/L"
+        CurrencyFormatting.formatPricePerLiter(value)
     }
 }
 
@@ -1503,13 +1477,7 @@ struct GroupSummaryCard: View {
     }
     
     private func formatCurrency(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = Locale.current
-        formatter.maximumFractionDigits = 2
-        formatter.minimumFractionDigits = 2
-        let formatted = formatter.string(from: NSNumber(value: value)) ?? String(format: "€%.2f", value)
-        return formatted.replacingOccurrences(of: ".", with: ",")
+        CurrencyFormatting.format(value)
     }
     
     private var pricePerLiter: Double {
@@ -1517,14 +1485,7 @@ struct GroupSummaryCard: View {
     }
     
     private func formatPricePerLiter(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = Locale.current
-        formatter.maximumFractionDigits = 2
-        formatter.minimumFractionDigits = 2
-        let formatted = formatter.string(from: NSNumber(value: value)) ?? String(format: "€%.2f", value)
-        // Replace decimal separator and add /L
-        return formatted.replacingOccurrences(of: ".", with: ",") + "/L"
+        CurrencyFormatting.formatPricePerLiter(value)
     }
     
     var body: some View {
@@ -1549,7 +1510,7 @@ struct GroupSummaryCard: View {
                 
                 // Price per unit (Green pill matching FuelConsumptionEntryView)
                 if totalFuel > 0 {
-                    let priceText = fuelTypeToUse.formatPricePerUnit(pricePerLiter, isUsingMetric: isUsingMetric)
+                    let priceText = fuelTypeToUse.formatPricePerUnit(pricePerLiter, isUsingMetric: isUsingMetric, currency: GetSelectedCurrencyUseCase()())
                     FuelPill(
                         icon: "fuelpump.fill",
                         text: priceText.replacingOccurrences(of: ".", with: ","),

@@ -151,7 +151,7 @@ private struct FuelUsagePreviewRow: View {
     }
     
     private var volumeCostString: String {
-        let costText = model.cost.formatted(.currency(code: Locale.current.currency?.identifier ?? "EUR"))
+        let costText = CurrencyFormatting.format(model.cost)
         let fuelType = model.fuelType ?? .liquid
         let fuelText = fuelType.formatFuelAmount(model.liters, isUsingMetric: settings.isUsingMetric)
         return "\(fuelText) - \(costText)"

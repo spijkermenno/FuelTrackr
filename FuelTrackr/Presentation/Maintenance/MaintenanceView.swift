@@ -139,7 +139,7 @@ public struct MaintenanceRow: View {
                     .font(.footnote)
                     .foregroundColor(.secondary)
 
-                Text("\(maintenance.type.localized): \(maintenance.isFree ? NSLocalizedString("free_or_warranty", comment: "Free maintenance") : String(format: "€%.2f", maintenance.cost))")
+                Text("\(maintenance.type.localized): \(maintenance.isFree ? NSLocalizedString("free_or_warranty", comment: "Free maintenance") : CurrencyFormatting.format(maintenance.cost))")
                     .font(.body)
                     .foregroundColor(.primary)
 

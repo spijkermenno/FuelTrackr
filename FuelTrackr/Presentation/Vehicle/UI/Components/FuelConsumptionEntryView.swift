@@ -173,16 +173,11 @@ public struct FuelConsumptionEntryView: View {
     
     private func formatPrice(_ pricePerUnit: Double) -> String {
         let fuelType = entry.fuelType ?? .liquid
-        return fuelType.formatPricePerUnit(pricePerUnit, isUsingMetric: settings.isUsingMetric)
+        return fuelType.formatPricePerUnit(pricePerUnit, isUsingMetric: settings.isUsingMetric, currency: GetSelectedCurrencyUseCase()())
     }
     
     private func formatCost(_ cost: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.currencyCode = Locale.current.currency?.identifier ?? "EUR"
-        formatter.maximumFractionDigits = 2
-        formatter.minimumFractionDigits = 0 // Allow no decimals if .00
-        return formatter.string(from: NSNumber(value: cost)) ?? String(format: "%.2f", cost)
+        CurrencyFormatting.format(cost)
     }
     
     private func formatConsumption(_ consumption: Double) -> String {
