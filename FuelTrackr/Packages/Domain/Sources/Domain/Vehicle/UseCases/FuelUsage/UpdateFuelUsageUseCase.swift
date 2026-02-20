@@ -5,6 +5,7 @@
 //  Created by Menno Spijker on 20/08/2025.
 //
 
+import Foundation
 import SwiftData
 
 public struct UpdateFuelUsageUseCase {
@@ -19,8 +20,9 @@ public struct UpdateFuelUsageUseCase {
         liters: Double,
         cost: Double,
         mileageValue: Int,
+        date: Date,
         context: ModelContext
     ) throws {
-        try repository.updateFuelUsage(id: id, liters: liters, cost: cost, mileageValue: mileageValue, context: context)
+        try repository.updateFuelUsage(id: id, liters: liters, cost: cost, mileageValue: mileageValue, date: date, context: context)
     }
 }

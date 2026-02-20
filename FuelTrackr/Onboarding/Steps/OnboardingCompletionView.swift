@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import FirebaseAnalytics
 import Domain
 import ScovilleKit
 
@@ -74,14 +75,14 @@ public struct OnboardingCompletionView: View {
         // Track vehicle creation and onboarding completion
         Task { @MainActor in
             Scoville.track(FuelTrackrEvents.onboardingCompleted)
-            Scoville.track(
-                FuelTrackrEvents.vehicleCreated,
-                parameters: [
-                    "fuel_type": vehicle.fuelType?.rawValue ?? "unknown",
-                    "has_photo": vehicle.photo != nil ? "true" : "false",
-                    "initial_mileage": String(initialMileage)
-                ]
-            )
+            Analytics.logEvent(FuelTrackrEvents.onboardingCompleted.rawValue, parameters: nil)
+            let params: [String: Any] = [
+                "fuel_type": vehicle.fuelType?.rawValue ?? "unknown",
+                "has_photo": vehicle.photo != nil ? "true" : "false",
+                "initial_mileage": String(initialMileage)
+            ]
+            Scoville.track(FuelTrackrEvents.vehicleCreated, parameters: params)
+            Analytics.logEvent(FuelTrackrEvents.vehicleCreated.rawValue, parameters: params)
         }
         
         withAnimation {

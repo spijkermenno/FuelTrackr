@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAnalytics
 import StoreKit
 import ScovilleKit
 
@@ -145,19 +146,19 @@ struct InAppPurchasePayWall: View {
         .onAppear {
             // Track paywall shown
             Task { @MainActor in
-                Scoville.track(
-                    FuelTrackrEvents.paywallShown,
-                    parameters: [
-                        "has_active_subscription": inAppPurchaseManager.hasActiveSubscription ? "true" : "false",
-                        "product_count": String(inAppPurchaseManager.products.count)
-                    ]
-                )
+                let params: [String: Any] = [
+                    "has_active_subscription": inAppPurchaseManager.hasActiveSubscription ? "true" : "false",
+                    "product_count": String(inAppPurchaseManager.products.count)
+                ]
+                Scoville.track(FuelTrackrEvents.paywallShown, parameters: params)
+                Analytics.logEvent(FuelTrackrEvents.paywallShown.rawValue, parameters: params)
             }
         }
         .onDisappear {
             // Track paywall dismissed
             Task { @MainActor in
                 Scoville.track(FuelTrackrEvents.paywallDismissed)
+                Analytics.logEvent(FuelTrackrEvents.paywallDismissed.rawValue, parameters: nil)
             }
         }
     }

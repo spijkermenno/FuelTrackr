@@ -68,6 +68,9 @@
 "fuel_usage_empty_description" = "Add more fuel entries for a better overview.";
 "fuel_usage_list_title" = "Fuel Usage Records";
 "second_entry_needed_calculation" = "Add a 2nd fuel entry to start calculating consumption and distance.";
+"fuel_entry_date_today" = "Today";
+"fuel_entry_date_label" = "Date";
+"fuel_entry_past_warning" = "You're adding a refill from the past. Please double-check the mileage. If it's off, your consumption stats may not be accurate. We skip mileage validation for past entries to give you flexibility.";
 
 /* Maintenance */
 "maintenance_title" = "Maintenance History";

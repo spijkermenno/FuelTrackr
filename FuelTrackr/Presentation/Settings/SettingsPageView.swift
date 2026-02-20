@@ -13,6 +13,7 @@ import Domain
 import UserNotifications
 import AppTrackingTransparency
 import ScovilleKit
+import FirebaseAnalytics
 import Data
 
 public struct SettingsPageView: View {
@@ -213,6 +214,7 @@ public struct SettingsPageView: View {
                 ) {
                     Button(action: {
                         Scoville.track(FuelTrackrEvents.reviewButtonClicked)
+                        Analytics.logEvent(FuelTrackrEvents.reviewButtonClicked.rawValue, parameters: nil)
                         dismiss()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                             ReviewPrompter.shared.maybeRequestReview(reason: .debug)
@@ -260,6 +262,7 @@ public struct SettingsPageView: View {
                     
                     Button(action: {
                         Scoville.track(FuelTrackrEvents.suggestionButtonClicked)
+                        Analytics.logEvent(FuelTrackrEvents.suggestionButtonClicked.rawValue, parameters: nil)
                         showAppSuggestion = true
                     }) {
                         HStack(spacing: 12) {
@@ -353,6 +356,7 @@ public struct SettingsPageView: View {
                             // Track vehicle deletion
                             Task { @MainActor in
                                 Scoville.track(FuelTrackrEvents.vehicleDeleted)
+                                Analytics.logEvent(FuelTrackrEvents.vehicleDeleted.rawValue, parameters: nil)
                             }
                             
                             vehicleViewModel.loadActiveVehicle(context: context)

@@ -17,7 +17,7 @@ public struct SaveFuelUsageUseCase {
         self.repository = repository
     }
 
-    public func callAsFunction(liters: Double, cost: Double, mileageValue: Int, context: ModelContext) throws {
-        try repository.saveFuelUsage(liters: liters, cost: cost, mileageValue: mileageValue, context: context)
+    public func callAsFunction(liters: Double, cost: Double, mileageValue: Int, date: Date, context: ModelContext) throws {
+        try repository.saveFuelUsage(liters: liters, cost: cost, mileageValue: mileageValue, date: date, context: context)
     }
 }

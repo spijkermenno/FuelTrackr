@@ -205,7 +205,7 @@ public final class VehicleViewModel: ObservableObject {
     
     public func saveFuelUsage(liters: Double, cost: Double, mileageValue: Int, context: ModelContext) {
         do {
-            try saveFuelUsageUseCase(liters: liters, cost: cost, mileageValue: mileageValue, context: context)
+            try saveFuelUsageUseCase(liters: liters, cost: cost, mileageValue: mileageValue, date: Date(), context: context)
             // Invalidate caches when fuel usage changes
             cachedMonthlySummaries = nil
             cachedProjectedYearStats = nil
@@ -245,10 +245,11 @@ public final class VehicleViewModel: ObservableObject {
             liters: Double,
             cost: Double,
             mileageValue: Int,
+            date: Date,
             context: ModelContext
         ) {
             do {
-                try updateFuelUsageUseCase(id: id, liters: liters, cost: cost, mileageValue: mileageValue, context: context)
+                try updateFuelUsageUseCase(id: id, liters: liters, cost: cost, mileageValue: mileageValue, date: date, context: context)
                 // Invalidate caches when fuel usage changes
                 cachedMonthlySummaries = nil
                 cachedProjectedYearStats = nil

@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseAnalytics
 import SwiftData
 import Domain
 import Data
@@ -40,12 +41,11 @@ struct ContentView: View {
             
             // Track app start
             Task { @MainActor in
-                Scoville.track(
-                    FuelTrackrEvents.appStarted,
-                    parameters: [
-                        "has_vehicle": vehicleViewModel.hasActiveVehicle ? "true" : "false"
-                    ]
-                )
+                let params: [String: Any] = [
+                    "has_vehicle": vehicleViewModel.hasActiveVehicle ? "true" : "false"
+                ]
+                Scoville.track(FuelTrackrEvents.appStarted, parameters: params)
+                Analytics.logEvent(FuelTrackrEvents.appStarted.rawValue, parameters: params)
             }
         }
     }

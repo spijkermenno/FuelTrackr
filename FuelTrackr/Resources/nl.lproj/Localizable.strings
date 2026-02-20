@@ -67,6 +67,9 @@
 "fuel_usage_empty_description" = "Voeg meer tankbeurten toe voor een beter overzicht.";
 "fuel_usage_list_title" = "Brandstof details";
 "second_entry_needed_calculation" = "Voeg een 2e tankbeurt toe om verbruik en afstand te berekenen.";
+"fuel_entry_date_today" = "Vandaag";
+"fuel_entry_date_label" = "Datum";
+"fuel_entry_past_warning" = "Je voegt een tankbeurt uit het verleden toe. Controleer de kilometerstand nog eens. Als die niet klopt, kunnen je verbruiksstatistieken afwijken. We slaan de kilometercontrole over bij verleden tankbeurten zodat je flexibel bent.";
 
 /* Onderhoud */
 "maintenance_title" = "Onderhoud Geschiedenis";

@@ -10,6 +10,7 @@
 import SwiftUI
 import Domain
 import ScovilleKit
+import FirebaseAnalytics
 
 
  struct AddMaintenanceSheet: View {
@@ -226,15 +227,14 @@ import ScovilleKit
         
         // Track maintenance creation
         Task { @MainActor in
-            Scoville.track(
-                FuelTrackrEvents.maintenanceTracked,
-                parameters: [
-                    "type": selectedType.rawValue,
-                    "cost": String(costValue),
-                    "is_free": isFree ? "true" : "false",
-                    "has_notes": (selectedType == .other && !notes.isEmpty) ? "true" : "false"
-                ]
-            )
+            let params: [String: Any] = [
+                "type": selectedType.rawValue,
+                "cost": String(costValue),
+                "is_free": isFree ? "true" : "false",
+                "has_notes": (selectedType == .other && !notes.isEmpty) ? "true" : "false"
+            ]
+            Scoville.track(FuelTrackrEvents.maintenanceTracked, parameters: params)
+            Analytics.logEvent(FuelTrackrEvents.maintenanceTracked.rawValue, parameters: params)
         }
         
         dismiss()

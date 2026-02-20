@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import FirebaseAnalytics
 import SwiftData
 import Domain
 import ScovilleKit
@@ -333,13 +334,12 @@ public struct EditVehicleSheet: View {
 
         // Track vehicle edit
         Task { @MainActor in
-            Scoville.track(
-                FuelTrackrEvents.vehicleEdited,
-                parameters: [
-                    "fuel_type": selectedFuelType?.rawValue ?? "unknown",
-                    "has_photo": photo != nil ? "true" : "false"
-                ]
-            )
+            let params: [String: Any] = [
+                "fuel_type": selectedFuelType?.rawValue ?? "unknown",
+                "has_photo": photo != nil ? "true" : "false"
+            ]
+            Scoville.track(FuelTrackrEvents.vehicleEdited, parameters: params)
+            Analytics.logEvent(FuelTrackrEvents.vehicleEdited.rawValue, parameters: params)
         }
 
         dismiss()

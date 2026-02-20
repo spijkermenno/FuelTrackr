@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAnalytics
 import ScovilleKit
 
 struct AppSuggestionView: View {
@@ -181,10 +182,12 @@ struct AppSuggestionView: View {
         let trimmedSuggestion = suggestionText.trimmingCharacters(in: .whitespacesAndNewlines)
         
         // Track suggestion via ScovilleKit
-        Scoville.track(FuelTrackrEvents.appSuggestionSubmitted, parameters: [
+        let params: [String: Any] = [
             "suggestion": trimmedSuggestion,
             "character_count": String(characterCount)
-        ])
+        ]
+        Scoville.track(FuelTrackrEvents.appSuggestionSubmitted, parameters: params)
+        Analytics.logEvent(FuelTrackrEvents.appSuggestionSubmitted.rawValue, parameters: params)
         
         // Simulate submission delay for better UX
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
