@@ -208,8 +208,21 @@ struct ProductDisplayModel: Identifiable {
     let displayPrice: String
     let salePrice: String?
     let showOfferReason: Bool
+    let offerDurationText: String?
     let isYearly: Bool
     let isLifetime: Bool
+    
+    init(id: String, title: String, billingDescription: String, displayPrice: String, salePrice: String?, showOfferReason: Bool, offerDurationText: String? = nil, isYearly: Bool, isLifetime: Bool) {
+        self.id = id
+        self.title = title
+        self.billingDescription = billingDescription
+        self.displayPrice = displayPrice
+        self.salePrice = salePrice
+        self.showOfferReason = showOfferReason
+        self.offerDurationText = offerDurationText
+        self.isYearly = isYearly
+        self.isLifetime = isLifetime
+    }
 }
 
 // MARK: - Premium Purchase Button Content (presentational, usable with mock data)
@@ -234,13 +247,20 @@ struct ProPurchaseButtonContent: View {
         Button(action: action) {
             VStack(spacing: 0) {
                 if model.showOfferReason {
-                    HStack(spacing: 6) {
-                        Image(systemName: "tag.fill")
-                            .font(.system(size: 12, weight: .bold))
-                        Text(NSLocalizedString("offer_reason_introductory", comment: ""))
-                            .font(.system(size: 13, weight: .heavy))
-                            .textCase(.uppercase)
-                            .tracking(0.5)
+                    VStack(spacing: 4) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "tag.fill")
+                                .font(.system(size: 12, weight: .bold))
+                            Text(NSLocalizedString("offer_reason_introductory", comment: ""))
+                                .font(.system(size: 13, weight: .heavy))
+                                .textCase(.uppercase)
+                                .tracking(0.5)
+                        }
+                        if let duration = model.offerDurationText {
+                            Text(duration)
+                                .font(.system(size: 11, weight: .medium))
+                                .opacity(0.95)
+                        }
                     }
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
@@ -325,6 +345,7 @@ struct ProPurchaseButton: View {
             displayPrice: product.displayPrice,
             salePrice: nil,
             showOfferReason: false,
+            offerDurationText: nil,
             isYearly: product.id.contains("yearly"),
             isLifetime: product.id.contains("lifetime")
         )
@@ -337,6 +358,7 @@ struct ProPurchaseButton: View {
                     displayPrice: product.displayPrice,
                     salePrice: nil,
                     showOfferReason: false,
+                    offerDurationText: nil,
                     isYearly: product.id.contains("yearly"),
                     isLifetime: product.id.contains("lifetime")
                 )
@@ -346,6 +368,11 @@ struct ProPurchaseButton: View {
                     return
                 }
                 if await subscription.isEligibleForIntroOffer {
+                    let durationText = InAppPurchaseManager.formatOfferDuration(
+                        period: offer.period,
+                        periodCount: offer.periodCount,
+                        paymentMode: offer.paymentMode
+                    )
                     displayModel = ProductDisplayModel(
                         id: product.id,
                         title: cleanTitle,
@@ -353,6 +380,7 @@ struct ProPurchaseButton: View {
                         displayPrice: product.displayPrice,
                         salePrice: offer.displayPrice,
                         showOfferReason: true,
+                        offerDurationText: durationText,
                         isYearly: product.id.contains("yearly"),
                         isLifetime: product.id.contains("lifetime")
                     )
@@ -614,10 +642,11 @@ struct PaywallPreviewView: View {
 }
 
 #Preview("Paywall - With Offers") {
-    PaywallPreviewView(products: [
-        ProductDisplayModel(id: "pro_lifetime", title: NSLocalizedString("pro_lifetime_title", comment: ""), billingDescription: NSLocalizedString("pro_one_time_payment", comment: ""), displayPrice: "€49.99", salePrice: "€29.99", showOfferReason: true, isYearly: false, isLifetime: true),
-        ProductDisplayModel(id: "pro_yearly", title: NSLocalizedString("pro_yearly_title", comment: ""), billingDescription: NSLocalizedString("pro_billed_annually", comment: ""), displayPrice: "€29.99", salePrice: "€19.99", showOfferReason: true, isYearly: true, isLifetime: false),
-        ProductDisplayModel(id: "pro_monthly", title: NSLocalizedString("pro_monthly_title", comment: ""), billingDescription: NSLocalizedString("pro_billed_monthly", comment: ""), displayPrice: "€4.99", salePrice: "€1.99", showOfferReason: true, isYearly: false, isLifetime: false),
+    let offerDuration = String(format: NSLocalizedString("offer_valid_for", comment: ""), String(format: NSLocalizedString("offer_duration_n_months", comment: ""), 3))
+    return PaywallPreviewView(products: [
+        ProductDisplayModel(id: "pro_lifetime", title: NSLocalizedString("pro_lifetime_title", comment: ""), billingDescription: NSLocalizedString("pro_one_time_payment", comment: ""), displayPrice: "€49.99", salePrice: "€29.99", showOfferReason: true, offerDurationText: offerDuration, isYearly: false, isLifetime: true),
+        ProductDisplayModel(id: "pro_yearly", title: NSLocalizedString("pro_yearly_title", comment: ""), billingDescription: NSLocalizedString("pro_billed_annually", comment: ""), displayPrice: "€29.99", salePrice: "€19.99", showOfferReason: true, offerDurationText: offerDuration, isYearly: true, isLifetime: false),
+        ProductDisplayModel(id: "pro_monthly", title: NSLocalizedString("pro_monthly_title", comment: ""), billingDescription: NSLocalizedString("pro_billed_monthly", comment: ""), displayPrice: "€4.99", salePrice: "€1.99", showOfferReason: true, offerDurationText: String(format: NSLocalizedString("offer_valid_for", comment: ""), NSLocalizedString("offer_duration_1_week", comment: "")), isYearly: false, isLifetime: false),
     ])
 }
 

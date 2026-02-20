@@ -78,6 +78,7 @@ class InAppPurchaseManager: ObservableObject {
     @Published var hasActiveSubscription: Bool = false
     @Published var hasEligibleOffer: Bool = false
     @Published var eligibleOfferDiscountPercent: Int? = nil
+    @Published var eligibleOfferDurationText: String? = nil
     @Published var currentPurchaseInfo: PurchaseInfo = PurchaseInfo(type: .none, productID: "", transactionID: nil, purchaseDate: nil, expirationDate: nil)
     
     private var hasPreloadedProducts = false
@@ -140,10 +141,12 @@ class InAppPurchaseManager: ObservableObject {
         guard !hasActiveSubscription else {
             hasEligibleOffer = false
             eligibleOfferDiscountPercent = nil
+            eligibleOfferDurationText = nil
             return
         }
         var bestDiscount: Int = 0
         var foundEligible = false
+        var bestDurationText: String? = nil
         for product in products {
             guard let subscription = product.subscription,
                   let offer = subscription.introductoryOffer else { continue }
@@ -164,11 +167,17 @@ class InAppPurchaseManager: ObservableObject {
                 default:
                     discount = 0
                 }
-                bestDiscount = max(bestDiscount, discount)
+                if discount > bestDiscount {
+                    bestDiscount = discount
+                    bestDurationText = Self.formatOfferDuration(period: offer.period, periodCount: offer.periodCount, paymentMode: offer.paymentMode)
+                } else if bestDurationText == nil, discount > 0 || offer.paymentMode == .freeTrial {
+                    bestDurationText = Self.formatOfferDuration(period: offer.period, periodCount: offer.periodCount, paymentMode: offer.paymentMode)
+                }
             }
         }
         hasEligibleOffer = foundEligible
         eligibleOfferDiscountPercent = foundEligible && bestDiscount > 0 ? bestDiscount : nil
+        eligibleOfferDurationText = foundEligible ? bestDurationText : nil
     }
     
     func purchase(product: Product) async {
@@ -372,6 +381,43 @@ class InAppPurchaseManager: ObservableObject {
     
     func resetPurchaseState() {
         purchaseState = .idle
+    }
+    
+    /// Formats the offer duration for display (e.g. "Valid for 7 days", "3 months at this price").
+    static func formatOfferDuration(period: Product.SubscriptionPeriod, periodCount: Int, paymentMode: Product.SubscriptionOffer.PaymentMode) -> String? {
+        let totalValue = periodCount * period.value
+        guard totalValue > 0 else { return nil }
+        
+        let durationPhrase: String
+        switch period.unit {
+        case .day:
+            durationPhrase = totalValue == 1
+                ? NSLocalizedString("offer_duration_1_day", comment: "")
+                : String(format: NSLocalizedString("offer_duration_n_days", comment: ""), totalValue)
+        case .week:
+            durationPhrase = totalValue == 1
+                ? NSLocalizedString("offer_duration_1_week", comment: "")
+                : String(format: NSLocalizedString("offer_duration_n_weeks", comment: ""), totalValue)
+        case .month:
+            durationPhrase = totalValue == 1
+                ? NSLocalizedString("offer_duration_1_month", comment: "")
+                : String(format: NSLocalizedString("offer_duration_n_months", comment: ""), totalValue)
+        case .year:
+            durationPhrase = totalValue == 1
+                ? NSLocalizedString("offer_duration_1_year", comment: "")
+                : String(format: NSLocalizedString("offer_duration_n_years", comment: ""), totalValue)
+        @unknown default:
+            return nil
+        }
+        
+        switch paymentMode {
+        case .freeTrial:
+            return String(format: NSLocalizedString("offer_valid_for", comment: ""), durationPhrase)
+        case .payAsYouGo, .payUpFront:
+            return String(format: NSLocalizedString("offer_valid_for", comment: ""), durationPhrase)
+        default:
+            return String(format: NSLocalizedString("offer_valid_for", comment: ""), durationPhrase)
+        }
     }
     
     #if DEBUG

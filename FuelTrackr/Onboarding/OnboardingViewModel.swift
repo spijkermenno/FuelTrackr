@@ -25,7 +25,7 @@ public final class OnboardingViewModel: ObservableObject {
     private let getIsUsingMetric: GetUsingMetricUseCase
     
     // MARK: - Computed Properties
-    public var totalSteps: Int { 9 }
+    public var totalSteps: Int { 8 }
     
     /// Returns the step index for progress indicator (excludes welcome screen, accounts for skipped step 8)
     public var currentStepIndex: Int {
@@ -33,23 +33,21 @@ public final class OnboardingViewModel: ObservableObject {
         case .welcome:
             return 0 // Welcome doesn't show progress
         case .notifications:
-            return 1 // Shows "1 of 9" in design
-        case .tracking:
-            return 2 // Shows "2 of 9" in design
+            return 1
         case .unitSelection:
-            return 3 // Shows "3 of 9" in design
+            return 2
         case .vehicleName:
-            return 4 // Shows "4 of 9" in design
+            return 3
         case .vehicleFuelType:
-            return 5 // Shows "5 of 9" in design
+            return 4
         case .optionalDetails:
-            return 6 // Shows "6 of 9" in design
+            return 5
         case .currentMileage:
-            return 7 // Shows "7 of 9" in design
+            return 6
         case .addPhoto:
-            return 8 // Shows "8 of 9" in design (step 8 is skipped)
+            return 7
         case .completion:
-            return 9 // Completion doesn't show progress, but if it did it would be 9
+            return 8
         }
     }
     
@@ -98,8 +96,6 @@ public final class OnboardingViewModel: ObservableObject {
         case .welcome:
             return true
         case .notifications:
-            return true // Permission step, can always proceed
-        case .tracking:
             return true // Permission step, can always proceed
         case .unitSelection:
             return true
@@ -152,8 +148,7 @@ public final class OnboardingViewModel: ObservableObject {
 public enum OnboardingStep: Int, CaseIterable {
     case welcome = 1
     case notifications = 2
-    case tracking = 3
-    case unitSelection = 4
+    case unitSelection = 3
     case vehicleName = 5
     case vehicleFuelType = 6
     case optionalDetails = 7
@@ -187,8 +182,6 @@ public enum OnboardingStep: Int, CaseIterable {
             return NSLocalizedString("onboarding_welcome_title", comment: "")
         case .notifications:
             return NSLocalizedString("onboarding_notifications_title", comment: "")
-        case .tracking:
-            return NSLocalizedString("onboarding_tracking_title", comment: "")
         case .unitSelection:
             return NSLocalizedString("onboarding_unit_selection_title", comment: "")
         case .vehicleName:

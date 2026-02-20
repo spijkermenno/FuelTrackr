@@ -24,10 +24,14 @@ public struct EditVehicleSheet: View {
     @State private var purchaseDate: Date = Date()
     @State private var manufacturingDate: Date = Date()
     @State private var photo: UIImage?
+    @State private var odometer: String = ""
+    @State private var isEditingOdometer = false
     @State private var errorMessage: String?
     @State private var showImagePicker = false
     @State private var showImageSourcePicker = false
     @State private var imageSourceType: UIImagePickerController.SourceType = .photoLibrary
+    @State private var showOdometerEditAlert = false
+    @State private var showOdometerSaveConfirm = false
 
     private var colors: ColorsProtocol {
         Theme.colors(for: colorScheme)
@@ -64,10 +68,9 @@ public struct EditVehicleSheet: View {
                         selection: $manufacturingDate
                     )
 
-                    // Latest Mileage Info (Read-only)
-                    if let vehicle = viewModel.resolvedVehicle(context: context),
-                       let latestMileage = vehicle.latestMileage {
-                        latestMileageInfo(mileage: latestMileage)
+                    // Odometer / Current Mileage (Editable)
+                    if viewModel.resolvedVehicle(context: context) != nil {
+                        odometerSection
                     }
 
                     // Error Message
@@ -142,6 +145,25 @@ public struct EditVehicleSheet: View {
             Button(NSLocalizedString("cancel", comment: ""), role: .cancel) {}
         }
         .onAppear(perform: initializeFields)
+        .alert(NSLocalizedString("odometer_title", comment: ""), isPresented: $showOdometerEditAlert) {
+            Button(NSLocalizedString("cancel", comment: ""), role: .cancel) {}
+            Button(NSLocalizedString("continue", comment: "")) {
+                isEditingOdometer = true
+            }
+        } message: {
+            Text(NSLocalizedString("odometer_change_warning", comment: ""))
+        }
+        .alert(NSLocalizedString("odometer_save_confirm_title", comment: ""), isPresented: $showOdometerSaveConfirm) {
+            Button(NSLocalizedString("cancel", comment: ""), role: .cancel) {
+                initializeOdometerField()
+                isEditingOdometer = false
+            }
+            Button(NSLocalizedString("odometer_change_confirm", comment: "")) {
+                saveOdometerOnly()
+            }
+        } message: {
+            Text(NSLocalizedString("odometer_save_confirm_message", comment: ""))
+        }
     }
 
     // MARK: - Photo Section
@@ -258,37 +280,116 @@ public struct EditVehicleSheet: View {
         }
     }
 
-    // MARK: - Latest Mileage Info
-    private func latestMileageInfo(mileage: Mileage) -> some View {
+    // MARK: - Odometer Section
+    private var odometerSection: some View {
         VStack(alignment: .leading, spacing: Theme.dimensions.spacingS) {
-            Text(NSLocalizedString("latest_mileage_title", comment: ""))
+            Text(NSLocalizedString("odometer_title", comment: ""))
                 .font(Theme.typography.headlineFont)
                 .foregroundColor(colors.onBackground)
 
-            HStack {
-                VStack(alignment: .leading, spacing: Theme.dimensions.spacingXS) {
-                    Text(formatMileage(mileage.value))
-                        .font(Theme.typography.headlineFont)
-                        .foregroundColor(colors.onBackground)
+            if isEditingOdometer {
+                InputField(
+                    title: viewModel.isUsingMetric ?
+                        NSLocalizedString("mileage_title_km", comment: "") :
+                        NSLocalizedString("mileage_title_miles", comment: ""),
+                    placeholder: viewModel.isUsingMetric ?
+                        NSLocalizedString("onboarding_mileage_placeholder_km", comment: "") :
+                        NSLocalizedString("onboarding_mileage_placeholder_miles", comment: ""),
+                    text: $odometer,
+                    keyboardType: .numberPad,
+                    hasError: false
+                )
 
-                    Text(formatDate(mileage.date))
-                        .font(Theme.typography.footnoteFont)
-                        .foregroundColor(colors.onSurface)
-                }
-
-                Spacer()
-
-                Image(systemName: "info.circle")
+                HStack(spacing: Theme.dimensions.spacingM) {
+                    Button(NSLocalizedString("cancel", comment: "")) {
+                        initializeOdometerField()
+                        isEditingOdometer = false
+                    }
                     .foregroundColor(colors.onSurface)
+
+                    Button(NSLocalizedString("save", comment: "")) {
+                        handleOdometerSaveTap()
+                    }
+                    .fontWeight(.semibold)
+                    .foregroundColor(colors.primary)
+                }
+            } else {
+                HStack {
+                    if let vehicle = viewModel.resolvedVehicle(context: context),
+                       let latestMileage = vehicle.latestMileage {
+                        Text(formatMileage(latestMileage.value))
+                            .font(Theme.typography.headlineFont)
+                            .foregroundColor(colors.onBackground)
+                    } else {
+                        Text("—")
+                            .font(Theme.typography.headlineFont)
+                            .foregroundColor(colors.onSurface)
+                    }
+                    Spacer()
+                    Button {
+                        handleOdometerPencilTap()
+                    } label: {
+                        Image(systemName: "pencil")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(colors.primary)
+                            .frame(width: 44, height: 44)
+                    }
+                }
+                .padding(Theme.dimensions.spacingM)
+                .background(colors.surface)
+                .cornerRadius(Theme.dimensions.radiusButton)
+                .overlay(
+                    RoundedRectangle(cornerRadius: Theme.dimensions.radiusButton)
+                        .stroke(colors.border, lineWidth: 1)
+                )
             }
-            .padding(Theme.dimensions.spacingM)
-            .background(colors.surface)
-            .cornerRadius(Theme.dimensions.radiusButton)
-            .overlay(
-                RoundedRectangle(cornerRadius: Theme.dimensions.radiusButton)
-                    .stroke(colors.border, lineWidth: 1)
-            )
         }
+    }
+
+    private func handleOdometerPencilTap() {
+        guard let vehicle = viewModel.resolvedVehicle(context: context) else { return }
+        initializeOdometerField()
+        if hasOdometerWarningData(vehicle: vehicle) {
+            showOdometerEditAlert = true
+        } else {
+            isEditingOdometer = true
+        }
+    }
+
+    private func handleOdometerSaveTap() {
+        guard let vehicle = viewModel.resolvedVehicle(context: context) else { return }
+        guard let value = parseOdometerValue(), value > 0 else {
+            errorMessage = NSLocalizedString("validation_mileage_invalid", comment: "")
+            return
+        }
+        errorMessage = nil
+        let originalOdometer = vehicle.latestMileage?.value ?? 0
+        guard value != originalOdometer else {
+            isEditingOdometer = false
+            return
+        }
+        if hasOdometerWarningData(vehicle: vehicle) {
+            showOdometerSaveConfirm = true
+        } else {
+            saveOdometerOnly()
+        }
+    }
+
+    private func saveOdometerOnly() {
+        guard let value = parseOdometerValue(), value > 0 else { return }
+        viewModel.updateOdometer(newValue: value, context: context)
+        initializeOdometerField()
+        isEditingOdometer = false
+    }
+
+    private func initializeOdometerField() {
+        guard let vehicle = viewModel.resolvedVehicle(context: context) else { return }
+        let currentValue = vehicle.latestMileage?.value ?? 0
+        odometer = viewModel.isUsingMetric ? String(currentValue) : String(Int(Double(currentValue) * 0.621371))
+    }
+
+    private func hasOdometerWarningData(vehicle: Vehicle) -> Bool {
+        !vehicle.fuelUsages.isEmpty || vehicle.maintenances.contains { $0.mileage != nil }
     }
 
     // MARK: - Helper Methods
@@ -299,28 +400,32 @@ public struct EditVehicleSheet: View {
         purchaseDate = vehicle.purchaseDate
         manufacturingDate = vehicle.manufacturingDate
         photo = vehicle.photo.flatMap { UIImage(data: $0) }
+        initializeOdometerField()
     }
 
     private func saveVehicle() {
-        // Clear previous error
         errorMessage = nil
 
-        // Validate name
         guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             errorMessage = NSLocalizedString("all_fields_required_error", comment: "")
             return
         }
 
-        // Validate dates
         guard manufacturingDate <= purchaseDate else {
             errorMessage = NSLocalizedString("manufacturing_date_before_purchase_error", comment: "")
             return
         }
 
-        guard let vehicle = viewModel.resolvedVehicle(context: context) else {
+        guard viewModel.resolvedVehicle(context: context) != nil else {
             errorMessage = NSLocalizedString("vehicle_not_found_error", comment: "")
             return
         }
+
+        performSave()
+    }
+
+    private func performSave() {
+        guard viewModel.resolvedVehicle(context: context) != nil else { return }
 
         viewModel.updateVehicle(
             name: name.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -332,7 +437,6 @@ public struct EditVehicleSheet: View {
             context: context
         )
 
-        // Track vehicle edit
         Task { @MainActor in
             let params: [String: Any] = [
                 "fuel_type": selectedFuelType?.rawValue ?? "unknown",
@@ -343,6 +447,11 @@ public struct EditVehicleSheet: View {
         }
 
         dismiss()
+    }
+
+    private func parseOdometerValue() -> Int? {
+        guard let parsed = Int(odometer.trimmingCharacters(in: .whitespaces)), parsed >= 0 else { return nil }
+        return viewModel.isUsingMetric ? parsed : Int(Double(parsed) / 0.621371)
     }
 
     private func formatMileage(_ mileage: Int) -> String {

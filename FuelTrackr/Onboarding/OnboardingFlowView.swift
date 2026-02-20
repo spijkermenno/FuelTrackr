@@ -60,8 +60,6 @@ public struct OnboardingFlowView: View {
                         OnboardingWelcomeView(viewModel: viewModel)
                     case .notifications:
                         OnboardingNotificationsView(viewModel: viewModel)
-                    case .tracking:
-                        OnboardingTrackingView(viewModel: viewModel)
                     case .unitSelection:
                         OnboardingUnitSelectionView(viewModel: viewModel)
                     case .vehicleName:
@@ -86,7 +84,7 @@ public struct OnboardingFlowView: View {
                 ))
                 
                 // Persistent progress indicator - only show when not on welcome, notifications, tracking, or completion
-                if viewModel.currentStep != .welcome && viewModel.currentStep != .notifications && viewModel.currentStep != .tracking && viewModel.currentStep != .completion {
+                if viewModel.currentStep != .welcome && viewModel.currentStep != .notifications && viewModel.currentStep != .completion {
                     OnboardingProgressIndicator(
                         currentStep: viewModel.currentStepIndex,
                         totalSteps: viewModel.totalSteps

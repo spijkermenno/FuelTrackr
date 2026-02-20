@@ -11,7 +11,6 @@ import SwiftUI
 import SwiftData
 import Domain
 import UserNotifications
-import AppTrackingTransparency
 import ScovilleKit
 import FirebaseAnalytics
 import Data
@@ -31,7 +30,6 @@ public struct SettingsPageView: View {
     @State private var showDeleteConfirmation = false
     @State private var showPayWall = false
     @State private var notificationAuthorizationStatus: UNAuthorizationStatus = .notDetermined
-    @State private var trackingAuthorizationStatus: ATTrackingManager.AuthorizationStatus = .notDetermined
     @StateObject private var reviewPrompter = ReviewPrompter.shared
     @State private var showAppSuggestion = false
     @State private var exportShareItem: ExportShareItem?
@@ -163,41 +161,6 @@ public struct SettingsPageView: View {
                                 .font(Theme.typography.bodyFont)
                                 .foregroundColor(colors.onBackground)
                             Text(NSLocalizedString("notifications_toggle_description", comment: ""))
-                                .font(Theme.typography.captionFont)
-                                .foregroundColor(colors.onSurface)
-                        }
-                    }
-                }
-                
-                // Tracking Section
-                Section(header: Text(NSLocalizedString("tracking_toggle", comment: ""))
-                    .foregroundColor(colors.onSurface)) {
-                    Toggle(isOn: Binding(
-                        get: { trackingAuthorizationStatus == .authorized },
-                        set: { newValue in
-                            if newValue {
-                                // Request permission if not determined
-                                if trackingAuthorizationStatus == .notDetermined {
-                                    requestTrackingPermission()
-                                } else if trackingAuthorizationStatus == .denied || trackingAuthorizationStatus == .restricted {
-                                    // Open settings if denied or restricted
-                                    if let url = URL(string: UIApplication.openSettingsURLString) {
-                                        UIApplication.shared.open(url)
-                                    }
-                                }
-                            } else {
-                                // If trying to disable, open settings
-                                if let url = URL(string: UIApplication.openSettingsURLString) {
-                                    UIApplication.shared.open(url)
-                                }
-                            }
-                        }
-                    )) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(NSLocalizedString("tracking_toggle", comment: ""))
-                                .font(Theme.typography.bodyFont)
-                                .foregroundColor(colors.onBackground)
-                            Text(NSLocalizedString("tracking_toggle_description", comment: ""))
                                 .font(Theme.typography.captionFont)
                                 .foregroundColor(colors.onSurface)
                         }
@@ -392,11 +355,9 @@ public struct SettingsPageView: View {
         .task {
             await purchaseManager.checkPurchaseStatus()
             checkNotificationStatus()
-            checkTrackingStatus()
         }
         .onAppear {
             checkNotificationStatus()
-            checkTrackingStatus()
             // Reset review sheet state when view appears to prevent auto-opening
             if reviewPrompter.showCustomReview {
                 reviewPrompter.showCustomReview = false
@@ -421,10 +382,6 @@ public struct SettingsPageView: View {
         }
     }
     
-    private func checkTrackingStatus() {
-        trackingAuthorizationStatus = ATTrackingManager.trackingAuthorizationStatus
-    }
-    
     private func requestNotificationPermission() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
             if granted {
@@ -434,14 +391,6 @@ public struct SettingsPageView: View {
             }
             Task { @MainActor in
                 checkNotificationStatus()
-            }
-        }
-    }
-    
-    private func requestTrackingPermission() {
-        ATTrackingManager.requestTrackingAuthorization { status in
-            Task { @MainActor in
-                checkTrackingStatus()
             }
         }
     }
