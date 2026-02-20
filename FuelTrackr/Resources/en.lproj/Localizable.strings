@@ -67,7 +67,7 @@
 "fuel_usage_empty_title" = "More data needed";
 "fuel_usage_empty_description" = "Add more fuel entries for a better overview.";
 "fuel_usage_list_title" = "Fuel Usage Records";
-"fuel_history_need_more_data" = "Add another fuel entry to view the detailed history.";
+"second_entry_needed_calculation" = "Add a 2nd fuel entry to start calculating consumption and distance.";
 
 /* Maintenance */
 "maintenance_title" = "Maintenance History";

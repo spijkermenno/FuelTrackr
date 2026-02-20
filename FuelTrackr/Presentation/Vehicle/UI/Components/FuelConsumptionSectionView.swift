@@ -100,12 +100,6 @@ public struct FuelConsumptionSectionView: View {
                         )
                         .cornerRadius(12)
                 }
-            } else if entries.count == 1 {
-                Text(NSLocalizedString("fuel_history_need_more_data", comment: "Need more data for history"))
-                    .font(.system(size: 14, weight: .regular))
-                    .foregroundColor(colors.onSurface)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 12)
             }
         }
         .padding(Theme.dimensions.spacingL)

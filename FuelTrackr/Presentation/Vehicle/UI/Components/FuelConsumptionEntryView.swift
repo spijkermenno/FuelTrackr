@@ -71,19 +71,26 @@ public struct FuelConsumptionEntryView: View {
     
     public var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            // Date
-            HStack {
-                Text(formatDate(entry.date))
-                    .font(.system(size: 14, weight: .regular))
-                    .foregroundColor(colors.primary)
-                
-                Spacer()
+            // Date (leading) and odometer range (trailing)
+            ViewThatFits {
+                HStack {
+                    Text(formatDate(entry.date))
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundColor(colors.primary)
+                    Spacer(minLength: 8)
+                    Text(formatOdometerRange(entry.startOdometer, entry.endOdometer))
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundColor(colors.onSurface)
+                }
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(formatDate(entry.date))
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundColor(colors.primary)
+                    Text(formatOdometerRange(entry.startOdometer, entry.endOdometer))
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundColor(colors.onSurface)
+                }
             }
-            
-            // Odometer range
-            Text(formatOdometerRange(entry.startOdometer, entry.endOdometer))
-                .font(.system(size: 14, weight: .regular))
-                .foregroundColor(colors.onSurface)
             
             // All pills in a flow layout (wraps to multiple lines if needed, but tries to stay on one line)
             FlowLayout(spacing: 8, lineSpacing: 8) {
@@ -114,23 +121,34 @@ public struct FuelConsumptionEntryView: View {
                     textColor: colorScheme == .dark ? colors.accentOrange : hexColor("#8F6126") // Adaptive: orange in dark mode, dark orange in light
                 )
                 
-                SummaryPillView(
-                    icon: "fuelpump.fill",
-                    label: "",
-                    value: formatConsumption(entry.consumptionRate),
-                    backgroundColor: colors.fuelUsagePillBackground,
-                    iconColor: colors.fuelUsagePillText,
-                    textColor: colors.fuelUsagePillText
-                )
+                if entry.consumptionRate > 0 {
+                    SummaryPillView(
+                        icon: "fuelpump.fill",
+                        label: "",
+                        value: formatConsumption(entry.consumptionRate),
+                        backgroundColor: colors.fuelUsagePillBackground,
+                        iconColor: colors.fuelUsagePillText,
+                        textColor: colors.fuelUsagePillText
+                    )
+                }
                 
-                SummaryPillView(
-                    icon: "speedometer",
-                    label: "",
-                    value: formatDistance(entry.distanceDriven),
-                    backgroundColor: colors.kmDrivenPillBackground,
-                    iconColor: colors.kmDrivenPillText,
-                    textColor: colors.kmDrivenPillText
-                )
+                if entry.distanceDriven > 0 {
+                    SummaryPillView(
+                        icon: "speedometer",
+                        label: "",
+                        value: formatDistance(entry.distanceDriven),
+                        backgroundColor: colors.kmDrivenPillBackground,
+                        iconColor: colors.kmDrivenPillText,
+                        textColor: colors.kmDrivenPillText
+                    )
+                }
+            }
+            
+            if entry.consumptionRate == 0 && entry.distanceDriven == 0 {
+                Text(NSLocalizedString("second_entry_needed_calculation", comment: ""))
+                    .font(.system(size: 12, weight: .regular))
+                    .foregroundColor(colors.onSurface.opacity(0.8))
+                    .padding(.top, 4)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
