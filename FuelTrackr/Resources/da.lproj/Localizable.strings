@@ -1,0 +1,486 @@
+/* Welcome and General */
+"welcome_title" = "Velkommen til FuelTrackr!";
+"welcome_subtitle" = "Start med at indtaste din køretøjsoplysninger. Når de er gemt, begynder FuelTrackr at spore dit brændstofforbrug, vedligeholdelse og kilometertal.";
+
+/* Vehicle Editing */
+"edit_vehicle_title" = "Rediger køretøj";
+
+/* Photo */
+"tap_to_select_photo" = "Tryk for at vælge et foto";
+"select_photo" = "Vælg foto";
+"photo_title" = "Foto";
+"add_photo_button" = "Tilføj foto";
+
+/* Vehicle Details */
+"vehicle_name_title" = "Køretøjsnavn";
+"vehicle_name_placeholder" = "Indtast køretøjsnavn";
+"license_plate_title" = "Nummerplade";
+"license_plate_placeholder" = "Indtast nummerplade";
+"purchase_date_title" = "Købsdato";
+"manufacturing_date_title" = "Produktionsdato";
+"save_vehicle_button" = "Gem køretøj";
+
+/* Mileage */
+"mileage_title" = "Kilometertal";
+"mileage_placeholder" = "Indtast kilometertal";
+"mileage_label" = "Kilometertal";
+"mileage_title_km" = "Nuværende kilometertal (km)";
+"mileage_title_miles" = "Nuværende kilometertal (mi)";
+
+"mileage_history_km" = "kilometertal (km) historik";
+"mileage_history_miles" = "kilometertal (mi) historik";
+
+/* Additional Labels */
+"license_plate_label" = "Nummerplade";
+"purchase_date_label" = "Købsdato";
+"manufacturing_date_label" = "Produktionsdato";
+
+/* Deletion */
+"delete_vehicle_button" = "Slet køretøj";
+"delete_vehicle_confirmation_title" = "Er du sikker på, at du vil slette dette køretøj?";
+"delete_confirmation_title" = "Er du sikker?";
+"delete_confirmation_delete" = "Slet";
+
+/* Fuel Usage */
+"add_fuel_usage_title" = "Tilføj brændstofforbrug";
+"add_fuel_usage_description" = "Registrer hvert brændstoffyld for at holde en komplet brændstofhistorik og overvåge forbrugstendenser over tid.";
+"fuel_entry_details" = "Brændstofindtastningsdetaljer";
+"liters_label" = "Hvor mange liter tankede du?";
+"gallons_label" = "Hvor mange gallon tankede du?";
+"kwh_label" = "Hvor mange kWh opladede du?";
+"kg_h2_label" = "Hvor mange kg H₂ tankede du?";
+"fuel_amount_label" = "Hvor meget brændstof tilføjede du?";
+"cost_label" = "Samlet omkostning (%@)";
+"cost_placeholder" = "Indtast pris (f.eks. 100)";
+"liters_placeholder" = "Indtast mængde (f.eks. 12)";
+"gallons_placeholder" = "Indtast mængde (f.eks. 3,5)";
+"kwh_placeholder" = "Indtast mængde (f.eks. 50)";
+"kg_h2_placeholder" = "Indtast mængde (f.eks. 5)";
+"fuel_amount_placeholder" = "Indtast mængde";
+"price_per_liter" = "Pris per liter";
+"price_per_gallon" = "Pris per gallon";
+"fuel_type" = "Brændstoftype";
+"fuel_usage_title" = "Brændstofforbrug";
+"fuel_usage_no_content" = "For at få indsigt i dit brændstofforbrug, tilføj data via knappen med '+' symbolet";
+"fuel_usage_saved_success" = "Brændstofforbrug gemt succesfuldt.";
+"fuel_usage_saved_error" = "Kunne ikke gemme brændstofforbrug.";
+"fuel_usage_empty_title" = "Flere data påkrævet";
+"fuel_usage_empty_description" = "Tilføj flere brændstofindtastninger for et bedre overblik.";
+"fuel_usage_list_title" = "Brændstofforbrugsposter";
+"second_entry_needed_calculation" = "Tilføj en 2. brændstofindtastning for at begynde at beregne forbrug og afstand.";
+"fuel_entry_date_today" = "I dag";
+"fuel_entry_date_label" = "Dato";
+"fuel_entry_past_warning" = "Du tilføjer en tankning fra fortiden. Tjek venligst kilometertallet grundigt. Hvis det er forkert, kan dine forbrugsstatistikker være unøjagtige. Vi springer kilometertal-validering over for fortidige indtastninger for at give dig fleksibilitet.";
+"edit_fuel_entry_past_warning" = "Denne tankning er fra fortiden. Tjek venligst kilometertallet grundigt. Hvis det er forkert, kan dine forbrugsstatistikker være unøjagtige. Vi springer kilometertal-validering over for fortidige indtastninger for at give dig fleksibilitet.";
+"edit_liters_label" = "Liter";
+"edit_gallons_label" = "Gallon";
+"edit_kwh_label" = "kWh";
+"edit_kg_h2_label" = "kg H₂";
+"edit_fuel_amount_label" = "Brændstofmængde";
+
+/* Maintenance */
+"maintenance_title" = "Vedligeholdelseshistorik";
+"maintenance_no_content" = "Ingen vedligeholdelsesposter tilgængelige. Tilføj en post via '+' knappen.";
+"maintenance_details" = "Vedligeholdelsesdetaljer";
+"maintenance_type" = "Vedligeholdelsestype";
+"add_maintenance_title" = "Tilføj vedligeholdelse";
+"maintenance_saved_success" = "Vedligeholdelse gemt succesfuldt.";
+"maintenance_saved_error" = "Kunne ikke gemme vedligeholdelse.";
+"maintenance_list_title" = "Vedligeholdelsesposter";
+"delete_confirmation_maintenance" = "Er du sikker på, at du vil slette denne vedligeholdelsespost?";
+"delete_confirmation_fuel" = "Er du sikker på, at du vil slette denne brændstofpost?";
+
+/* Other */
+"other" = "Andet";
+"other_notes" = "Angiv venligst";
+"other_notes_placeholder" = "Indtast beskrivelse for 'Andet'";
+"all_fields_required_error" = "Alle felter skal udfyldes med gyldige data.";
+"invalid_liters_error" = "Indtast venligst et gyldigt antal liter større end 0.";
+"invalid_gallons_error" = "Indtast venligst et gyldigt antal gallon større end 0.";
+"invalid_kwh_error" = "Indtast venligst et gyldigt antal kWh større end 0.";
+"invalid_kg_h2_error" = "Indtast venligst et gyldigt antal kg H₂ større end 0.";
+"invalid_fuel_amount_error" = "Indtast venligst en gyldig brændstofmængde større end 0.";
+"invalid_cost_error" = "Indtast venligst en gyldig omkostning større end 0.";
+"invalid_mileage_error" = "Kilometertallet skal være højere end det nuværende kilometertal.";
+"invalid_cost_error_generic" = "Ugyldig omkostning. Tjek venligst indtastningsformatet.";
+"invalid_number_error" = "Ugyldigt tal. Sørg for, at indtastningen er numerisk.";
+"invalid_notes_error" = "Angiv venligst en beskrivelse for vedligeholdelsen.";
+"general_error" = "Noget gik galt. Prøv venligst igen.";
+"mileage_too_low_error" = "Kilometertallet kan ikke være lavere end den foregående registrerede værdi (%d).";
+"mileage_suspiciously_high_warning" = "Dette kilometertal er meget højere end forventet. Tjek om du har tilføjet et ekstra ciffer.";
+
+/* Notifications */
+"notifications_section" = "Notifikationer";
+"notifications_disclaimer" = "Vi arbejder på notifikationer, så du ikke misser opdateringer. De er ikke tilgængelige endnu—hold øje!";
+"enable_notifications" = "Aktiver notifikationer";
+"enable_notifications_description" = "Aktiver eller deaktiver notifikationer for vedligeholdelsespåmindelser.";
+"notification_permission_error" = "Aktiver venligst notifikationer i dine enhedsindstillinger.";
+"notifications_disabled_title" = "Notifikationer deaktiveret";
+"notifications_disabled_message" = "Aktiver notifikationer i indstillinger for påmindelser.";
+"notifications_toggle" = "Notifikationer";
+"notifications_toggle_description" = "Tillad notifikationer for vedligeholdelsespåmindelser og opdateringer.";
+"notification_status_authorized" = "Autoriseret";
+"notification_status_denied" = "Afvist";
+"notification_status_not_determined" = "Ikke bestemt";
+"tracking_toggle" = "Sporing";
+"tracking_toggle_description" = "Tillad sporing for at hjælpe med at forbedre appoplevelsen.";
+"tracking_status_authorized" = "Autoriseret";
+"tracking_status_denied" = "Afvist";
+"tracking_status_restricted" = "Begrænset";
+"tracking_status_not_determined" = "Ikke bestemt";
+"open_settings" = "Åbn indstillinger";
+"pro_grant_debug" = "Giv Pro (fejlsøgning)";
+"ok" = "OK";
+
+/* Units and Settings */
+"units_section" = "Enheder";
+"measurement_system" = "Målesystem";
+"measurement_system_description" = "Vælg målesystem for afstand og brændstof.";
+"use_metric_units" = "Brug metersystem";
+
+"currently_using_metric" = "Bruger i øjeblikket metersystem for afstand og brændstof (kilometer og liter)";
+"currently_using_imperial" = "Bruger i øjeblikket imperial system for afstand og brændstof (miles og gallon)";
+
+"default_maintenance_intervals" = "Standard vedligeholdelsesintervaller";
+"tires" = "Dæk";
+"distribution_belt" = "Tandrem";
+"oil_change" = "Olieskift";
+"brakes" = "Bremser";
+"other" = "Andet";
+"settings_title" = "Indstillinger";
+"settings_description" = "Tilpas din appoplevelse ved at administrere indstillinger som notifikationer, enheder og standard vedligeholdelsesintervaller.";
+
+/* Data Export */
+"export_section" = "Eksportér data";
+"export_to_json" = "Eksportér til JSON";
+"export_to_json_subtitle" = "Fuldt sikkerhedskopi til FuelTrackr";
+"export_to_xml" = "Eksportér til XML";
+"export_to_xml_subtitle" = "Brændstofforbrug til regneark og personlig brug";
+"export_to_csv" = "Eksportér til CSV";
+"export_to_csv_subtitle" = "Åbnes direkte i Excel, Google Sheets, Numbers";
+"export_failed_title" = "Eksport mislykkedes";
+
+/* Data Reset */
+"reset_section" = "Nulstil data";
+"reset_maintenance_button" = "Nulstil vedligeholdelsesdata";
+"reset_fuel_button" = "Nulstil brændstofforbrugsdata";
+"reset_confirmation_title" = "Er du sikker?";
+"reset_confirmation_confirm" = "Nulstil";
+"settings_reset" = "Nulstil indstillinger";
+
+/* Vehicle Purchase */
+"vehicle_is_purchased" = "Køretøj købt";
+"vehicle_not_purchased_banner" = "Dette køretøj er endnu ikke købt. Når du har købt det, bekræft venligst nedenfor.";
+"vehicle_purchase_confirm" = "Bekræft køb";
+"vehicle_purchase_cancel" = "Slet køretøj";
+"vehicle_purchase_question" = "Har du allerede købt dette køretøj?";
+"vehicle_purchase_success" = "Køretøj markeret som købt!";
+"vehicle_purchase_error" = "Der opstod en fejl under opdatering af køretøjsstatus.";
+
+/* Date and Misc */
+"date_label" = "Dato";
+"select_date" = "Vælg dato";
+"date" = "Dato";
+"close" = "Luk";
+"search" = "Søg";
+
+/* Graphs */
+"no_graph_fuel" = "En graf vil vises her, når der er tilføjet flere brændstofdata.";
+"no_graph_maintenance" = "En graf vil vises her, når der er tilføjet flere vedligeholdelsesdata.";
+"no_graph_mileage" = "En graf vil vises her, når der er registreret flere kilometertalsposter.";
+
+/* Analytics and Refresh */
+"refreshing" = "Opdaterer...";
+"no_active_vehicle_found" = "Intet aktivt køretøj fundet.";
+
+/* Notification (Purchase Date Passed) */
+"notification_purchase_date_passed_title" = "Har du købt dit køretøj?";
+"notification_purchase_date_passed_description" = "Hvis du har købt dit køretøj i dag, sørg for at bekræfte det i appen.";
+
+/* Vehicle Details */
+"vehicle_details_title" = "Køretøjsdetaljer";
+
+"cancel" = "Annuller";
+"save" = "Gem";
+"latest_mileage" = "Seneste kilometertal";
+"add_maintenance_description" = "Registrer din vedligeholdelse for at holde dit køretøj i topform.";
+"free_or_warranty" = "Gratis / Garanti";
+"days_ago" = "Dage siden";
+"maintenance_interval_description" = "Når dit køretøjs kilometertal siden sidste vedligeholdelse—som dækskift, olieskift eller bremseinspektion—overskrider denne tærskel, modtager du en notifikation om, at det er tid til service.";
+
+"monthly_recap_nav_title" = "Her er en opsummering af de data, du indtastede sidste måned:";
+"monthly_recap_title" = "Månedlig opsummering";
+"km_driven" = "Kørte kilometer";
+"total_fuel_used" = "Samlet brændstofforbrug";
+"total_fuel_cost" = "Samlet brændstofomkostning";
+"average_fuel_usage" = "Gennemsnitligt brændstofforbrug";
+"comparison" = "Ændring i kørte kilometer sammenlignet med sidste måned:";
+"comparison_result" = "Sammenlignet med foregående måned: %+.0f%%";
+"no_data_available" = "Ingen data tilgængelige for denne måned.";
+
+"monthly_recap_notification_title" = "Månedlig opsummering klar";
+"monthly_recap_notification_body" = "Tryk for at se en opsummering af dit køretøjs præstation sidste måned.";
+"test_notification_title" = "Testnotifikation";
+"test_notification_body" = "Dette er en testnotifikation fra FuelTrackr.";
+"test_notification" = "Testnotifikation";
+"test_notification_success" = "Testnotifikation planlagt.";
+
+"mileage_title" = "Kilometertal";
+"purchase_date" = "Købsdato";
+"manufacturing_date" = "Produktionsdato";
+
+"currency_section" = "Valuta";
+"select_currency" = "Vælg din valuta";
+
+"ytd" = "År til dato";
+"all_time" = "Hele tiden";
+"projected_year" = "Projekteret år";
+
+"fuel_usage_title" = "Brændstofforbrug";
+"add" = "Tilføj";
+"edit" = "Rediger";
+"swipe_to_edit_hint" = "Rediger";
+
+"edit_fuel_usage_title" = "Rediger brændstofforbrug";
+"edit_fuel_usage_description" = "Juster liter, omkostning eller kilometertal for denne tankning.";
+
+"validation_liters_invalid" = "Indtast venligst gyldige liter større end nul.";
+"validation_cost_invalid" = "Indtast venligst en gyldig omkostning (nul eller mere).";
+"validation_mileage_invalid" = "Indtast venligst et gyldigt kilometertal.";
+"mileage_placeholder_format" = "f.eks. %d";
+
+/* Onboarding */
+"onboarding_welcome_title" = "Velkommen til FuelTrackr 👋";
+"onboarding_welcome_description" = "Lad os sætte dit køretøj op, så du nemt kan spore dit brændstofforbrug og vedligeholdelse.";
+"onboarding_setup_vehicle_button" = "Opsæt mit køretøj";
+"onboarding_notifications_title" = "Hold dig opdateret";
+"onboarding_notifications_description" = "Aktiver notifikationer for at modtage påmindelser om brændstofsporing og månedlige opsummeringer.";
+"onboarding_notifications_allow" = "Aktiver notifikationer";
+"onboarding_notifications_skip" = "Ikke nu";
+"onboarding_tracking_title" = "Hjælp med at forbedre FuelTrackr";
+"onboarding_tracking_description" = "Vi bruger anonym sporing til at forbedre appen. Vi vil aldrig spore dig med personlige data eller dele dine oplysninger.";
+"onboarding_tracking_allow" = "Fortsæt";
+"onboarding_tracking_skip" = "Bed app om ikke at spore";
+"onboarding_unit_selection_title" = "Afstand og forbrug";
+"onboarding_unit_selection_question" = "Hvilke enheder bruger du til afstand og brændstofforbrug?";
+"onboarding_vehicle_name_title" = "Køretøjsnavn";
+"onboarding_vehicle_name_description" = "Giv dit køretøj et navn for nemt at identificere det.";
+"onboarding_vehicle_name_placeholder" = "Indtast køretøjsnavn";
+"onboarding_vehicle_name_default" = "Min bil";
+"onboarding_vehicle_name_use_default" = "Brug \"%@\"";
+"kilometers_liters" = "Kilometer og liter";
+"miles_gallons" = "Miles og gallon";
+"metric" = "(Metrisk)";
+"imperial" = "(Imperial)";
+"continue" = "Fortsæt";
+"onboarding_license_plate_title" = "Nummerplade";
+"onboarding_license_plate_description" = "Indtast dit køretøjs nummerplade for automatisk at hente offentlige specifikationer.";
+"onboarding_license_plate_placeholder" = "Udfyld nummerplade";
+"onboarding_license_plate_info" = "Når tilgængeligt, vil FuelTrackr bruge offentlige køretøjsdata til at forududfylde detaljer. Dette virker kun for understøttede regioner og nummerpladeformater.";
+"onboarding_add_later" = "Jeg tilføjer dette senere";
+
+"onboarding_vehicle_fuel_type_title" = "Køretøjets brændstoftype";
+"onboarding_vehicle_fuel_type_question" = "Hvilken brændstof bruger dit køretøj?";
+"onboarding_vehicle_fuel_type_placeholder" = "[NYD]";
+
+"fuel_liquid" = "Benzin eller diesel";
+"fuel_electric" = "Elektrisk";
+"fuel_hydrogen" = "Brint";
+"fuel_unknown" = "Andet";
+
+"onboarding_vehicle_brand_title" = "Køretøjsmærke";
+"onboarding_vehicle_brand_question" = "Hvilket mærke er dit køretøj?";
+"onboarding_vehicle_brand_placeholder" = "Søg eller vælg dit mærke";
+
+"onboarding_not_on_list" = "Ikke på listen";
+"onboarding_vehicle_model_title" = "Køretøjsmodel";
+"onboarding_vehicle_model_question" = "Hvilken model kører du?";
+"onboarding_vehicle_model_placeholder" = "Søg eller skriv din model";
+"onboarding_optional_details_title" = "Valgfrie detaljer";
+"onboarding_optional_details_description" = "Tilføj disse for at forbedre vedligeholdelsesestimater og langsigtede omkostningsindsigter.";
+"onboarding_production_date_title" = "Produktionsmåned og år";
+"onboarding_select_date_placeholder" = "Vælg dato";
+"onboarding_skip_for_now" = "Spring over for nu";
+"onboarding_current_mileage_title" = "Nuværende kilometertal";
+"onboarding_current_mileage_question" = "Hvad er dit køretøjs nuværende kilometertal?\n\nVi har brug for dette for nøjagtigt at beregne dit brændstofforbrug og spore dit køretøjs præstation over tid.";
+"onboarding_mileage_placeholder_km" = "f.eks. 125.000 km";
+"onboarding_mileage_placeholder_miles" = "f.eks. 77.671 mi";
+"onboarding_mileage_new_car" = "Start fra 0";
+"onboarding_add_photo_title" = "Tilføj et foto af dit køretøj";
+"onboarding_add_photo_description" = "Dette hjælper dig med hurtigt at genkende det i dit overblik.";
+"onboarding_take_photo" = "Tag foto";
+"onboarding_choose_from_gallery" = "Vælg fra galleri";
+"onboarding_confirm_photo" = "Bekræft foto";
+"onboarding_reset_photo" = "Nulstil foto";
+"onboarding_completion_title" = "Køretøjsopsætning fuldført! 🎉";
+"onboarding_completion_description" = "FuelTrackr er nu klar til at hjælpe dig med automatisk at spore brændstof, omkostninger og vedligeholdelse.";
+"onboarding_go_to_dashboard" = "Gå til dashboard";
+"done" = "Færdig";
+
+/* Redesigned Active Vehicle View */
+"fuel_consumption" = "Brændstofforbrug";
+"maintenance_history" = "Vedligeholdelseshistorik";
+"show_more" = "Vis mere";
+"fuel_history" = "Brændstofhistorik";
+"total_distance_km" = "Samlet afstand";
+"total_distance_miles" = "Samlet afstand";
+"average_price" = "Gennemsnitlig pris";
+"fuel" = "Brændstof";
+"costs" = "Omkostninger";
+"odometer" = "Kilometertæller";
+"brake_replacement" = "Bremseudskiftning";
+"tire_replacement" = "Dækskift";
+"distribution_belt" = "Tandrem";
+"other_maintenance" = "Andet";
+"mileage" = "Kilometertal";
+"owned" = "Ejet";
+"age" = "Alder";
+
+/* Fuel Detail Page */
+"consumption_overview" = "Forbrugsoversigt";
+"consumption_over_time" = "Forbrug over tid";
+"average_consumption" = "gennemsnitligt forbrug";
+"total_cost_label" = "Samlet omkostning";
+"last_refueling" = "Sidste tankning";
+"fuel_entries_last_months" = "Brændstofindtastninger seneste %d måneder (%d)";
+"fuel_entries_last_month" = "Brændstofindtastninger sidste måned (%d)";
+"fuel_entries_all" = "Alle brændstofindtastninger (%d)";
+"add_new_refueling" = "Tilføj ny tankning";
+"timeframe_all" = "Alt";
+"timeframe_1m" = "1M";
+"timeframe_3m" = "3M";
+"timeframe_1y" = "1Å";
+"timeframe_ytd" = "YTD";
+"range" = "område";
+"location" = "Placering";
+"km_per_liter" = "km/l";
+"liters" = "L";
+"price_per_liter" = "$/L";
+"consumption" = "Forbrug";
+"cost" = "Omkostning";
+
+/* Partial Fill */
+"partial_fill" = "Deltankning";
+"partial_fill_description" = "Denne tankning ser ud til at være delvis. Den vil blive slået sammen med næste fulde tankning for nøjagtige forbrugsberegninger.";
+"partial_fill_badge" = "Halv tank";
+"mark_as_full_fill" = "Markér som fuld tankning";
+"mark_as_partial_fill" = "Markér som deltankning";
+"partial_fill_info" = "Deltankninger opdages automatisk, når en tankning er væsentligt mindre end dit gennemsnit. De slås sammen med næste fulde tankning for nøjagtige brændstofforbrugsberegninger.";
+"not_enough_data_for_detection" = "Mindst %d tankninger nødvendige for at opdage deltankninger";
+"current_status" = "Nuværende status";
+"fill_type" = "Tankningstype";
+"full_fill" = "Fuld tankning";
+"average_refill_amount" = "Gennemsnitlig tankningsmængde";
+"merged_partial_fill_description" = "Denne post indeholder flere brændstoftankninger, der er slået sammen. Du kan markere enkelte poster som fulde eller delvise tankninger nedenfor.";
+"merged_group_summary" = "Sammenslået gruppeopsummering";
+"total_fuel" = "Samlet brændstof";
+"entries_count" = "Poster";
+"entries_in_group" = "Poster i denne gruppe";
+"partial_fill_toggle_description" = "Markér denne tankning som delvis, hvis det ikke var en fuld tank. Delvise tankninger slås sammen med næste fulde tankning for nøjagtige forbrugsberegninger.";
+"merged_group_title" = "Sammenslået gruppe";
+"merged_group_info" = "Denne post er en del af en sammenslået gruppe. Alle poster nedenfor kombineres til forbrugsberegning, indtil en fuld tankning nås.";
+"current" = "Nuværende";
+"closing_fill" = "Fuld tank";
+"combined_stats" = "Kombinerede statistikker";
+
+/* In-App Purchase / Pro */
+"pro_title" = "FuelTrackr Pro";
+"pro_subtitle" = "Fremtiden for køretøjsintelligens";
+"pro_feature_unlimited_history_title" = "Ubegrænset historik";
+"pro_feature_unlimited_history_subtitle" = "Fuld udgiftstransparens";
+"pro_feature_smart_maintenance_title" = "Smart vedligeholdelse";
+"pro_feature_smart_maintenance_subtitle" = "Smarte servicepåmindelser";
+"pro_feature_smart_refill_title" = "Smart tankningslogik";
+"pro_feature_smart_refill_subtitle" = "Prædiktiv rækkevidde og omkostningsindsigter";
+"restore_purchase" = "Gendan køb";
+"privacy_policy" = "Privatlivspolitik";
+"terms_of_service" = "Servicevilkår";
+"pro_lifetime_title" = "Livstid Pro";
+"pro_yearly_title" = "Årlig adgang";
+"pro_monthly_title" = "Månedlig adgang";
+"pro_one_time_payment" = "Engangsbetaling";
+"pro_billed_annually" = "Faktureres årligt";
+"pro_billed_monthly" = "Faktureres månedligt";
+"pro_unlock_lifetime" = "Lås op for Livstid Pro";
+"pro_processing_purchase" = "Behandler køb...";
+"pro_purchase_successful" = "Køb gennemført!";
+"pro_thank_you_message" = "Tak fordi du opgraderede til Pro";
+"continue_button" = "Fortsæt";
+"pro_status" = "Pro-status";
+"pro_purchased" = "Købt: %@";
+"pro_renews" = "Fornyes: %@";
+"pro_never_expires" = "Udløber aldrig";
+"pro_manage_subscription" = "Administrer abonnement";
+"purchase_display_lifetime" = "Livstid Pro";
+"purchase_display_monthly" = "Månedligt abonnement";
+"purchase_display_yearly" = "Årligt abonnement";
+"purchase_display_none" = "Intet aktivt køb";
+"pro_remove_debug" = "Fjern Pro (fejlsøgning)";
+"pro_upgrade" = "Opgrader til Pro";
+"pro_best_value_badge" = "BEDSTE VÆRDI";
+"offer_reason_introductory" = "App-lanceringstilbud";
+"offer_discount_percent" = "%d%% rabat";
+"offer_free_trial" = "Gratis prøveperiode";
+"offer_valid_for" = "Gyldig for %@";
+"offer_duration_1_day" = "1 dag";
+"offer_duration_n_days" = "%d dage";
+"offer_duration_1_week" = "1 uge";
+"offer_duration_n_weeks" = "%d uger";
+"offer_duration_1_month" = "1 måned";
+"offer_duration_n_months" = "%d måneder";
+"offer_duration_1_year" = "1 år";
+"offer_duration_n_years" = "%d år";
+"offer_valid_until_march_6" = "Gyldig til 6. marts";
+"unit_km" = "km";
+"unit_mi" = "mi";
+"unit_l" = "L";
+"unit_g" = "G";
+"unit_kwh" = "kWh";
+"unit_kg_h2" = "kg H₂";
+
+/* Review & Feedback */
+"help_feedback_section" = "Hjælp og feedback";
+"help_feedback_footer" = "Del din feedback eller forslag for at hjælpe os med at forbedre";
+"review_app" = "Bedøm appen";
+"review_share_opinion" = "Fortæl os hvad du synes";
+"review_recent_feedback" = "Du indsendte for nylig feedback";
+"review_title" = "Hvordan synes du om FuelTrackr?";
+"review_subtitle" = "Din mening betyder virkelig meget";
+"review_description" = "Nyder du appen? Eller mangler der noget?\nMed din feedback kan vi forbedre FuelTrackr trin for trin, for dig og andre brugere.";
+"review_star_rating" = "%d stjerne";
+"review_feedback_prompt" = "Hvad kan vi forbedre?";
+"review_feedback_placeholder" = "Fortæl os, hvad vi kan gøre bedre...";
+"review_feedback_min_chars" = "Mindst %d tegn påkrævet";
+"review_feedback_max_chars" = "Maksimum %d tegn tilladt";
+"review_go_to_app_store" = "Gå til App Store";
+"review_submit_feedback" = "Send feedback";
+"review_feedback_required" = "Fortæl venligst hvad vi kan forbedre, før du kan sende";
+"review_maybe_later" = "Måske senere";
+"review_cooldown_recent" = "Du indsendte for nylig feedback";
+"review_cooldown_days" = "Du kan sende feedback igen om %d dag(e)";
+"app_suggestion" = "App-forslag";
+"app_suggestion_subtitle" = "Del din idé til forbedring";
+"suggestion_title" = "App-forslag";
+"suggestion_subtitle" = "Har du en idé til at forbedre appen? Del den med os!";
+"suggestion_field_label" = "Dit forslag";
+"suggestion_field_placeholder" = "Beskriv din idé til en ny funktion eller forbedring...";
+"suggestion_min_chars" = "Mindst %d tegn påkrævet";
+"suggestion_max_chars" = "Maksimum %d tegn tilladt";
+"suggestion_submit" = "Send";
+
+/* Edit Vehicle */
+"fuel_type_title" = "Brændstoftype";
+"purchase_status_title" = "Købsstatus";
+"vehicle_purchased" = "Køretøj købt";
+"latest_mileage_title" = "Seneste kilometertal";
+"odometer_title" = "Kilometertæller";
+"odometer_change_warning" = "Ændring af kilometertælleren med eksisterende brændstof- eller vedligeholdelsesdata kan påvirke dine forbrugsstatistikker og rapporter. Fortsæt kun, hvis du er sikker på, at den nye værdi er korrekt.";
+"odometer_change_confirm" = "Ændr kilometertæller";
+"odometer_save_confirm_title" = "Ændre kilometertæller?";
+"odometer_save_confirm_message" = "Dette opdaterer det nuværende kilometertal. Dine forbrugsstatistikker kan blive påvirket. Fortsætte?";
+"select_photo_source" = "Vælg fotokilde";
+"camera" = "Kamera";
+"photo_library" = "Fotobibliotek";
+"remove_photo" = "Fjern foto";
+"manufacturing_date_before_purchase_error" = "Produktionsdatoen skal være før eller lig med købsdatoen.";
+"vehicle_not_found_error" = "Køretøj ikke fundet. Prøv venligst igen.";

@@ -55,12 +55,12 @@ public struct ActiveVehicleContent: View {
         ScrollView {
             if let vehicle = vehicleViewModel.resolvedVehicle(context: context) {
                 VStack(alignment: .leading, spacing: 12) {
-                    // Offer banner for non-premium users when an introductory offer is available
-                    if forceShowOfferBanner ?? (!purchaseManager.hasActiveSubscription && purchaseManager.hasEligibleOffer) {
+                    // Offer banner for non-premium users (Lifetime Pro promo or subscription intro offer)
+                    if forceShowOfferBanner ?? (!purchaseManager.hasActiveSubscription && (LifetimeProPromo.isActive || purchaseManager.hasEligibleOffer)) {
                         OfferBannerView(
                             onTap: { isShowingPayWall = true },
-                            discountPercent: forceShowOfferBanner == true ? 40 : purchaseManager.eligibleOfferDiscountPercent,
-                            offerDurationText: forceShowOfferBanner == true ? String(format: NSLocalizedString("offer_valid_for", comment: ""), String(format: NSLocalizedString("offer_duration_n_days", comment: ""), 7)) : purchaseManager.eligibleOfferDurationText
+                            discountPercent: forceShowOfferBanner == true ? 50 : (LifetimeProPromo.isActive ? LifetimeProPromo.discountPercent : purchaseManager.eligibleOfferDiscountPercent),
+                            offerDurationText: forceShowOfferBanner == true ? LifetimeProPromo.offerDurationText : (LifetimeProPromo.isActive ? LifetimeProPromo.offerDurationText : purchaseManager.eligibleOfferDurationText)
                         )
                         .padding(.horizontal, Theme.dimensions.spacingL)
                     }

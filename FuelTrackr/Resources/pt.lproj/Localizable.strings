@@ -1,0 +1,486 @@
+/* Welcome and General */
+"welcome_title" = "Bem-vindo ao FuelTrackr!";
+"welcome_subtitle" = "Comece inserindo os dados do seu veículo. Depois de guardados, o FuelTrackr começará a acompanhar o consumo de combustível, a manutenção e a quilometragem.";
+
+/* Vehicle Editing */
+"edit_vehicle_title" = "Editar veículo";
+
+/* Photo */
+"tap_to_select_photo" = "Toque para selecionar uma foto";
+"select_photo" = "Selecionar foto";
+"photo_title" = "Foto";
+"add_photo_button" = "Adicionar foto";
+
+/* Vehicle Details */
+"vehicle_name_title" = "Nome do veículo";
+"vehicle_name_placeholder" = "Inserir nome do veículo";
+"license_plate_title" = "Matrícula";
+"license_plate_placeholder" = "Inserir matrícula";
+"purchase_date_title" = "Data de compra";
+"manufacturing_date_title" = "Data de fabrico";
+"save_vehicle_button" = "Guardar veículo";
+
+/* Mileage */
+"mileage_title" = "Quilometragem";
+"mileage_placeholder" = "Inserir quilometragem";
+"mileage_label" = "Quilometragem";
+"mileage_title_km" = "Quilometragem atual (km)";
+"mileage_title_miles" = "Quilometragem atual (mi)";
+
+"mileage_history_km" = "histórico de quilometragem (km)";
+"mileage_history_miles" = "histórico de quilometragem (mi)";
+
+/* Additional Labels */
+"license_plate_label" = "Matrícula";
+"purchase_date_label" = "Data de compra";
+"manufacturing_date_label" = "Data de fabrico";
+
+/* Deletion */
+"delete_vehicle_button" = "Eliminar veículo";
+"delete_vehicle_confirmation_title" = "Tem a certeza de que deseja eliminar este veículo?";
+"delete_confirmation_title" = "Tem a certeza?";
+"delete_confirmation_delete" = "Eliminar";
+
+/* Fuel Usage */
+"add_fuel_usage_title" = "Adicionar consumo de combustível";
+"add_fuel_usage_description" = "Registe cada abastecimento para manter um histórico completo e monitorizar tendências de consumo ao longo do tempo.";
+"fuel_entry_details" = "Detalhes do abastecimento";
+"liters_label" = "Quantos litros abasteceu?";
+"gallons_label" = "Quantas galões abasteceu?";
+"kwh_label" = "Quantos kWh carregou?";
+"kg_h2_label" = "Quantos kg de H₂ abasteceu?";
+"fuel_amount_label" = "Quanto combustível adicionou?";
+"cost_label" = "Custo total (%@)";
+"cost_placeholder" = "Inserir preço (ex.: 100)";
+"liters_placeholder" = "Inserir quantidade (ex.: 12)";
+"gallons_placeholder" = "Inserir quantidade (ex.: 3,5)";
+"kwh_placeholder" = "Inserir quantidade (ex.: 50)";
+"kg_h2_placeholder" = "Inserir quantidade (ex.: 5)";
+"fuel_amount_placeholder" = "Inserir quantidade";
+"price_per_liter" = "Preço por litro";
+"price_per_gallon" = "Preço por galão";
+"fuel_type" = "Tipo de combustível";
+"fuel_usage_title" = "Consumo de combustível";
+"fuel_usage_no_content" = "Para obter insights sobre o seu consumo, adicione dados usando o botão com o símbolo '+'";
+"fuel_usage_saved_success" = "Consumo de combustível guardado com sucesso.";
+"fuel_usage_saved_error" = "Falha ao guardar o consumo de combustível.";
+"fuel_usage_empty_title" = "São necessários mais dados";
+"fuel_usage_empty_description" = "Adicione mais abastecimentos para uma melhor visão geral.";
+"fuel_usage_list_title" = "Registos de consumo de combustível";
+"second_entry_needed_calculation" = "Adicione um 2.º abastecimento para começar a calcular o consumo e a distância.";
+"fuel_entry_date_today" = "Hoje";
+"fuel_entry_date_label" = "Data";
+"fuel_entry_past_warning" = "Está a adicionar um abastecimento do passado. Por favor, verifique a quilometragem. Se estiver incorreta, as estatísticas de consumo podem não ser precisas. Não validamos a quilometragem para entradas passadas para dar-lhe flexibilidade.";
+"edit_fuel_entry_past_warning" = "Este abastecimento é do passado. Por favor, verifique a quilometragem. Se estiver incorreta, as estatísticas de consumo podem não ser precisas. Não validamos a quilometragem para entradas passadas para dar-lhe flexibilidade.";
+"edit_liters_label" = "Litros";
+"edit_gallons_label" = "Galões";
+"edit_kwh_label" = "kWh";
+"edit_kg_h2_label" = "kg H₂";
+"edit_fuel_amount_label" = "Quantidade de combustível";
+
+/* Maintenance */
+"maintenance_title" = "Histórico de manutenção";
+"maintenance_no_content" = "Não há registos de manutenção. Adicione um registo usando o botão '+'.";
+"maintenance_details" = "Detalhes da manutenção";
+"maintenance_type" = "Tipo de manutenção";
+"add_maintenance_title" = "Adicionar manutenção";
+"maintenance_saved_success" = "Manutenção guardada com sucesso.";
+"maintenance_saved_error" = "Falha ao guardar a manutenção.";
+"maintenance_list_title" = "Registos de manutenção";
+"delete_confirmation_maintenance" = "Tem a certeza de que deseja eliminar este registo de manutenção?";
+"delete_confirmation_fuel" = "Tem a certeza de que deseja eliminar este registo de combustível?";
+
+/* Other */
+"other" = "Outro";
+"other_notes" = "Por favor especifique";
+"other_notes_placeholder" = "Inserir descrição para 'Outro'";
+"all_fields_required_error" = "Todos os campos devem ser preenchidos com dados válidos.";
+"invalid_liters_error" = "Por favor, insira um número válido de litros maior que 0.";
+"invalid_gallons_error" = "Por favor, insira um número válido de galões maior que 0.";
+"invalid_kwh_error" = "Por favor, insira um número válido de kWh maior que 0.";
+"invalid_kg_h2_error" = "Por favor, insira um número válido de kg H₂ maior que 0.";
+"invalid_fuel_amount_error" = "Por favor, insira uma quantidade válida de combustível maior que 0.";
+"invalid_cost_error" = "Por favor, insira um custo válido maior que 0.";
+"invalid_mileage_error" = "A quilometragem deve ser superior à quilometragem atual.";
+"invalid_cost_error_generic" = "Custo inválido. Por favor, verifique o formato de entrada.";
+"invalid_number_error" = "Número inválido. Certifique-se de que a entrada é numérica.";
+"invalid_notes_error" = "Por favor, forneça uma descrição para a manutenção.";
+"general_error" = "Algo correu mal. Por favor, tente novamente.";
+"mileage_too_low_error" = "A quilometragem não pode ser inferior ao valor registado anteriormente (%d).";
+"mileage_suspiciously_high_warning" = "Esta quilometragem é muito superior ao esperado. Por favor, verifique se adicionou um dígito extra.";
+
+/* Notifications */
+"notifications_section" = "Notificações";
+"notifications_disclaimer" = "Estamos a trabalhar em notificações para não perder nenhuma atualização. Ainda não estão disponíveis—fique atento!";
+"enable_notifications" = "Ativar notificações";
+"enable_notifications_description" = "Ativar ou desativar notificações para lembretes de manutenção.";
+"notification_permission_error" = "Por favor, ative as notificações nas definições do dispositivo.";
+"notifications_disabled_title" = "Notificações desativadas";
+"notifications_disabled_message" = "Ative as notificações nas definições para lembretes.";
+"notifications_toggle" = "Notificações";
+"notifications_toggle_description" = "Permitir notificações para lembretes de manutenção e atualizações.";
+"notification_status_authorized" = "Autorizado";
+"notification_status_denied" = "Negado";
+"notification_status_not_determined" = "Não determinado";
+"tracking_toggle" = "Rastreamento";
+"tracking_toggle_description" = "Permitir rastreamento para ajudar a melhorar a experiência da aplicação.";
+"tracking_status_authorized" = "Autorizado";
+"tracking_status_denied" = "Negado";
+"tracking_status_restricted" = "Restrito";
+"tracking_status_not_determined" = "Não determinado";
+"open_settings" = "Abrir definições";
+"pro_grant_debug" = "Conceder Pro (depuração)";
+"ok" = "OK";
+
+/* Units and Settings */
+"units_section" = "Unidades";
+"measurement_system" = "Sistema de medição";
+"measurement_system_description" = "Selecione o sistema de medição para distância e combustível.";
+"use_metric_units" = "Usar sistema métrico";
+
+"currently_using_metric" = "Atualmente a usar o sistema métrico para distância e combustível (quilómetros e litros)";
+"currently_using_imperial" = "Atualmente a usar o sistema imperial para distância e combustível (milhas e galões)";
+
+"default_maintenance_intervals" = "Intervalos de manutenção predefinidos";
+"tires" = "Pneus";
+"distribution_belt" = "Correia de distribuição";
+"oil_change" = "Mudança de óleo";
+"brakes" = "Travões";
+"other" = "Outro";
+"settings_title" = "Definições";
+"settings_description" = "Personalize a sua experiência gerindo definições como notificações, unidades e intervalos de manutenção predefinidos.";
+
+/* Data Export */
+"export_section" = "Exportar dados";
+"export_to_json" = "Exportar para JSON";
+"export_to_json_subtitle" = "Cópia de segurança completa do FuelTrackr";
+"export_to_xml" = "Exportar para XML";
+"export_to_xml_subtitle" = "Consumos de combustível para folhas de cálculo e uso pessoal";
+"export_to_csv" = "Exportar para CSV";
+"export_to_csv_subtitle" = "Abre diretamente no Excel, Google Sheets, Numbers";
+"export_failed_title" = "Exportação falhou";
+
+/* Data Reset */
+"reset_section" = "Repor dados";
+"reset_maintenance_button" = "Repor dados de manutenção";
+"reset_fuel_button" = "Repor dados de consumo de combustível";
+"reset_confirmation_title" = "Tem a certeza?";
+"reset_confirmation_confirm" = "Repor";
+"settings_reset" = "Repor definições";
+
+/* Vehicle Purchase */
+"vehicle_is_purchased" = "Veículo comprado";
+"vehicle_not_purchased_banner" = "Este veículo ainda não foi comprado. Assim que o comprar, confirme abaixo.";
+"vehicle_purchase_confirm" = "Confirmar compra";
+"vehicle_purchase_cancel" = "Eliminar veículo";
+"vehicle_purchase_question" = "Já comprou este veículo?";
+"vehicle_purchase_success" = "Veículo marcado como comprado!";
+"vehicle_purchase_error" = "Ocorreu um erro ao atualizar o estado do veículo.";
+
+/* Date and Misc */
+"date_label" = "Data";
+"select_date" = "Selecionar data";
+"date" = "Data";
+"close" = "Fechar";
+"search" = "Pesquisar";
+
+/* Graphs */
+"no_graph_fuel" = "Um gráfico aparecerá aqui assim que forem adicionados mais dados de combustível.";
+"no_graph_maintenance" = "Um gráfico aparecerá aqui assim que forem adicionados mais dados de manutenção.";
+"no_graph_mileage" = "Um gráfico aparecerá aqui assim que forem registados mais quilómetros.";
+
+/* Analytics and Refresh */
+"refreshing" = "A atualizar...";
+"no_active_vehicle_found" = "Nenhum veículo ativo encontrado.";
+
+/* Notification (Purchase Date Passed) */
+"notification_purchase_date_passed_title" = "Comprou o seu veículo?";
+"notification_purchase_date_passed_description" = "Se comprou o seu veículo hoje, confirme-o na aplicação.";
+
+/* Vehicle Details */
+"vehicle_details_title" = "Detalhes do veículo";
+
+"cancel" = "Cancelar";
+"save" = "Guardar";
+"latest_mileage" = "Última quilometragem";
+"add_maintenance_description" = "Registe a sua manutenção para manter o veículo em condições.";
+"free_or_warranty" = "Grátis / Garantia";
+"days_ago" = "Dias atrás";
+"maintenance_interval_description" = "Quando a quilometragem do seu veículo desde a última manutenção—como troca de pneus, mudança de óleo ou inspeção de travões—exceder este limite, receberá uma notificação a lembrá-lo de que está na altura do serviço.";
+
+"monthly_recap_nav_title" = "Aqui está um resumo dos dados que inseriu no mês passado:";
+"monthly_recap_title" = "Resumo mensal";
+"km_driven" = "Quilómetros percorridos";
+"total_fuel_used" = "Total de combustível usado";
+"total_fuel_cost" = "Custo total de combustível";
+"average_fuel_usage" = "Consumo médio de combustível";
+"comparison" = "Alteração dos quilómetros percorridos em comparação com o mês passado:";
+"comparison_result" = "Em comparação com o mês anterior: %+.0f%%";
+"no_data_available" = "Sem dados disponíveis para este mês.";
+
+"monthly_recap_notification_title" = "Resumo mensal pronto";
+"monthly_recap_notification_body" = "Toque para ver um resumo do desempenho do seu veículo no mês passado.";
+"test_notification_title" = "Notificação de teste";
+"test_notification_body" = "Esta é uma notificação de teste do FuelTrackr.";
+"test_notification" = "Notificação de teste";
+"test_notification_success" = "Notificação de teste agendada.";
+
+"mileage_title" = "Quilometragem";
+"purchase_date" = "Data de compra";
+"manufacturing_date" = "Data de fabrico";
+
+"currency_section" = "Moeda";
+"select_currency" = "Selecione a sua moeda";
+
+"ytd" = "Ano até à data";
+"all_time" = "Todo o tempo";
+"projected_year" = "Ano projetado";
+
+"fuel_usage_title" = "Consumo de combustível";
+"add" = "Adicionar";
+"edit" = "Editar";
+"swipe_to_edit_hint" = "Editar";
+
+"edit_fuel_usage_title" = "Editar consumo de combustível";
+"edit_fuel_usage_description" = "Ajuste litros, custo ou quilometragem para este abastecimento.";
+
+"validation_liters_invalid" = "Por favor, insira litros válidos maiores que zero.";
+"validation_cost_invalid" = "Por favor, insira um custo válido (zero ou mais).";
+"validation_mileage_invalid" = "Por favor, insira uma quilometragem válida.";
+"mileage_placeholder_format" = "ex. %d";
+
+/* Onboarding */
+"onboarding_welcome_title" = "Bem-vindo ao FuelTrackr 👋";
+"onboarding_welcome_description" = "Vamos configurar o seu veículo para que possa acompanhar facilmente o consumo de combustível e a manutenção.";
+"onboarding_setup_vehicle_button" = "Configurar o meu veículo";
+"onboarding_notifications_title" = "Fique atualizado";
+"onboarding_notifications_description" = "Ative as notificações para receber lembretes sobre o acompanhamento de combustível e resumos mensais.";
+"onboarding_notifications_allow" = "Ativar notificações";
+"onboarding_notifications_skip" = "Agora não";
+"onboarding_tracking_title" = "Ajude a melhorar o FuelTrackr";
+"onboarding_tracking_description" = "Usamos rastreamento anónimo para melhorar a aplicação. Nunca rastrearemos com dados pessoais nem partilharemos a sua informação.";
+"onboarding_tracking_allow" = "Continuar";
+"onboarding_tracking_skip" = "Pedir à app para não rastrear";
+"onboarding_unit_selection_title" = "Distância e consumo";
+"onboarding_unit_selection_question" = "Que unidades usa para distância e consumo de combustível?";
+"onboarding_vehicle_name_title" = "Nome do veículo";
+"onboarding_vehicle_name_description" = "Dê um nome ao seu veículo para o identificar facilmente.";
+"onboarding_vehicle_name_placeholder" = "Inserir nome do veículo";
+"onboarding_vehicle_name_default" = "O meu carro";
+"onboarding_vehicle_name_use_default" = "Usar \"%@\"";
+"kilometers_liters" = "Quilómetros e litros";
+"miles_gallons" = "Milhas e galões";
+"metric" = "(Métrico)";
+"imperial" = "(Imperial)";
+"continue" = "Continuar";
+"onboarding_license_plate_title" = "Matrícula";
+"onboarding_license_plate_description" = "Inserir a matrícula do seu veículo para obter automaticamente especificações públicas.";
+"onboarding_license_plate_placeholder" = "Preencher matrícula";
+"onboarding_license_plate_info" = "Quando disponível, o FuelTrackr usará dados públicos de veículos para pré-preencher detalhes. Isto só funciona para regiões e formatos de matrícula suportados.";
+"onboarding_add_later" = "Adiciono isto mais tarde";
+
+"onboarding_vehicle_fuel_type_title" = "Tipo de combustível do veículo";
+"onboarding_vehicle_fuel_type_question" = "Que combustível o seu veículo usa?";
+"onboarding_vehicle_fuel_type_placeholder" = "[Por definir]";
+
+"fuel_liquid" = "Gasolina ou gasóleo";
+"fuel_electric" = "Elétrico";
+"fuel_hydrogen" = "Hidrogénio";
+"fuel_unknown" = "Outro";
+
+"onboarding_vehicle_brand_title" = "Marca do veículo";
+"onboarding_vehicle_brand_question" = "Qual é a marca do seu veículo?";
+"onboarding_vehicle_brand_placeholder" = "Pesquisar ou selecionar a sua marca";
+
+"onboarding_not_on_list" = "Não está na lista";
+"onboarding_vehicle_model_title" = "Modelo do veículo";
+"onboarding_vehicle_model_question" = "Que modelo conduz?";
+"onboarding_vehicle_model_placeholder" = "Pesquisar ou escrever o seu modelo";
+"onboarding_optional_details_title" = "Detalhes opcionais";
+"onboarding_optional_details_description" = "Adicione estes para melhorar estimativas de manutenção e insights de custos a longo prazo.";
+"onboarding_production_date_title" = "Mês e ano de produção";
+"onboarding_select_date_placeholder" = "Selecionar data";
+"onboarding_skip_for_now" = "Saltar por agora";
+"onboarding_current_mileage_title" = "Quilometragem atual";
+"onboarding_current_mileage_question" = "Qual é a quilometragem atual do seu veículo?\n\nPrecisamos disto para calcular com precisão o seu consumo de combustível e acompanhar o desempenho do veículo ao longo do tempo.";
+"onboarding_mileage_placeholder_km" = "ex. 125.000 km";
+"onboarding_mileage_placeholder_miles" = "ex. 77.671 mi";
+"onboarding_mileage_new_car" = "Começar do zero";
+"onboarding_add_photo_title" = "Adicionar uma foto do seu veículo";
+"onboarding_add_photo_description" = "Isto ajuda-o a reconhecê-lo rapidamente na sua visão geral.";
+"onboarding_take_photo" = "Tirar foto";
+"onboarding_choose_from_gallery" = "Escolher da galeria";
+"onboarding_confirm_photo" = "Confirmar foto";
+"onboarding_reset_photo" = "Repor foto";
+"onboarding_completion_title" = "Configuração do veículo concluída! 🎉";
+"onboarding_completion_description" = "O FuelTrackr está agora pronto para o ajudar a acompanhar combustível, custos e manutenção automaticamente.";
+"onboarding_go_to_dashboard" = "Ir para o painel";
+"done" = "Concluído";
+
+/* Redesigned Active Vehicle View */
+"fuel_consumption" = "Consumo de combustível";
+"maintenance_history" = "Histórico de manutenção";
+"show_more" = "Mostrar mais";
+"fuel_history" = "Histórico de combustível";
+"total_distance_km" = "Distância total";
+"total_distance_miles" = "Distância total";
+"average_price" = "Preço médio";
+"fuel" = "Combustível";
+"costs" = "Custos";
+"odometer" = "Odómetro";
+"brake_replacement" = "Substituição de travões";
+"tire_replacement" = "Substituição de pneus";
+"distribution_belt" = "Correia de distribuição";
+"other_maintenance" = "Outro";
+"mileage" = "Quilometragem";
+"owned" = "Possuído";
+"age" = "Idade";
+
+/* Fuel Detail Page */
+"consumption_overview" = "Visão geral do consumo";
+"consumption_over_time" = "Consumo ao longo do tempo";
+"average_consumption" = "consumo médio";
+"total_cost_label" = "Custo total";
+"last_refueling" = "Último abastecimento";
+"fuel_entries_last_months" = "Abastecimentos nos últimos %d meses (%d)";
+"fuel_entries_last_month" = "Abastecimentos no mês passado (%d)";
+"fuel_entries_all" = "Todos os abastecimentos (%d)";
+"add_new_refueling" = "Adicionar novo abastecimento";
+"timeframe_all" = "Tudo";
+"timeframe_1m" = "1M";
+"timeframe_3m" = "3M";
+"timeframe_1y" = "1A";
+"timeframe_ytd" = "YTD";
+"range" = "alcance";
+"location" = "Localização";
+"km_per_liter" = "km/l";
+"liters" = "L";
+"price_per_liter" = "$/L";
+"consumption" = "Consumo";
+"cost" = "Custo";
+
+/* Partial Fill */
+"partial_fill" = "Abastecimento parcial";
+"partial_fill_description" = "Este abastecimento parece ser parcial. Será combinado com o próximo abastecimento completo para cálculos precisos de consumo.";
+"partial_fill_badge" = "Meio depósito";
+"mark_as_full_fill" = "Marcar como abastecimento completo";
+"mark_as_partial_fill" = "Marcar como abastecimento parcial";
+"partial_fill_info" = "Abastecimentos parciais são detetados automaticamente quando um abastecimento é significativamente inferior à sua média. São combinados com o próximo abastecimento completo para cálculos precisos de consumo.";
+"not_enough_data_for_detection" = "Necessários pelo menos %d abastecimentos para detetar parciais";
+"current_status" = "Estado atual";
+"fill_type" = "Tipo de abastecimento";
+"full_fill" = "Abastecimento completo";
+"average_refill_amount" = "Quantidade média de abastecimento";
+"merged_partial_fill_description" = "Esta entrada contém vários abastecimentos que foram combinados. Pode marcar entradas individuais como completas ou parciais abaixo.";
+"merged_group_summary" = "Resumo do grupo combinado";
+"total_fuel" = "Total de combustível";
+"entries_count" = "Entradas";
+"entries_in_group" = "Entradas neste grupo";
+"partial_fill_toggle_description" = "Marque este abastecimento como parcial se não foi um depósito cheio. Abastecimentos parciais são combinados com o próximo abastecimento completo para cálculos precisos de consumo.";
+"merged_group_title" = "Grupo combinado";
+"merged_group_info" = "Esta entrada faz parte de um grupo combinado. Todas as entradas abaixo são combinadas para cálculo de consumo até atingir um abastecimento completo.";
+"current" = "Atual";
+"closing_fill" = "Depósito cheio";
+"combined_stats" = "Estatísticas combinadas";
+
+/* In-App Purchase / Pro */
+"pro_title" = "FuelTrackr Pro";
+"pro_subtitle" = "O Futuro da Inteligência Automóvel";
+"pro_feature_unlimited_history_title" = "Histórico ilimitado";
+"pro_feature_unlimited_history_subtitle" = "Transparência total de despesas";
+"pro_feature_smart_maintenance_title" = "Manutenção inteligente";
+"pro_feature_smart_maintenance_subtitle" = "Alertas de serviço inteligentes";
+"pro_feature_smart_refill_title" = "Lógica de abastecimento inteligente";
+"pro_feature_smart_refill_subtitle" = "Previsão de alcance e insights de custos";
+"restore_purchase" = "Restaurar compra";
+"privacy_policy" = "Política de privacidade";
+"terms_of_service" = "Termos de serviço";
+"pro_lifetime_title" = "Pro vitalício";
+"pro_yearly_title" = "Acesso anual";
+"pro_monthly_title" = "Acesso mensal";
+"pro_one_time_payment" = "Pagamento único";
+"pro_billed_annually" = "Faturado anualmente";
+"pro_billed_monthly" = "Faturado mensalmente";
+"pro_unlock_lifetime" = "Desbloquear Pro vitalício";
+"pro_processing_purchase" = "A processar compra...";
+"pro_purchase_successful" = "Compra bem-sucedida!";
+"pro_thank_you_message" = "Obrigado por fazer upgrade para Pro";
+"continue_button" = "Continuar";
+"pro_status" = "Estado Pro";
+"pro_purchased" = "Comprado: %@";
+"pro_renews" = "Renova: %@";
+"pro_never_expires" = "Nunca expira";
+"pro_manage_subscription" = "Gerir subscrição";
+"purchase_display_lifetime" = "Pro vitalício";
+"purchase_display_monthly" = "Subscrição mensal";
+"purchase_display_yearly" = "Subscrição anual";
+"purchase_display_none" = "Nenhuma compra ativa";
+"pro_remove_debug" = "Remover Pro (depuração)";
+"pro_upgrade" = "Fazer upgrade para Pro";
+"pro_best_value_badge" = "MELHOR VALOR";
+"offer_reason_introductory" = "Oferta de lançamento";
+"offer_discount_percent" = "%d%% de desconto";
+"offer_free_trial" = "Período experimental gratuito";
+"offer_valid_for" = "Válido por %@";
+"offer_duration_1_day" = "1 dia";
+"offer_duration_n_days" = "%d dias";
+"offer_duration_1_week" = "1 semana";
+"offer_duration_n_weeks" = "%d semanas";
+"offer_duration_1_month" = "1 mês";
+"offer_duration_n_months" = "%d meses";
+"offer_duration_1_year" = "1 ano";
+"offer_duration_n_years" = "%d anos";
+"offer_valid_until_march_6" = "Válido até 6 de março";
+"unit_km" = "km";
+"unit_mi" = "mi";
+"unit_l" = "L";
+"unit_g" = "G";
+"unit_kwh" = "kWh";
+"unit_kg_h2" = "kg H₂";
+
+/* Review & Feedback */
+"help_feedback_section" = "Ajuda e feedback";
+"help_feedback_footer" = "Partilhe o seu feedback ou sugestões para nos ajudar a melhorar";
+"review_app" = "Avaliar a aplicação";
+"review_share_opinion" = "Diga-nos o que pensa";
+"review_recent_feedback" = "Enviou feedback recentemente";
+"review_title" = "O que acha do FuelTrackr?";
+"review_subtitle" = "A sua opinião importa";
+"review_description" = "Está a gostar da aplicação? Ou falta algo?\nCom o seu feedback, podemos melhorar o FuelTrackr passo a passo, para si e outros utilizadores.";
+"review_star_rating" = "%d estrela";
+"review_feedback_prompt" = "O que podemos melhorar?";
+"review_feedback_placeholder" = "Diga-nos o que podemos fazer melhor...";
+"review_feedback_min_chars" = "Mínimo de %d caracteres necessário";
+"review_feedback_max_chars" = "Máximo de %d caracteres permitido";
+"review_go_to_app_store" = "Ir à App Store";
+"review_submit_feedback" = "Enviar feedback";
+"review_feedback_required" = "Por favor, diga-nos o que podemos melhorar antes de enviar";
+"review_maybe_later" = "Talvez mais tarde";
+"review_cooldown_recent" = "Enviou feedback recentemente";
+"review_cooldown_days" = "Pode enviar feedback novamente em %d dia(s)";
+"app_suggestion" = "Sugestão de aplicação";
+"app_suggestion_subtitle" = "Partilhe a sua ideia de melhoria";
+"suggestion_title" = "Sugestão de aplicação";
+"suggestion_subtitle" = "Tem uma ideia para melhorar a aplicação? Partilhe connosco!";
+"suggestion_field_label" = "A sua sugestão";
+"suggestion_field_placeholder" = "Descreva a sua ideia para uma nova funcionalidade ou melhoria...";
+"suggestion_min_chars" = "Mínimo de %d caracteres necessário";
+"suggestion_max_chars" = "Máximo de %d caracteres permitido";
+"suggestion_submit" = "Enviar";
+
+/* Edit Vehicle */
+"fuel_type_title" = "Tipo de combustível";
+"purchase_status_title" = "Estado da compra";
+"vehicle_purchased" = "Veículo comprado";
+"latest_mileage_title" = "Última quilometragem";
+"odometer_title" = "Odómetro";
+"odometer_change_warning" = "Alterar o odómetro com dados de combustível ou manutenção existentes pode afetar as suas estatísticas e relatórios de consumo. Prossiga apenas se tiver certeza de que o novo valor está correto.";
+"odometer_change_confirm" = "Alterar odómetro";
+"odometer_save_confirm_title" = "Alterar odómetro?";
+"odometer_save_confirm_message" = "Isto atualizará a quilometragem atual. As suas estatísticas de consumo podem ser afetadas. Continuar?";
+"select_photo_source" = "Selecionar fonte da foto";
+"camera" = "Câmara";
+"photo_library" = "Biblioteca de fotos";
+"remove_photo" = "Remover foto";
+"manufacturing_date_before_purchase_error" = "A data de fabrico deve ser anterior ou igual à data de compra.";
+"vehicle_not_found_error" = "Veículo não encontrado. Por favor, tente novamente.";

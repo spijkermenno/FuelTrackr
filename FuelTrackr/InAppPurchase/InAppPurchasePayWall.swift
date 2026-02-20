@@ -307,6 +307,7 @@ struct ProPurchaseButtonContent: View {
                     .fill(buttonGradient)
                     .opacity(isLoading ? 0.7 : 1.0)
             )
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
             .shadow(color: buttonColor.opacity(isLoading ? 0.15 : 0.3), radius: 12, y: 6)
         }
         .disabled(isLoading)
@@ -362,6 +363,23 @@ struct ProPurchaseButton: View {
                     isYearly: product.id.contains("yearly"),
                     isLifetime: product.id.contains("lifetime")
                 )
+                // Lifetime Pro promotional offer (50% off until March 6)
+                // App Store Connect has the discounted price; product.price is 50% of original.
+                if product.id.contains("lifetime"), LifetimeProPromo.isActive {
+                    displayModel = ProductDisplayModel(
+                        id: product.id,
+                        title: cleanTitle,
+                        billingDescription: billingDescription,
+                        displayPrice: LifetimeProPromo.formatOriginalPrice(for: product), // Original (strikethrough)
+                        salePrice: product.displayPrice, // Current discounted price from App Store
+                        showOfferReason: true,
+                        offerDurationText: LifetimeProPromo.offerDurationText,
+                        isYearly: false,
+                        isLifetime: true
+                    )
+                    return
+                }
+                // Subscription introductory offers
                 guard let subscription = product.subscription,
                       let offer = subscription.introductoryOffer else {
                     displayModel = baseModel
