@@ -18,6 +18,7 @@ public struct FuelTrackrEvents: AnalyticsEventName, Sendable {
     public static let IAPFullPremiumBought = FuelTrackrEvents("IAPFullPremiumBought")
     public static let IAPCancelled = FuelTrackrEvents("IAPCancelled")
     public static let IAPFailed = FuelTrackrEvents("IAPFailed")
+    public static let IAPRestored = FuelTrackrEvents("IAPRestored")
     
     // Review
     public static let askedForUserReview = FuelTrackrEvents("askedForUserReview")

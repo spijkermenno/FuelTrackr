@@ -45,13 +45,13 @@ struct PurchaseInfo: Equatable {
     var displayName: String {
         switch type {
         case .lifetime:
-            return "Lifetime Pro"
+            return NSLocalizedString("purchase_display_lifetime", comment: "")
         case .monthly:
-            return "Monthly Subscription"
+            return NSLocalizedString("purchase_display_monthly", comment: "")
         case .yearly:
-            return "Yearly Subscription"
+            return NSLocalizedString("purchase_display_yearly", comment: "")
         case .none:
-            return "No Active Purchase"
+            return NSLocalizedString("purchase_display_none", comment: "")
         }
     }
 }
@@ -98,14 +98,17 @@ class InAppPurchaseManager: ObservableObject {
                         await checkPurchaseStatus()
                         // Finish the transaction
                         await transaction.finish()
-                        // Report IAP to ScovilleKit
-                        Task { @MainActor in
-                            Scoville.reportInAppPurchase(
-                                productId: transaction.productID,
-                                type: scovilleIAPType(for: transaction.productID)
-                            ) { result in
-                                if case .failure(let error) = result {
-                                    print("IAP report failed:", error)
+                        
+                        if transaction.environment == .production {
+                            // Report IAP to ScovilleKit
+                            Task { @MainActor in
+                                Scoville.reportInAppPurchase(
+                                    productId: transaction.productID,
+                                    type: scovilleIAPType(for: transaction.productID)
+                                ) { result in
+                                    if case .failure(let error) = result {
+                                        print("IAP report failed:", error)
+                                    }
                                 }
                             }
                         }
@@ -147,17 +150,20 @@ class InAppPurchaseManager: ObservableObject {
                     // Set success state
                     purchaseState = .success
                     
-                    Task { @MainActor in
-                        Scoville.reportInAppPurchase(
-                            productId: transaction.productID,
-                            type: scovilleIAPType(for: transaction.productID)
-                        ) { result in
-                            if case .failure(let error) = result {
-                                print("IAP report failed:", error)
+                    if transaction.environment == .production {
+                        
+                        Task { @MainActor in
+                            Scoville.reportInAppPurchase(
+                                productId: transaction.productID,
+                                type: scovilleIAPType(for: transaction.productID)
+                            ) { result in
+                                if case .failure(let error) = result {
+                                    print("IAP report failed:", error)
+                                }
                             }
+                            // Trigger review prompt after purchase
+                            ReviewPrompter.shared.maybeRequestReview(reason: .purchaseDone)
                         }
-                        // Trigger review prompt after purchase
-                        ReviewPrompter.shared.maybeRequestReview(reason: .purchaseDone)
                     }
                     
                     // Don't auto-reset - let user dismiss the success overlay
@@ -214,14 +220,7 @@ class InAppPurchaseManager: ObservableObject {
                 let productId = currentPurchaseInfo.productID
                 if !productId.isEmpty {
                     Task { @MainActor in
-                        Scoville.reportInAppPurchase(
-                            productId: productId,
-                            type: scovilleIAPType(for: productId)
-                        ) { result in
-                            if case .failure(let error) = result {
-                                print("IAP report failed:", error)
-                            }
-                        }
+                        Scoville.track(FuelTrackrEvents.IAPRestored)
                     }
                 }
                 // Don't auto-reset - let user dismiss the success overlay
@@ -327,15 +326,6 @@ class InAppPurchaseManager: ObservableObject {
             purchaseDate: Date(),
             expirationDate: nil
         )
-        // Report debug purchase to ScovilleKit
-        Scoville.reportInAppPurchase(
-            productId: debugProductId,
-            type: .permanent
-        ) { result in
-            if case .failure(let error) = result {
-                print("IAP report failed:", error)
-            }
-        }
     }
     #endif
     

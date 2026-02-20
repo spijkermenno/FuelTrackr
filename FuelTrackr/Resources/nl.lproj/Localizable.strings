@@ -391,6 +391,10 @@
 "pro_renews" = "Verlengt: %@";
 "pro_never_expires" = "Verloopt nooit";
 "pro_manage_subscription" = "Abonnement Beheren";
+"purchase_display_lifetime" = "Levenslang Pro";
+"purchase_display_monthly" = "Maandelijks abonnement";
+"purchase_display_yearly" = "Jaarlijks abonnement";
+"purchase_display_none" = "Geen actieve aankoop";
 "pro_remove_debug" = "Pro Verwijderen (Debug)";
 "pro_upgrade" = "Upgraden naar Pro";
 "unit_km" = "km";
