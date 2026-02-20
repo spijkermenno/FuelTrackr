@@ -430,6 +430,7 @@
 "offer_duration_n_months" = "%d 个月";
 "offer_duration_1_year" = "1 年";
 "offer_duration_n_years" = "%d 年";
+"offer_valid_until_march_6" = "有效期至3月6日";
 "unit_km" = "公里";
 "unit_mi" = "英里";
 "unit_l" = "升";

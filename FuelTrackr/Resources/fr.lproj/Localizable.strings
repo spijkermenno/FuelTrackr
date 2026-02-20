@@ -430,6 +430,7 @@
 "offer_duration_n_months" = "%d mois";
 "offer_duration_1_year" = "1 an";
 "offer_duration_n_years" = "%d ans";
+"offer_valid_until_march_6" = "Valable jusqu'au 6 mars";
 "unit_km" = "km";
 "unit_mi" = "mi";
 "unit_l" = "L";

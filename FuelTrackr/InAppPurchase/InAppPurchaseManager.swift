@@ -57,6 +57,33 @@ struct PurchaseInfo: Equatable {
     }
 }
 
+// MARK: - Lifetime Pro promotional offer (50% off until March 6, 2026)
+enum LifetimeProPromo {
+    static let discountPercent = 50
+    static let endDate: Date = {
+        var cal = Calendar.current
+        cal.timeZone = TimeZone.current
+        return cal.date(from: DateComponents(year: 2026, month: 3, day: 7))! // Offer valid through end of March 6
+    }()
+    
+    static var isActive: Bool {
+        Date() < endDate
+    }
+    
+    static var offerDurationText: String {
+        NSLocalizedString("offer_valid_until_march_6", comment: "")
+    }
+    
+    /// Original price for strikethrough (2x current, since App Store has 50% discounted price).
+    static func formatOriginalPrice(for product: Product) -> String {
+        let originalPrice = (product.price as NSDecimalNumber).doubleValue * 2.0
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = Locale.current
+        return formatter.string(from: NSNumber(value: originalPrice)) ?? product.displayPrice
+    }
+}
+
 // MARK: - Scoville IAP Type Mapping
 private func scovilleIAPType(for productId: String) -> InAppPurchaseType {
     if productId.contains("lifetime") || productId.contains("debug") {
