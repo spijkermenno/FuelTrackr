@@ -71,6 +71,12 @@
 "fuel_entry_date_today" = "Today";
 "fuel_entry_date_label" = "Date";
 "fuel_entry_past_warning" = "You're adding a refill from the past. Please double-check the mileage. If it's off, your consumption stats may not be accurate. We skip mileage validation for past entries to give you flexibility.";
+"edit_fuel_entry_past_warning" = "This refill is from the past. Please double-check the mileage. If it's off, your consumption stats may not be accurate. We skip mileage validation for past entries to give you flexibility.";
+"edit_liters_label" = "Liters";
+"edit_gallons_label" = "Gallons";
+"edit_kwh_label" = "kWh";
+"edit_kg_h2_label" = "kg H₂";
+"edit_fuel_amount_label" = "Fuel amount";
 
 /* Maintenance */
 "maintenance_title" = "Maintenance History";
@@ -143,6 +149,16 @@
 "other" = "Other";
 "settings_title" = "Settings";
 "settings_description" = "Customize your app experience by managing settings such as notifications, units, and default maintenance intervals.";
+
+/* Data Export */
+"export_section" = "Export Data";
+"export_to_json" = "Export to JSON";
+"export_to_json_subtitle" = "Full backup for FuelTrackr";
+"export_to_xml" = "Export to XML";
+"export_to_xml_subtitle" = "Fuel usages for spreadsheets and personal use";
+"export_to_csv" = "Export to CSV";
+"export_to_csv_subtitle" = "Opens directly in Excel, Google Sheets, Numbers";
+"export_failed_title" = "Export Failed";
 
 /* Data Reset */
 "reset_section" = "Reset Data";

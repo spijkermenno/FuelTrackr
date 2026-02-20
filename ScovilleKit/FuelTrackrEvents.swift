@@ -45,6 +45,9 @@ public struct FuelTrackrEvents: AnalyticsEventName, Sendable {
     
     // Settings
     public static let unitPreferenceChanged = FuelTrackrEvents("unitPreferenceChanged")
+    public static let dataExportClicked = FuelTrackrEvents("dataExportClicked")
+    public static let dataExportXmlClicked = FuelTrackrEvents("dataExportXmlClicked")
+    public static let dataExportCsvClicked = FuelTrackrEvents("dataExportCsvClicked")
     
     // Onboarding
     public static let onboardingStarted = FuelTrackrEvents("onboardingStarted")

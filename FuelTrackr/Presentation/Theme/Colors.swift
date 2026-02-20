@@ -46,7 +46,7 @@ public struct DarkColors: Sendable, ColorsProtocol {
     public let surface = hexColor("#2A2A2D") // Dark cards, sheets, etc.
     public let onPrimary = hexColor("#FFFFFF") // White text on primary background
     public let onBackground = hexColor("#FFFFFF") // White text on dark background
-    public let onSurface = hexColor("#B0B0B0") // Light gray for labels
+    public let onSurface = hexColor("#CACACA") // Light gray for labels (brighter for dark mode contrast)
     public let success = hexColor("#2ECC71") // Success green
     public let error = hexColor("#E74C3C") // Error red
     public let purple = hexColor("#5832DF") // Alternate purple accent

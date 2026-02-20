@@ -105,13 +105,13 @@ struct AddFuelUsageSheet: View {
                 guard height > 0 else { return }
                 let buttonArea: CGFloat = 100
                 let warningExtra: CGFloat = !Calendar.current.isDateInToday(viewModel.entryDate) ? 65 : 0
-                let maxHeight = UIScreen.main.bounds.height * 0.9
+                let maxHeight = UIScreen.main.bounds.height * 0.65
                 contentHeight = min(height + buttonArea + warningExtra, maxHeight)
             }
             .onChange(of: viewModel.entryDate) { _, newDate in
                 if !Calendar.current.isDateInToday(newDate) {
                     let warningExtra: CGFloat = 65
-                    let maxHeight = UIScreen.main.bounds.height * 0.9
+                    let maxHeight = UIScreen.main.bounds.height * 0.65
                     contentHeight = min(contentHeight + warningExtra, maxHeight)
                 }
             }
@@ -215,6 +215,7 @@ struct InputSection: View {
     let showSaveButton: Bool
     let fuelType: FuelType?
     let isUsingMetric: Bool
+    let isEditing: Bool
 
     var onSave: () -> Void
 
@@ -236,6 +237,7 @@ struct InputSection: View {
         isPartialFill: Binding<Bool>? = nil,
         showPartialFillToggle: Bool = false,
         showSaveButton: Bool = true,
+        isEditing: Bool = false,
         onSave: @escaping () -> Void
     ) {
         self._liters = liters
@@ -253,17 +255,28 @@ struct InputSection: View {
         self.showSaveButton = showSaveButton
         self.fuelType = fuelType
         self.isUsingMetric = isUsingMetric
+        self.isEditing = isEditing
         self.onSave = onSave
     }
     
     private var fuelAmountLabel: String {
         let fuelTypeToUse = fuelType ?? .liquid
-        switch (fuelTypeToUse, isUsingMetric) {
-        case (.liquid, true): return NSLocalizedString("liters_label", comment: "")
-        case (.liquid, false): return NSLocalizedString("gallons_label", comment: "")
-        case (.electric, _): return NSLocalizedString("kwh_label", comment: "")
-        case (.hydrogen, _): return NSLocalizedString("kg_h2_label", comment: "")
-        case (.unknown, _): return NSLocalizedString("fuel_amount_label", comment: "")
+        if isEditing {
+            switch (fuelTypeToUse, isUsingMetric) {
+            case (.liquid, true): return NSLocalizedString("edit_liters_label", comment: "")
+            case (.liquid, false): return NSLocalizedString("edit_gallons_label", comment: "")
+            case (.electric, _): return NSLocalizedString("edit_kwh_label", comment: "")
+            case (.hydrogen, _): return NSLocalizedString("edit_kg_h2_label", comment: "")
+            case (.unknown, _): return NSLocalizedString("edit_fuel_amount_label", comment: "")
+            }
+        } else {
+            switch (fuelTypeToUse, isUsingMetric) {
+            case (.liquid, true): return NSLocalizedString("liters_label", comment: "")
+            case (.liquid, false): return NSLocalizedString("gallons_label", comment: "")
+            case (.electric, _): return NSLocalizedString("kwh_label", comment: "")
+            case (.hydrogen, _): return NSLocalizedString("kg_h2_label", comment: "")
+            case (.unknown, _): return NSLocalizedString("fuel_amount_label", comment: "")
+            }
         }
     }
     
@@ -282,24 +295,6 @@ struct InputSection: View {
         let colors = Theme.colors(for: colorScheme)
         
         VStack(alignment: .leading, spacing: Theme.dimensions.spacingM) {
-            InputField(
-                title: fuelAmountLabel,
-                placeholder: fuelAmountPlaceholder,
-                text: $liters,
-                keyboardType: .decimalPad,
-                hasError: litersError
-            )
-            .accessibilityLabel(fuelAmountLabel)
-            
-            InputField(
-                title: String(format: NSLocalizedString("cost_label", comment: ""), GetSelectedCurrencyUseCase()().symbol),
-                placeholder: NSLocalizedString("cost_placeholder", comment: ""),
-                text: $cost,
-                keyboardType: .decimalPad,
-                hasError: costError
-            )
-            .accessibilityLabel(String(format: NSLocalizedString("cost_label", comment: ""), GetSelectedCurrencyUseCase()().symbol))
-            
             VStack(alignment: .leading, spacing: 4) {
                 InputField(
                     title: NSLocalizedString("mileage_label", comment: ""),
@@ -325,14 +320,32 @@ struct InputSection: View {
                 }
             }
             
+            InputField(
+                title: fuelAmountLabel,
+                placeholder: fuelAmountPlaceholder,
+                text: $liters,
+                keyboardType: .decimalPad,
+                hasError: litersError
+            )
+            .accessibilityLabel(fuelAmountLabel)
+            
+            InputField(
+                title: String(format: NSLocalizedString("cost_label", comment: ""), GetSelectedCurrencyUseCase()().symbol),
+                placeholder: NSLocalizedString("cost_placeholder", comment: ""),
+                text: $cost,
+                keyboardType: .decimalPad,
+                hasError: costError
+            )
+            .accessibilityLabel(String(format: NSLocalizedString("cost_label", comment: ""), GetSelectedCurrencyUseCase()().symbol))
+            
             FuelEntryDateField(date: $entryDate)
 
             if !Calendar.current.isDateInToday(entryDate) {
-                Text(NSLocalizedString("fuel_entry_past_warning", comment: ""))
+                Text(NSLocalizedString(isEditing ? "edit_fuel_entry_past_warning" : "fuel_entry_past_warning", comment: ""))
                     .font(Theme.typography.footnoteFont)
-                    .foregroundColor(colors.onSurface.opacity(0.85))
+                    .foregroundColor(colorScheme == .dark ? colors.onSurface : colors.onSurface.opacity(0.85))
                     .multilineTextAlignment(.leading)
-                    .accessibilityLabel(NSLocalizedString("fuel_entry_past_warning", comment: ""))
+                    .accessibilityLabel(NSLocalizedString(isEditing ? "edit_fuel_entry_past_warning" : "fuel_entry_past_warning", comment: ""))
             }
 
             if let error = errorMessage {
@@ -384,10 +397,10 @@ struct FuelEntryDateField: View {
             HStack(spacing: 6) {
                 Image(systemName: "calendar")
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(colors.onSurface.opacity(0.6))
+                    .foregroundColor(colorScheme == .dark ? colors.onSurface : colors.onSurface.opacity(0.6))
                 Text(formattedDateString)
                     .font(.system(size: 16, weight: .regular))
-                    .foregroundColor(colors.onSurface.opacity(0.8))
+                    .foregroundColor(colorScheme == .dark ? colors.onBackground : colors.onSurface.opacity(0.8))
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 14)

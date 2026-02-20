@@ -70,6 +70,12 @@
 "fuel_entry_date_today" = "Vandaag";
 "fuel_entry_date_label" = "Datum";
 "fuel_entry_past_warning" = "Je voegt een tankbeurt uit het verleden toe. Controleer de kilometerstand nog eens. Als die niet klopt, kunnen je verbruiksstatistieken afwijken. We slaan de kilometercontrole over bij verleden tankbeurten zodat je flexibel bent.";
+"edit_fuel_entry_past_warning" = "Deze tankbeurt is uit het verleden. Controleer de kilometerstand nog eens. Als die niet klopt, kunnen je verbruiksstatistieken afwijken. We slaan de kilometercontrole over bij verleden tankbeurten zodat je flexibel bent.";
+"edit_liters_label" = "Liters";
+"edit_gallons_label" = "Gallons";
+"edit_kwh_label" = "kWh";
+"edit_kg_h2_label" = "kg H₂";
+"edit_fuel_amount_label" = "Brandstofhoeveelheid";
 
 /* Onderhoud */
 "maintenance_title" = "Onderhoud Geschiedenis";
@@ -142,6 +148,16 @@
 "other" = "Overig";
 "settings_title" = "Instellingen";
 "settings_description" = "Pas je app-ervaring aan door instellingen zoals meldingen, eenheden en standaard onderhoudsintervallen te beheren.";
+
+/* Data Export */
+"export_section" = "Data exporteren";
+"export_to_json" = "Exporteren naar JSON";
+"export_to_json_subtitle" = "Volledige back-up voor FuelTrackr";
+"export_to_xml" = "Exporteren naar XML";
+"export_to_xml_subtitle" = "Tankbeurten voor spreadsheets en eigen gebruik";
+"export_to_csv" = "Exporteren naar CSV";
+"export_to_csv_subtitle" = "Opent direct in Excel, Google Sheets, Numbers";
+"export_failed_title" = "Export mislukt";
 
 /* Gegevens Resetten */
 "reset_section" = "Gegevens resetten";
