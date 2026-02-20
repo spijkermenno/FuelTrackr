@@ -205,11 +205,6 @@ public struct FuelDetailsSheet: View {
             ScrollView {
                 VStack(spacing: 0) {
                     if let vehicle = resolvedVehicle {
-                        // Vehicle Info Header
-//                        VehicleInfoHeader(vehicle: vehicle)
-//                            .padding(.horizontal, Theme.dimensions.spacingL)
-//                            .padding(.top, Theme.dimensions.spacingM)
-                        
                         // Timeframe Selector
                         TimeframeSelector(selectedTimeframe: $selectedTimeframe)
                             .padding(.horizontal, Theme.dimensions.spacingL)
@@ -329,7 +324,6 @@ public struct FuelDetailsSheet: View {
                     vehicleViewModel: viewModel,
                     fuelUsageID: selection.id
                 )
-                .presentationDetents([.fraction(0.65)])
                 .presentationDragIndicator(.visible)
                 .onDisappear {
                     resolvedVehicle = viewModel.resolvedVehicle(context: context)

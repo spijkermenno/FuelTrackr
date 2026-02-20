@@ -194,7 +194,6 @@ public struct ActiveVehicleContent: View {
                 vehicleViewModel: vehicleViewModel,
                 fuelUsageID: selection.id
             )
-            .presentationDetents([.fraction(0.65)])
             .presentationDragIndicator(.visible)
         }
         // Add Maintenance

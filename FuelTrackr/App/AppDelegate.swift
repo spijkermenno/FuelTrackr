@@ -43,8 +43,16 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         await ScovilleEnvironment.configureFromDefaults()
 
         let cachedToken = UserDefaults.standard.string(forKey: apnsDefaultsKey) ?? ""
+        let hasNotificationsEnabled = await currentHasNotificationsEnabled()
+        var isProduction = true
+        
+        #if DEBUG
+        isProduction = false
+        #endif
+        
+        print("APNS Token: \(cachedToken)")
 
-        Scoville.registerDevice(token: cachedToken) { [weak self] result in
+        Scoville.registerDevice(token: cachedToken, isProduction: isProduction, hasNotificationsEnabled: hasNotificationsEnabled) { [weak self] result in
             switch result {
             case .success:
                 Task { @MainActor in
@@ -76,8 +84,22 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             return
         }
         
-        Scoville.registerDevice(token: newToken)
+        print("New APNS Token: \(newToken)")
+
+        Task { @MainActor in
+            let hasNotificationsEnabled = await currentHasNotificationsEnabled()
+            Scoville.registerDevice(token: newToken, hasNotificationsEnabled: hasNotificationsEnabled)
+        }
         UserDefaults.standard.set(newToken, forKey: apnsDefaultsKey)
+    }
+    
+    /// Returns whether notifications are enabled, using the same logic as Settings (authorizationStatus == .authorized).
+    private func currentHasNotificationsEnabled() async -> Bool {
+        await withCheckedContinuation { continuation in
+            UNUserNotificationCenter.current().getNotificationSettings { settings in
+                continuation.resume(returning: settings.authorizationStatus == .authorized)
+            }
+        }
     }
     
     // MARK: Notifications

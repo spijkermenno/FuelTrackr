@@ -11,6 +11,13 @@ import SwiftData
 import ScovilleKit
 import FirebaseAnalytics
 
+private struct EditSheetContentHeightKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
 struct EditFuelUsageSheet: View {
     @StateObject var vehicleViewModel: VehicleViewModel
     @StateObject private var viewModel = EditFuelUsageViewModel()
@@ -24,6 +31,10 @@ struct EditFuelUsageSheet: View {
     @State private var resolvedVehicle: Vehicle?
     @State private var existingFuelUsage: FuelUsage?
     @State private var mergedGroup: [FuelUsage] = []
+    @State private var contentHeight: CGFloat = 520
+    @State private var keyboardHeight: CGFloat = 0
+    @State private var keyboardShowObserver: Any?
+    @State private var keyboardHideObserver: Any?
 
     private var mileagePlaceholder: String {
         let currentMileage = resolvedVehicle?.mileages.last?.value ?? 0
@@ -55,6 +66,7 @@ struct EditFuelUsageSheet: View {
                             isUsingMetric: vehicleViewModel.isUsingMetric,
                             isPartialFill: $viewModel.isPartialFill,
                             showPartialFillToggle: existingFuelUsage != nil,
+                            isEditing: true,
                             onSave: saveEdits
                         )
                     } else {
@@ -73,6 +85,7 @@ struct EditFuelUsageSheet: View {
                             isUsingMetric: vehicleViewModel.isUsingMetric,
                             isPartialFill: $viewModel.isPartialFill,
                             showPartialFillToggle: existingFuelUsage != nil,
+                            isEditing: true,
                             onSave: saveEdits
                         )
                     }
@@ -95,10 +108,18 @@ struct EditFuelUsageSheet: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .top)
                 .padding(.horizontal, Theme.dimensions.spacingSection)
+                .background(
+                    GeometryReader { geo in
+                        Color.clear.preference(key: EditSheetContentHeightKey.self, value: geo.size.height)
+                    }
+                )
             }
             .scrollBounceBehavior(.basedOnSize)
             .scrollDismissesKeyboard(.interactively)
             .onTapGesture { hideKeyboard() }
+            .padding(.bottom, keyboardHeight)
+            .animation(.easeOut(duration: 0.25), value: keyboardHeight)
+            .background(Color(UIColor.systemGroupedBackground))
             .navigationTitle(NSLocalizedString("edit_fuel_usage_title", comment: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -116,7 +137,51 @@ struct EditFuelUsageSheet: View {
                     viewModel.load(from: fu, usingMetric: vehicleViewModel.isUsingMetric)
                 }
                 loadMergedGroup()
+                startKeyboardObserver()
             }
+            .onDisappear {
+                stopKeyboardObserver()
+            }
+            .onPreferenceChange(EditSheetContentHeightKey.self) { height in
+                guard height > 0 else { return }
+                let bottomPadding: CGFloat = Theme.dimensions.spacingXL
+                let maxHeight = UIScreen.main.bounds.height * 0.65
+                contentHeight = min(height + bottomPadding, maxHeight)
+            }
+        }
+        .presentationDetents([.height(contentHeight)])
+        .presentationBackground(Color(UIColor.systemGroupedBackground))
+    }
+    
+    private func startKeyboardObserver() {
+        keyboardShowObserver = NotificationCenter.default.addObserver(
+            forName: UIResponder.keyboardWillShowNotification,
+            object: nil,
+            queue: .main
+        ) { notification in
+            if let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                Task { @MainActor in
+                    keyboardHeight = frame.height
+                }
+            }
+        }
+        keyboardHideObserver = NotificationCenter.default.addObserver(
+            forName: UIResponder.keyboardWillHideNotification,
+            object: nil,
+            queue: .main
+        ) { _ in
+            Task { @MainActor in
+                keyboardHeight = 0
+            }
+        }
+    }
+    
+    private func stopKeyboardObserver() {
+        if let ob = keyboardShowObserver {
+            NotificationCenter.default.removeObserver(ob)
+        }
+        if let ob = keyboardHideObserver {
+            NotificationCenter.default.removeObserver(ob)
         }
     }
 

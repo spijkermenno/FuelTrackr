@@ -260,6 +260,79 @@ public struct SettingsPageView: View {
                     .accessibilityLabel(NSLocalizedString("app_suggestion", comment: ""))
                 }
                 
+                // Export Data
+                Section(header: Text(NSLocalizedString("export_section", comment: ""))
+                    .foregroundColor(colors.onSurface)) {
+                    Button(action: exportToJSON) {
+                        HStack(spacing: 12) {
+                            Image(systemName: "doc.text")
+                                .font(.title3)
+                                .foregroundColor(colors.primary)
+                                .frame(width: 32, height: 32)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(NSLocalizedString("export_to_json", comment: ""))
+                                    .font(Theme.typography.bodyFont)
+                                    .foregroundColor(colors.onBackground)
+                                Text(NSLocalizedString("export_to_json_subtitle", comment: ""))
+                                    .font(Theme.typography.captionFont)
+                                    .foregroundColor(colors.onSurface)
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundColor(colors.onSurface)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                    .accessibilityLabel(NSLocalizedString("export_to_json", comment: ""))
+                    
+                    Button(action: exportToXML) {
+                        HStack(spacing: 12) {
+                            Image(systemName: "tablecells")
+                                .font(.title3)
+                                .foregroundColor(colors.primary)
+                                .frame(width: 32, height: 32)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(NSLocalizedString("export_to_xml", comment: ""))
+                                    .font(Theme.typography.bodyFont)
+                                    .foregroundColor(colors.onBackground)
+                                Text(NSLocalizedString("export_to_xml_subtitle", comment: ""))
+                                    .font(Theme.typography.captionFont)
+                                    .foregroundColor(colors.onSurface)
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundColor(colors.onSurface)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                    .accessibilityLabel(NSLocalizedString("export_to_xml", comment: ""))
+                    
+                    Button(action: exportToCSV) {
+                        HStack(spacing: 12) {
+                            Image(systemName: "tablecells.badge.ellipsis")
+                                .font(.title3)
+                                .foregroundColor(colors.primary)
+                                .frame(width: 32, height: 32)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(NSLocalizedString("export_to_csv", comment: ""))
+                                    .font(Theme.typography.bodyFont)
+                                    .foregroundColor(colors.onBackground)
+                                Text(NSLocalizedString("export_to_csv_subtitle", comment: ""))
+                                    .font(Theme.typography.captionFont)
+                                    .foregroundColor(colors.onSurface)
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundColor(colors.onSurface)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                    .accessibilityLabel(NSLocalizedString("export_to_csv", comment: ""))
+                }
+                
                 // Reset Vehicle
                 Section(header: Text(NSLocalizedString("reset_section", comment: ""))
                     .foregroundColor(colors.onSurface)) {
@@ -272,7 +345,7 @@ public struct SettingsPageView: View {
                 }
                 
                 #if DEBUG
-                // Debug Section - Notification Testing & Export
+                // Debug Section - Notification Testing
                 Section(header: Text("Debug")
                     .foregroundColor(colors.onSurface)) {
                     Button(action: {
@@ -286,18 +359,6 @@ public struct SettingsPageView: View {
                                 .font(Theme.typography.bodyFont)
                             Spacer()
                             Image(systemName: "bell.badge")
-                                .foregroundColor(colors.primary)
-                        }
-                    }
-                    .padding(.vertical, Theme.dimensions.spacingXS)
-
-                    Button(action: exportToJSON) {
-                        HStack {
-                            Text("Export to JSON")
-                                .foregroundColor(colors.primary)
-                                .font(Theme.typography.bodyFont)
-                            Spacer()
-                            Image(systemName: "square.and.arrow.up")
                                 .foregroundColor(colors.primary)
                         }
                     }
@@ -338,11 +399,9 @@ public struct SettingsPageView: View {
             .sheet(isPresented: $showAppSuggestion) {
                 AppSuggestionView(isPresented: $showAppSuggestion)
             }
-            #if DEBUG
             .sheet(item: $exportShareItem, onDismiss: { exportShareItem = nil }) { item in
                 ShareSheet(items: [item.fileURL])
             }
-            #endif
             .alert(isPresented: $showAlert) {
                 Alert(
                     title: Text(alertTitle),
@@ -395,27 +454,70 @@ public struct SettingsPageView: View {
         }
     }
 
-    #if DEBUG
     private func exportToJSON() {
         do {
             let vehicles = try context.fetch(FetchDescriptor<Vehicle>())
             let json = try VehicleJSONExporter().exportAll(vehicles)
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyy-MM-dd_HHmmss"
-            let fileName = "FuelTrackr_Export_\(formatter.string(from: Date())).json"
+            let fileName = "FuelTrackr_Backup_\(formatter.string(from: Date())).json"
             let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
             try json.write(to: tempURL, atomically: true, encoding: .utf8)
+            Task { @MainActor in
+                Scoville.track(FuelTrackrEvents.dataExportClicked)
+                Analytics.logEvent(FuelTrackrEvents.dataExportClicked.rawValue, parameters: nil)
+            }
             exportShareItem = ExportShareItem(fileURL: tempURL)
         } catch {
-            alertTitle = "Export Failed"
+            alertTitle = NSLocalizedString("export_failed_title", comment: "")
             alertMessage = error.localizedDescription
             showAlert = true
         }
     }
-    #endif
+    
+    private func exportToXML() {
+        do {
+            let vehicles = try context.fetch(FetchDescriptor<Vehicle>())
+            let xml = FuelUsageXMLExporter().exportFuelUsages(from: vehicles)
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd_HHmmss"
+            let fileName = "FuelTrackr_FuelUsages_\(formatter.string(from: Date())).xml"
+            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+            try xml.write(to: tempURL, atomically: true, encoding: .utf8)
+            Task { @MainActor in
+                Scoville.track(FuelTrackrEvents.dataExportXmlClicked)
+                Analytics.logEvent(FuelTrackrEvents.dataExportXmlClicked.rawValue, parameters: nil)
+            }
+            exportShareItem = ExportShareItem(fileURL: tempURL)
+        } catch {
+            alertTitle = NSLocalizedString("export_failed_title", comment: "")
+            alertMessage = error.localizedDescription
+            showAlert = true
+        }
+    }
+    
+    private func exportToCSV() {
+        do {
+            let vehicles = try context.fetch(FetchDescriptor<Vehicle>())
+            let csv = FuelUsageCSVExporter().exportFuelUsages(from: vehicles)
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd_HHmmss"
+            let fileName = "FuelTrackr_FuelUsages_\(formatter.string(from: Date())).csv"
+            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+            try csv.write(to: tempURL, atomically: true, encoding: .utf8)
+            Task { @MainActor in
+                Scoville.track(FuelTrackrEvents.dataExportCsvClicked)
+                Analytics.logEvent(FuelTrackrEvents.dataExportCsvClicked.rawValue, parameters: nil)
+            }
+            exportShareItem = ExportShareItem(fileURL: tempURL)
+        } catch {
+            alertTitle = NSLocalizedString("export_failed_title", comment: "")
+            alertMessage = error.localizedDescription
+            showAlert = true
+        }
+    }
 }
 
-#if DEBUG
 private struct ExportShareItem: Identifiable {
     let id = UUID()
     let fileURL: URL
@@ -430,4 +532,3 @@ private struct ShareSheet: UIViewControllerRepresentable {
 
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
-#endif

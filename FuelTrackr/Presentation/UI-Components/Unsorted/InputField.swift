@@ -22,6 +22,8 @@ public struct InputField: View {
     @Environment(\.colorScheme) private var colorScheme
 
     public var body: some View {
+        let colors = Theme.colors(for: colorScheme)
+        
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.caption)
@@ -29,31 +31,42 @@ public struct InputField: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .accessibilityHidden(true)
 
-            TextField(placeholder, text: $text)
-                .padding()
-                .background(backgroundColor)
-                .cornerRadius(8)
-                .keyboardType(keyboardType)
-                .foregroundColor(.primary)
-                .focused($isFocused)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(
-                            borderColor,
-                            lineWidth: borderWidth
-                        )
-                )
-                .accessibilityLabel(title)
-                .accessibilityHint(placeholder)
-                .accessibilityValue(text.isEmpty ? placeholder : text)
+            ZStack(alignment: .leading) {
+                if text.isEmpty {
+                    Text(placeholder)
+                        .foregroundColor(placeholderColor(colors: colors))
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 16)
+                }
+                TextField("", text: $text)
+                    .padding()
+                    .keyboardType(keyboardType)
+                    .foregroundColor(.primary)
+                    .focused($isFocused)
+            }
+            .background(backgroundColor)
+            .cornerRadius(8)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(
+                        borderColor,
+                        lineWidth: borderWidth
+                    )
+            )
+            .accessibilityLabel(title)
+            .accessibilityHint(placeholder)
+            .accessibilityValue(text.isEmpty ? placeholder : text)
         }
     }
     
+    private func placeholderColor(colors: ColorsProtocol) -> Color {
+        colorScheme == .dark ? colors.onSurface : Color(.placeholderText)
+    }
+    
     private var backgroundColor: Color {
-        // Use systemBackground with higher opacity for better visibility with glass effects
-        // This ensures the input field stands out clearly while maintaining HIG compliance
+        let colors = Theme.colors(for: colorScheme)
         if colorScheme == .dark {
-            return Color(.systemGray6).opacity(0.9)
+            return colors.surface
         } else {
             return Color(.systemBackground).opacity(0.95)
         }
@@ -69,8 +82,7 @@ public struct InputField: View {
         } else if isFocused {
             return colors.primary
         } else {
-            // Subtle border for better visibility with glass effects
-            return Color(.separator).opacity(colorScheme == .dark ? 0.5 : 0.3)
+            return colorScheme == .dark ? colors.onSurface.opacity(0.35) : Color(.separator).opacity(0.3)
         }
     }
     
