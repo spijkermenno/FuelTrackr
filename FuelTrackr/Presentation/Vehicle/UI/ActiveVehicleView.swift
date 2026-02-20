@@ -78,11 +78,6 @@ public struct ActiveVehicleView: View {
         if let next1st = calendar.date(from: components) {
             let notificationManager = NotificationManager(settingsRepository: SettingsRepository())
             notificationManager.scheduleMonthlyRecapNotification(for: next1st)
-            
-            let formatter = DateFormatter()
-            formatter.dateStyle = .full
-            formatter.timeStyle = .short
-            print("📅 Scheduled monthly recap notification for \(formatter.string(from: next1st))")
         }
     }
 }

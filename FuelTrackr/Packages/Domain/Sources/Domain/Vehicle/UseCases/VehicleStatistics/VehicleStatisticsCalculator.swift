@@ -26,7 +26,6 @@ struct VehicleStatisticsCalculator {
         let fuel = repository.getFuelUsed(forMonth: month, year: year, context: context)
         let cost = repository.getFuelCost(forMonth: month, year: year, context: context)
         
-        print("Distance: \(distance)")
         return VehicleStatisticsUiModel(
             period: period,
             distanceDriven: Double(distance),

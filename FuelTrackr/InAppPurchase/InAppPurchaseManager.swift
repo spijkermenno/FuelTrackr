@@ -136,11 +136,7 @@ class InAppPurchaseManager: ObservableObject {
                                 Scoville.reportInAppPurchase(
                                     productId: transaction.productID,
                                     type: scovilleIAPType(for: transaction.productID)
-                                ) { result in
-                                    if case .failure(let error) = result {
-                                        print("IAP report failed:", error)
-                                    }
-                                }
+                                ) { _ in }
                             }
                         }
                     }
@@ -231,11 +227,7 @@ class InAppPurchaseManager: ObservableObject {
                             Scoville.reportInAppPurchase(
                                 productId: transaction.productID,
                                 type: scovilleIAPType(for: transaction.productID)
-                            ) { result in
-                                if case .failure(let error) = result {
-                                    print("IAP report failed:", error)
-                                }
-                            }
+                            ) { _ in }
                             // Trigger review prompt after purchase
                             ReviewPrompter.shared.maybeRequestReview(reason: .purchaseDone)
                         }
