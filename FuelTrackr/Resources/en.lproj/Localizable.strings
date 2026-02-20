@@ -392,8 +392,16 @@
 "pro_renews" = "Renews: %@";
 "pro_never_expires" = "Never expires";
 "pro_manage_subscription" = "Manage Subscription";
+"purchase_display_lifetime" = "Lifetime Pro";
+"purchase_display_monthly" = "Monthly Subscription";
+"purchase_display_yearly" = "Yearly Subscription";
+"purchase_display_none" = "No Active Purchase";
 "pro_remove_debug" = "Remove Pro (Debug)";
 "pro_upgrade" = "Upgrade to Pro";
+"pro_best_value_badge" = "BEST VALUE";
+"offer_reason_introductory" = "Introduction deal";
+"offer_discount_percent" = "%d%% off";
+"offer_free_trial" = "Free trial";
 "unit_km" = "km";
 "unit_mi" = "mi";
 "unit_l" = "L";

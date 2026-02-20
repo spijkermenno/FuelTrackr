@@ -18,6 +18,7 @@ public struct FuelTrackrEvents: AnalyticsEventName, Sendable {
     public static let IAPFullPremiumBought = FuelTrackrEvents("IAPFullPremiumBought")
     public static let IAPCancelled = FuelTrackrEvents("IAPCancelled")
     public static let IAPFailed = FuelTrackrEvents("IAPFailed")
+    public static let IAPRestored = FuelTrackrEvents("IAPRestored")
     
     // Review
     public static let askedForUserReview = FuelTrackrEvents("askedForUserReview")
@@ -47,7 +48,6 @@ public struct FuelTrackrEvents: AnalyticsEventName, Sendable {
     
     // Onboarding
     public static let onboardingStarted = FuelTrackrEvents("onboardingStarted")
-    public static let onboardingStepViewed = FuelTrackrEvents("onboardingStepViewed")
     public static let onboardingCompleted = FuelTrackrEvents("onboardingCompleted")
     
     // App Lifecycle

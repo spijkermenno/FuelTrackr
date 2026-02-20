@@ -8,6 +8,7 @@
 //
 
 import SwiftUI
+import SwiftData
 import Domain
 import UserNotifications
 import AppTrackingTransparency
@@ -32,7 +33,8 @@ public struct SettingsPageView: View {
     @State private var trackingAuthorizationStatus: ATTrackingManager.AuthorizationStatus = .notDetermined
     @StateObject private var reviewPrompter = ReviewPrompter.shared
     @State private var showAppSuggestion = false
-    
+    @State private var exportShareItem: ExportShareItem?
+
     private var colors: ColorsProtocol {
         Theme.colors(for: colorScheme)
     }
@@ -304,7 +306,7 @@ public struct SettingsPageView: View {
                 }
                 
                 #if DEBUG
-                // Debug Section - Notification Testing
+                // Debug Section - Notification Testing & Export
                 Section(header: Text("Debug")
                     .foregroundColor(colors.onSurface)) {
                     Button(action: {
@@ -318,6 +320,18 @@ public struct SettingsPageView: View {
                                 .font(Theme.typography.bodyFont)
                             Spacer()
                             Image(systemName: "bell.badge")
+                                .foregroundColor(colors.primary)
+                        }
+                    }
+                    .padding(.vertical, Theme.dimensions.spacingXS)
+
+                    Button(action: exportToJSON) {
+                        HStack {
+                            Text("Export to JSON")
+                                .foregroundColor(colors.primary)
+                                .font(Theme.typography.bodyFont)
+                            Spacer()
+                            Image(systemName: "square.and.arrow.up")
                                 .foregroundColor(colors.primary)
                         }
                     }
@@ -357,6 +371,11 @@ public struct SettingsPageView: View {
             .sheet(isPresented: $showAppSuggestion) {
                 AppSuggestionView(isPresented: $showAppSuggestion)
             }
+            #if DEBUG
+            .sheet(item: $exportShareItem, onDismiss: { exportShareItem = nil }) { item in
+                ShareSheet(items: [item.fileURL])
+            }
+            #endif
             .alert(isPresented: $showAlert) {
                 Alert(
                     title: Text(alertTitle),
@@ -422,4 +441,40 @@ public struct SettingsPageView: View {
             }
         }
     }
+
+    #if DEBUG
+    private func exportToJSON() {
+        do {
+            let vehicles = try context.fetch(FetchDescriptor<Vehicle>())
+            let json = try VehicleJSONExporter().exportAll(vehicles)
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd_HHmmss"
+            let fileName = "FuelTrackr_Export_\(formatter.string(from: Date())).json"
+            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+            try json.write(to: tempURL, atomically: true, encoding: .utf8)
+            exportShareItem = ExportShareItem(fileURL: tempURL)
+        } catch {
+            alertTitle = "Export Failed"
+            alertMessage = error.localizedDescription
+            showAlert = true
+        }
+    }
+    #endif
 }
+
+#if DEBUG
+private struct ExportShareItem: Identifiable {
+    let id = UUID()
+    let fileURL: URL
+}
+
+private struct ShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+#endif

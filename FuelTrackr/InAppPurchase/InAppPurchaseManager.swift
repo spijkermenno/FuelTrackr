@@ -45,13 +45,13 @@ struct PurchaseInfo: Equatable {
     var displayName: String {
         switch type {
         case .lifetime:
-            return "Lifetime Pro"
+            return NSLocalizedString("purchase_display_lifetime", comment: "")
         case .monthly:
-            return "Monthly Subscription"
+            return NSLocalizedString("purchase_display_monthly", comment: "")
         case .yearly:
-            return "Yearly Subscription"
+            return NSLocalizedString("purchase_display_yearly", comment: "")
         case .none:
-            return "No Active Purchase"
+            return NSLocalizedString("purchase_display_none", comment: "")
         }
     }
 }
@@ -75,6 +75,8 @@ class InAppPurchaseManager: ObservableObject {
     @Published var purchaseState: PurchaseState = .idle
     @Published var isRestoring: Bool = false
     @Published var hasActiveSubscription: Bool = false
+    @Published var hasEligibleOffer: Bool = false
+    @Published var eligibleOfferDiscountPercent: Int? = nil
     @Published var currentPurchaseInfo: PurchaseInfo = PurchaseInfo(type: .none, productID: "", transactionID: nil, purchaseDate: nil, expirationDate: nil)
     
     private var hasPreloadedProducts = false
@@ -98,14 +100,17 @@ class InAppPurchaseManager: ObservableObject {
                         await checkPurchaseStatus()
                         // Finish the transaction
                         await transaction.finish()
-                        // Report IAP to ScovilleKit
-                        Task { @MainActor in
-                            Scoville.reportInAppPurchase(
-                                productId: transaction.productID,
-                                type: scovilleIAPType(for: transaction.productID)
-                            ) { result in
-                                if case .failure(let error) = result {
-                                    print("IAP report failed:", error)
+                        
+                        if transaction.environment == .production {
+                            // Report IAP to ScovilleKit
+                            Task { @MainActor in
+                                Scoville.reportInAppPurchase(
+                                    productId: transaction.productID,
+                                    type: scovilleIAPType(for: transaction.productID)
+                                ) { result in
+                                    if case .failure(let error) = result {
+                                        print("IAP report failed:", error)
+                                    }
                                 }
                             }
                         }
@@ -121,12 +126,47 @@ class InAppPurchaseManager: ObservableObject {
             let productIdentifiers = Set(ids)
 
             products = try await Product.products(for: productIdentifiers)
+            await checkOfferEligibility()
         } catch {
-            
             Task { @MainActor in
                 Scoville.track(FuelTrackrEvents.failedToLoadProducts)
             }
         }
+    }
+    
+    private func checkOfferEligibility() async {
+        guard !hasActiveSubscription else {
+            hasEligibleOffer = false
+            eligibleOfferDiscountPercent = nil
+            return
+        }
+        var bestDiscount: Int = 0
+        var foundEligible = false
+        for product in products {
+            guard let subscription = product.subscription,
+                  let offer = subscription.introductoryOffer else { continue }
+            if await subscription.isEligibleForIntroOffer {
+                foundEligible = true
+                let discount: Int
+                switch offer.paymentMode {
+                case .freeTrial:
+                    discount = 100
+                case .payAsYouGo, .payUpFront:
+                    let productPrice = NSDecimalNumber(decimal: product.price).doubleValue
+                    let offerPrice = NSDecimalNumber(decimal: offer.price).doubleValue
+                    if productPrice > 0, offerPrice < productPrice {
+                        discount = min(99, Int(round((1 - offerPrice / productPrice) * 100)))
+                    } else {
+                        discount = 0
+                    }
+                default:
+                    discount = 0
+                }
+                bestDiscount = max(bestDiscount, discount)
+            }
+        }
+        hasEligibleOffer = foundEligible
+        eligibleOfferDiscountPercent = foundEligible && bestDiscount > 0 ? bestDiscount : nil
     }
     
     func purchase(product: Product) async {
@@ -147,17 +187,20 @@ class InAppPurchaseManager: ObservableObject {
                     // Set success state
                     purchaseState = .success
                     
-                    Task { @MainActor in
-                        Scoville.reportInAppPurchase(
-                            productId: transaction.productID,
-                            type: scovilleIAPType(for: transaction.productID)
-                        ) { result in
-                            if case .failure(let error) = result {
-                                print("IAP report failed:", error)
+                    if transaction.environment == .production {
+                        
+                        Task { @MainActor in
+                            Scoville.reportInAppPurchase(
+                                productId: transaction.productID,
+                                type: scovilleIAPType(for: transaction.productID)
+                            ) { result in
+                                if case .failure(let error) = result {
+                                    print("IAP report failed:", error)
+                                }
                             }
+                            // Trigger review prompt after purchase
+                            ReviewPrompter.shared.maybeRequestReview(reason: .purchaseDone)
                         }
-                        // Trigger review prompt after purchase
-                        ReviewPrompter.shared.maybeRequestReview(reason: .purchaseDone)
                     }
                     
                     // Don't auto-reset - let user dismiss the success overlay
@@ -214,14 +257,7 @@ class InAppPurchaseManager: ObservableObject {
                 let productId = currentPurchaseInfo.productID
                 if !productId.isEmpty {
                     Task { @MainActor in
-                        Scoville.reportInAppPurchase(
-                            productId: productId,
-                            type: scovilleIAPType(for: productId)
-                        ) { result in
-                            if case .failure(let error) = result {
-                                print("IAP report failed:", error)
-                            }
-                        }
+                        Scoville.track(FuelTrackrEvents.IAPRestored)
                     }
                 }
                 // Don't auto-reset - let user dismiss the success overlay
@@ -296,6 +332,7 @@ class InAppPurchaseManager: ObservableObject {
         }
         
         hasActiveSubscription = hasActive
+        await checkOfferEligibility()
         currentPurchaseInfo = PurchaseInfo(
             type: purchaseType,
             productID: productID,
@@ -327,15 +364,6 @@ class InAppPurchaseManager: ObservableObject {
             purchaseDate: Date(),
             expirationDate: nil
         )
-        // Report debug purchase to ScovilleKit
-        Scoville.reportInAppPurchase(
-            productId: debugProductId,
-            type: .permanent
-        ) { result in
-            if case .failure(let error) = result {
-                print("IAP report failed:", error)
-            }
-        }
     }
     #endif
     
