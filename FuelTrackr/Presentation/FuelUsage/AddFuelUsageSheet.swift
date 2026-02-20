@@ -199,13 +199,13 @@ struct InputSection: View {
             .accessibilityLabel(fuelAmountLabel)
             
             InputField(
-                title: NSLocalizedString("cost_label", comment: ""),
+                title: String(format: NSLocalizedString("cost_label", comment: ""), GetSelectedCurrencyUseCase()().symbol),
                 placeholder: NSLocalizedString("cost_placeholder", comment: ""),
                 text: $cost,
                 keyboardType: .decimalPad,
                 hasError: costError
             )
-            .accessibilityLabel(NSLocalizedString("cost_label", comment: ""))
+            .accessibilityLabel(String(format: NSLocalizedString("cost_label", comment: ""), GetSelectedCurrencyUseCase()().symbol))
             
             VStack(alignment: .leading, spacing: 4) {
                 InputField(

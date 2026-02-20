@@ -91,7 +91,7 @@ public struct MaintenanceEntryView: View {
         if isFree {
             return NSLocalizedString("free_or_warranty", comment: "Free/Warranty")
         }
-        return cost.formatted(.currency(code: Locale.current.currency?.identifier ?? "EUR"))
+        return CurrencyFormatting.format(cost)
     }
 }
 

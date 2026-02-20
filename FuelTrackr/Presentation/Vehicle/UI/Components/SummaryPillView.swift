@@ -82,7 +82,7 @@ public struct SummaryPillView: View {
         SummaryPillView(
             icon: "fuelpump.fill",
             label: "Gemiddelde prijs",
-            value: "€1,79/L",
+            value: CurrencyFormatting.formatPricePerLiter(1.79),
             backgroundColor: Color.green.opacity(0.2),
             iconColor: .green
         )

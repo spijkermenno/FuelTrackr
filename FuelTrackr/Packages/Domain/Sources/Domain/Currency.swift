@@ -41,4 +41,16 @@ public enum Currency: String, CaseIterable, Codable {
         case .chf: return "Swiss Franc (CHF)"
         }
     }
+
+    /// Locale identifier used for parsing decimal input (e.g. cost, liters).
+    /// EUR/GBP/CHF use comma as decimal separator; USD/CAD/AUD/JPY use dot.
+    public var parsingLocaleIdentifier: String {
+        switch self {
+        case .euro, .gbp, .chf: return "de_DE"
+        case .usd: return "en_US"
+        case .jpy: return "ja_JP"
+        case .aud: return "en_AU"
+        case .cad: return "en_CA"
+        }
+    }
 }

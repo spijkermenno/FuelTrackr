@@ -128,12 +128,12 @@ public struct FuelUsageRow: View {
             fuelFormatter.minimumFractionDigits = 0
             fuelFormatter.maximumFractionDigits = 2
             let fuelText = fuelFormatter.string(from: NSNumber(value: usage.liters)) ?? String(format: "%.2f", usage.liters)
-            let costText = usage.cost.formatted(.currency(code: Locale.current.currency?.identifier ?? "EUR"))
+            let costText = CurrencyFormatting.format(usage.cost)
             return "\(fuelText) \(NSLocalizedString("unit_l", comment: "")), \(costText)"
         }
         let fuelType = vehicle.fuelType ?? .liquid
         let fuelText = fuelType.formatFuelAmount(usage.liters, isUsingMetric: isUsingMetric)
-        let costText = usage.cost.formatted(.currency(code: Locale.current.currency?.identifier ?? "EUR"))
+        let costText = CurrencyFormatting.format(usage.cost)
         return "\(fuelText), \(costText)"
     }
 
@@ -192,7 +192,7 @@ public struct FuelUsageRow: View {
                 if usage.liters > 0, let vehicle = usage.vehicle {
                     let fuelType = vehicle.fuelType ?? .liquid
                     let pricePerUnit = usage.cost / usage.liters
-                    Text(fuelType.formatPricePerUnit(pricePerUnit, isUsingMetric: isUsingMetric))
+                    Text(fuelType.formatPricePerUnit(pricePerUnit, isUsingMetric: isUsingMetric, currency: GetSelectedCurrencyUseCase()()))
                         .font(.subheadline)
                         .fontWeight(.semibold)
                         .foregroundColor(.primary)

@@ -104,14 +104,7 @@ public struct MonthlyRecapSheet: View {
                     RecapCard(
                         displayedDistance: displayedDistance,
                         displayedFuelUsed: displayedFuelUsed,
-                        displayedFuelCost: {
-                            let formatter = NumberFormatter()
-                            formatter.numberStyle = .currency
-                            formatter.locale = Locale.current
-                            formatter.maximumFractionDigits = 2
-                            formatter.minimumFractionDigits = 0
-                            return formatter.string(from: NSNumber(value: totalFuelCost)) ?? String(format: "%.2f", totalFuelCost)
-                        }(),
+                        displayedFuelCost: CurrencyFormatting.format(totalFuelCost),
                         displayedAverage: displayedAverage,
                         comparisonText: comparisonText
                     )

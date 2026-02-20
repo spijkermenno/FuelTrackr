@@ -29,7 +29,7 @@ import ScovilleKit
     @State private var resolvedVehicle: Vehicle?
     
     private var decimalSeparator: String {
-        Locale.current.decimalSeparator ?? "."
+        Locale(identifier: GetSelectedCurrencyUseCase()().parsingLocaleIdentifier).decimalSeparator ?? Locale.current.decimalSeparator ?? "."
     }
     
     private var isUsingMetric: Bool {
@@ -86,7 +86,7 @@ import ScovilleKit
             }
             
             InputField(
-                title: NSLocalizedString("cost_label", comment: ""),
+                title: String(format: NSLocalizedString("cost_label", comment: ""), GetSelectedCurrencyUseCase()().symbol),
                 placeholder: NSLocalizedString("cost_placeholder", comment: ""),
                 text: $cost,
                 keyboardType: .decimalPad
@@ -322,8 +322,7 @@ import ScovilleKit
     }
     
     private func parseInput(_ input: String) -> Double? {
-        let normalized = input.replacingOccurrences(of: decimalSeparator, with: ".")
-        return Double(normalized)
+        DecimalInputParser.parse(input)
     }
     
     private func startKeyboardObserver() {

@@ -98,7 +98,7 @@ public struct MonthlyFuelSummaryCard: View {
     
     private func formatPrice(_ pricePerUnit: Double) -> String {
         let fuelTypeToUse = fuelType ?? .liquid
-        return fuelTypeToUse.formatPricePerUnit(pricePerUnit, isUsingMetric: isUsingMetric)
+        return fuelTypeToUse.formatPricePerUnit(pricePerUnit, isUsingMetric: isUsingMetric, currency: GetSelectedCurrencyUseCase()())
     }
     
     private func formatFuel(_ amount: Double) -> String {
@@ -107,6 +107,6 @@ public struct MonthlyFuelSummaryCard: View {
     }
     
     private func formatCost(_ cost: Double) -> String {
-        return cost.formatted(.currency(code: Locale.current.currency?.identifier ?? "EUR"))
+        CurrencyFormatting.format(cost)
     }
 }

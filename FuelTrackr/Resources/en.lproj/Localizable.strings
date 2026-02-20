@@ -50,7 +50,7 @@
 "kwh_label" = "How many kWh did you charge?";
 "kg_h2_label" = "How many kg H₂ did you refuel?";
 "fuel_amount_label" = "How much fuel did you add?";
-"cost_label" = "Total cost (€)";
+"cost_label" = "Total cost (%@)";
 "cost_placeholder" = "Enter price (e.g., 100)";
 "liters_placeholder" = "Enter amount (e.g., 12)";
 "gallons_placeholder" = "Enter amount (e.g., 3.5)";

@@ -20,13 +20,6 @@ public final class EditFuelUsageViewModel: ObservableObject {
     @Published public var mileageError: Bool = false
 
     private let getUsingMetricUseCase: GetUsingMetricUseCase
-    
-    private let numberFormatter: NumberFormatter = {
-        let f = NumberFormatter()
-        f.locale = .current
-        f.decimalSeparator = Locale.current.decimalSeparator
-        return f
-    }()
 
     public init(getUsingMetricUseCase: GetUsingMetricUseCase = GetUsingMetricUseCase()) {
         self.getUsingMetricUseCase = getUsingMetricUseCase
@@ -46,9 +39,9 @@ public final class EditFuelUsageViewModel: ObservableObject {
         costError = false
         mileageError = false
         
-        // Validate all fields together
-        let litersVal = Double(liters.replacingOccurrences(of: ",", with: "."))
-        let costVal = Double(cost.replacingOccurrences(of: ",", with: "."))
+        // Validate all fields together (DecimalInputParser supports both . and , as decimal separator)
+        let litersVal = DecimalInputParser.parse(liters)
+        let costVal = DecimalInputParser.parse(cost)
         let mileageVal = Int(mileage)
         
         // Check liters validation

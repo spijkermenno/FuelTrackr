@@ -126,7 +126,7 @@ private struct MaintenancePreviewRow: View {
         if model.isFree {
             return NSLocalizedString("free_or_warranty", comment: "")
         }
-        let costText = model.cost.formatted(.currency(code: Locale.current.currency?.identifier ?? "EUR"))
+        let costText = CurrencyFormatting.format(model.cost)
         return costText
     }
 

@@ -51,7 +51,7 @@
 "kwh_label" = "Hoeveel kWh heb je opgeladen?";
 "kg_h2_label" = "Hoeveel kg H₂ heb je getankt?";
 "fuel_amount_label" = "Hoeveel brandstof heb je toegevoegd?";
-"cost_label" = "Totale kosten (€)";
+"cost_label" = "Totale kosten (%@)";
 "cost_placeholder" = "Vul prijs in (bijv. 76)";
 "liters_placeholder" = "Vul aantal in (bijv. 43,2)";
 "gallons_placeholder" = "Vul aantal in (bijv. 3,5)";

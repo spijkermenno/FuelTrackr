@@ -16,11 +16,23 @@
 		A9A91A912D4C02B000153BE0 /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = A9A91A902D4C02B000153BE0 /* FirebasePerformance */; };
 		A9B3A5F52DC265AA00D219FF /* Data in Frameworks */ = {isa = PBXBuildFile; productRef = A9B3A5F42DC265AA00D219FF /* Data */; };
 		A9C83BAF2F193A61008371FC /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9C83BAE2F193A61008371FC /* StoreKit.framework */; };
+		A9D28F552F489E74006A7A64 /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = A98BBF122DC1670300F561BF /* Domain */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A9D28F4F2F489E74006A7A63 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A96F62562D43C5D500872385 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A96F625D2D43C5D500872385;
+			remoteInfo = FuelTrackr;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		A96F625E2D43C5D500872385 /* FuelTrackr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FuelTrackr.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9C83BAE2F193A61008371FC /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		A9D28F4B2F489E74006A7A63 /* FuelTrackrUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FuelTrackrUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -47,6 +59,11 @@
 			path = ScovilleKit;
 			sourceTree = "<group>";
 		};
+		A9D28F4C2F489E74006A7A63 /* FuelTrackrUnitTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FuelTrackrUnitTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +83,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A9D28F482F489E74006A7A63 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A9D28F552F489E74006A7A64 /* Domain in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -74,6 +99,7 @@
 			children = (
 				A98D0DCB2ECCD2A800B642CE /* ScovilleKit */,
 				A96F62602D43C5D500872385 /* FuelTrackr */,
+				A9D28F4C2F489E74006A7A63 /* FuelTrackrUnitTests */,
 				A98BBF0D2DC166F800F561BF /* Frameworks */,
 				A96F625F2D43C5D500872385 /* Products */,
 			);
@@ -83,6 +109,7 @@
 			isa = PBXGroup;
 			children = (
 				A96F625E2D43C5D500872385 /* FuelTrackr.app */,
+				A9D28F4B2F489E74006A7A63 /* FuelTrackrUnitTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -129,6 +156,30 @@
 			productReference = A96F625E2D43C5D500872385 /* FuelTrackr.app */;
 			productType = "com.apple.product-type.application";
 		};
+		A9D28F4A2F489E74006A7A63 /* FuelTrackrUnitTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A9D28F512F489E74006A7A63 /* Build configuration list for PBXNativeTarget "FuelTrackrUnitTests" */;
+			buildPhases = (
+				A9D28F472F489E74006A7A63 /* Sources */,
+				A9D28F482F489E74006A7A63 /* Frameworks */,
+				A9D28F492F489E74006A7A63 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A9D28F502F489E74006A7A63 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A9D28F4C2F489E74006A7A63 /* FuelTrackrUnitTests */,
+			);
+			name = FuelTrackrUnitTests;
+			packageProductDependencies = (
+				A98BBF122DC1670300F561BF /* Domain */,
+			);
+			productName = FuelTrackrUnitTests;
+			productReference = A9D28F4B2F489E74006A7A63 /* FuelTrackrUnitTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -136,11 +187,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1600;
+				LastSwiftUpdateCheck = 2620;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					A96F625D2D43C5D500872385 = {
 						CreatedOnToolsVersion = 16.0;
+					};
+					A9D28F4A2F489E74006A7A63 = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = A96F625D2D43C5D500872385;
 					};
 				};
 			};
@@ -166,12 +221,20 @@
 			projectRoot = "";
 			targets = (
 				A96F625D2D43C5D500872385 /* FuelTrackr */,
+				A9D28F4A2F489E74006A7A63 /* FuelTrackrUnitTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		A96F625C2D43C5D500872385 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A9D28F492F489E74006A7A63 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -188,7 +251,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A9D28F472F489E74006A7A63 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A9D28F502F489E74006A7A63 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A96F625D2D43C5D500872385 /* FuelTrackr */;
+			targetProxy = A9D28F4F2F489E74006A7A63 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		A96F626D2D43C5D600872385 /* Debug */ = {
@@ -395,6 +473,63 @@
 			};
 			name = Release;
 		};
+		A9D28F522F489E74006A7A63 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 327PJMKH2C;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "pepper-technologies.nl.FuelTrackrUnitTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FuelTrackr.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FuelTrackr";
+			};
+			name = Debug;
+		};
+		A9D28F532F489E74006A7A63 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 327PJMKH2C;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "pepper-technologies.nl.FuelTrackrUnitTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FuelTrackr.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FuelTrackr";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -412,6 +547,15 @@
 			buildConfigurations = (
 				A96F62702D43C5D600872385 /* Debug */,
 				A96F62712D43C5D600872385 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A9D28F512F489E74006A7A63 /* Build configuration list for PBXNativeTarget "FuelTrackrUnitTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A9D28F522F489E74006A7A63 /* Debug */,
+				A9D28F532F489E74006A7A63 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

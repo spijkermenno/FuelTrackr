@@ -146,23 +146,24 @@ public enum FuelType: String, Codable {
     /// - Parameters:
     ///   - price: Price per unit
     ///   - isUsingMetric: Whether to use metric or imperial units
+    ///   - currency: Optional currency; when nil uses Locale.current for backwards compatibility
     /// - Returns: Formatted string with currency and unit
-    public func formatPricePerUnit(_ price: Double, isUsingMetric: Bool) -> String {
-        let currencySymbol = Locale.current.currencySymbol ?? "€"
+    public func formatPricePerUnit(_ price: Double, isUsingMetric: Bool, currency: Currency? = nil) -> String {
+        let currencySymbol = currency?.symbol ?? Locale.current.currencySymbol ?? "€"
         switch (self, isUsingMetric) {
         case (.liquid, true):
             return "\(currencySymbol)\(formatNumber(price))/L"
         case (.liquid, false):
             let pricePerGallon = price * 3.78541
-            return "$\(formatNumber(pricePerGallon))/G"
+            return "\(currencySymbol)\(formatNumber(pricePerGallon))/G"
         case (.electric, true):
             return "\(currencySymbol)\(formatNumber(price))/kWh"
         case (.electric, false):
-            return "$\(formatNumber(price))/kWh"
+            return "\(currencySymbol)\(formatNumber(price))/kWh"
         case (.hydrogen, true):
             return "\(currencySymbol)\(formatNumber(price))/kg H₂"
         case (.hydrogen, false):
-            return "$\(formatNumber(price))/kg H₂"
+            return "\(currencySymbol)\(formatNumber(price))/kg H₂"
         case (.unknown, _):
             return "\(currencySymbol)\(formatNumber(price))"
         }
