@@ -1,0 +1,485 @@
+/* Welcome and General */
+"welcome_title" = "欢迎使用 FuelTrackr！";
+"welcome_subtitle" = "首先输入您的车辆信息。保存后，FuelTrackr 将开始追踪您的燃油使用、保养和里程。";
+
+/* Vehicle Editing */
+"edit_vehicle_title" = "编辑车辆";
+
+/* Photo */
+"tap_to_select_photo" = "点击选择照片";
+"select_photo" = "选择照片";
+"photo_title" = "照片";
+"add_photo_button" = "添加照片";
+
+/* Vehicle Details */
+"vehicle_name_title" = "车辆名称";
+"vehicle_name_placeholder" = "输入车辆名称";
+"license_plate_title" = "车牌号";
+"license_plate_placeholder" = "输入车牌号";
+"purchase_date_title" = "购买日期";
+"manufacturing_date_title" = "生产日期";
+"save_vehicle_button" = "保存车辆";
+
+/* Mileage */
+"mileage_title" = "里程";
+"mileage_placeholder" = "输入里程";
+"mileage_label" = "里程";
+"mileage_title_km" = "当前里程（公里）";
+"mileage_title_miles" = "当前里程（英里）";
+
+"mileage_history_km" = "里程（公里）历史";
+"mileage_history_miles" = "里程（英里）历史";
+
+/* Additional Labels */
+"license_plate_label" = "车牌号";
+"purchase_date_label" = "购买日期";
+"manufacturing_date_label" = "生产日期";
+
+/* Deletion */
+"delete_vehicle_button" = "删除车辆";
+"delete_vehicle_confirmation_title" = "确定要删除此车辆吗？";
+"delete_confirmation_title" = "确定吗？";
+"delete_confirmation_delete" = "删除";
+
+/* Fuel Usage */
+"add_fuel_usage_title" = "添加燃油记录";
+"add_fuel_usage_description" = "记录每次加油，完整保存燃油历史并监控燃油消耗趋势。";
+"fuel_entry_details" = "加油记录详情";
+"liters_label" = "您加了多少升油？";
+"gallons_label" = "您加了多少加仑油？";
+"kwh_label" = "您充了多少 kWh 电？";
+"kg_h2_label" = "您加了多少 kg H₂ 氢？";
+"fuel_amount_label" = "您加了多少燃油？";
+"cost_label" = "总费用（%@）";
+"cost_placeholder" = "输入金额（如 100）";
+"liters_placeholder" = "输入数量（如 12）";
+"gallons_placeholder" = "输入数量（如 3.5）";
+"kwh_placeholder" = "输入数量（如 50）";
+"kg_h2_placeholder" = "输入数量（如 5）";
+"fuel_amount_placeholder" = "输入数量";
+"price_per_liter" = "每升价格";
+"price_per_gallon" = "每加仑价格";
+"fuel_type" = "燃油类型";
+"fuel_usage_title" = "燃油使用";
+"fuel_usage_no_content" = "要查看燃油使用统计，请使用带「+」号的按钮添加数据";
+"fuel_usage_saved_success" = "燃油记录已成功保存。";
+"fuel_usage_saved_error" = "保存燃油记录失败。";
+"fuel_usage_empty_title" = "需要更多数据";
+"fuel_usage_empty_description" = "添加更多加油记录以获取完整概览。";
+"fuel_usage_list_title" = "燃油使用记录";
+"second_entry_needed_calculation" = "添加第二条加油记录以开始计算油耗和行驶距离。";
+"fuel_entry_date_today" = "今天";
+"fuel_entry_date_label" = "日期";
+"fuel_entry_past_warning" = "您正在添加过去的加油记录。请仔细核对里程。如有偏差，油耗统计可能不准确。我们跳过过去记录的里程验证，以便您灵活操作。";
+"edit_fuel_entry_past_warning" = "此加油记录为过去日期。请仔细核对里程。如有偏差，油耗统计可能不准确。我们跳过过去记录的里程验证，以便您灵活操作。";
+"edit_liters_label" = "升";
+"edit_gallons_label" = "加仑";
+"edit_kwh_label" = "kWh";
+"edit_kg_h2_label" = "kg H₂";
+"edit_fuel_amount_label" = "燃油数量";
+
+/* Maintenance */
+"maintenance_title" = "保养历史";
+"maintenance_no_content" = "暂无保养记录。请使用「+」按钮添加记录。";
+"maintenance_details" = "保养详情";
+"maintenance_type" = "保养类型";
+"add_maintenance_title" = "添加保养";
+"maintenance_saved_success" = "保养记录已成功保存。";
+"maintenance_saved_error" = "保存保养记录失败。";
+"maintenance_list_title" = "保养记录";
+"delete_confirmation_maintenance" = "确定要删除此保养记录吗？";
+"delete_confirmation_fuel" = "确定要删除此燃油记录吗？";
+
+/* Other */
+"other" = "其他";
+"other_notes" = "请说明";
+"other_notes_placeholder" = "输入「其他」的说明";
+"all_fields_required_error" = "所有字段必须填写有效数据。";
+"invalid_liters_error" = "请输入大于 0 的有效升数。";
+"invalid_gallons_error" = "请输入大于 0 的有效加仑数。";
+"invalid_kwh_error" = "请输入大于 0 的有效 kWh 数。";
+"invalid_kg_h2_error" = "请输入大于 0 的有效 kg H₂ 数。";
+"invalid_fuel_amount_error" = "请输入大于 0 的有效燃油数量。";
+"invalid_cost_error" = "请输入大于 0 的有效金额。";
+"invalid_mileage_error" = "里程必须高于当前里程。";
+"invalid_cost_error_generic" = "无效金额。请检查输入格式。";
+"invalid_number_error" = "无效数字。请确保输入为数字。";
+"invalid_notes_error" = "请提供保养说明。";
+"general_error" = "出现错误，请重试。";
+"mileage_too_low_error" = "里程不能低于上次记录值（%d）。";
+"mileage_suspiciously_high_warning" = "此里程明显高于预期，请检查是否多输入了一位数字。";
+
+/* Notifications */
+"notifications_section" = "通知";
+"notifications_disclaimer" = "我们正在开发通知功能，让您不会错过任何更新。目前尚未可用，敬请期待！";
+"enable_notifications" = "启用通知";
+"enable_notifications_description" = "启用或关闭保养提醒通知。";
+"notification_permission_error" = "请在设备设置中启用通知。";
+"notifications_disabled_title" = "通知已关闭";
+"notifications_disabled_message" = "请在设置中启用通知以接收提醒。";
+"notifications_toggle" = "通知";
+"notifications_toggle_description" = "允许接收保养提醒和更新通知。";
+"notification_status_authorized" = "已授权";
+"notification_status_denied" = "已拒绝";
+"notification_status_not_determined" = "未确定";
+"tracking_toggle" = "跟踪";
+"tracking_toggle_description" = "允许跟踪以改善应用体验。";
+"tracking_status_authorized" = "已授权";
+"tracking_status_denied" = "已拒绝";
+"tracking_status_restricted" = "受限";
+"tracking_status_not_determined" = "未确定";
+"open_settings" = "打开设置";
+"pro_grant_debug" = "授予 Pro（调试）";
+"ok" = "确定";
+
+/* Units and Settings */
+"units_section" = "单位";
+"measurement_system" = "计量系统";
+"measurement_system_description" = "选择距离和燃油的计量单位。";
+"use_metric_units" = "使用公制单位";
+
+"currently_using_metric" = "当前使用公制单位（公里和升）";
+"currently_using_imperial" = "当前使用英制单位（英里和加仑）";
+
+"default_maintenance_intervals" = "默认保养周期";
+"tires" = "轮胎";
+"distribution_belt" = "正时皮带";
+"oil_change" = "机油更换";
+"brakes" = "刹车";
+"other" = "其他";
+"settings_title" = "设置";
+"settings_description" = "通过管理通知、单位和默认保养周期等设置来个性化您的应用体验。";
+
+/* Data Export */
+"export_section" = "导出数据";
+"export_to_json" = "导出为 JSON";
+"export_to_json_subtitle" = "FuelTrackr 完整备份";
+"export_to_xml" = "导出为 XML";
+"export_to_xml_subtitle" = "用于电子表格和个人使用的燃油记录";
+"export_to_csv" = "导出为 CSV";
+"export_to_csv_subtitle" = "可直接在 Excel、Google Sheets、Numbers 中打开";
+"export_failed_title" = "导出失败";
+
+/* Data Reset */
+"reset_section" = "重置数据";
+"reset_maintenance_button" = "重置保养数据";
+"reset_fuel_button" = "重置燃油记录";
+"reset_confirmation_title" = "确定吗？";
+"reset_confirmation_confirm" = "重置";
+"settings_reset" = "重置设置";
+
+/* Vehicle Purchase */
+"vehicle_is_purchased" = "已购买车辆";
+"vehicle_not_purchased_banner" = "此车辆尚未购买。购买后请在下方确认。";
+"vehicle_purchase_confirm" = "确认购买";
+"vehicle_purchase_cancel" = "删除车辆";
+"vehicle_purchase_question" = "您是否已购买此车辆？";
+"vehicle_purchase_success" = "已标记为已购买！";
+"vehicle_purchase_error" = "更新车辆状态时出错。";
+
+/* Date and Misc */
+"date_label" = "日期";
+"select_date" = "选择日期";
+"date" = "日期";
+"close" = "关闭";
+"search" = "搜索";
+
+/* Graphs */
+"no_graph_fuel" = "添加更多燃油数据后，此处将显示图表。";
+"no_graph_maintenance" = "添加更多保养数据后，此处将显示图表。";
+"no_graph_mileage" = "登记更多里程记录后，此处将显示图表。";
+
+/* Analytics and Refresh */
+"refreshing" = "正在刷新...";
+"no_active_vehicle_found" = "未找到有效车辆。";
+
+/* Notification (Purchase Date Passed) */
+"notification_purchase_date_passed_title" = "您是否已购买车辆？";
+"notification_purchase_date_passed_description" = "如果您今天已购买车辆，请记得在应用中确认。";
+
+/* Vehicle Details */
+"vehicle_details_title" = "车辆详情";
+
+"cancel" = "取消";
+"save" = "保存";
+"latest_mileage" = "最新里程";
+"add_maintenance_description" = "记录保养信息，让爱车保持最佳状态。";
+"free_or_warranty" = "免费 / 保修";
+"days_ago" = "天前";
+"maintenance_interval_description" = "当自上次保养（如换胎、换机油或刹车检查）以来的里程超过此阈值时，您将收到提醒服务到期的通知。";
+
+"monthly_recap_nav_title" = "以下是您上个月录入的数据摘要：";
+"monthly_recap_title" = "月度总结";
+"km_driven" = "行驶里程";
+"total_fuel_used" = "燃油总用量";
+"total_fuel_cost" = "燃油总费用";
+"average_fuel_usage" = "平均油耗";
+"comparison" = "与上月相比的行驶里程变化：";
+"comparison_result" = "与上月相比：%+.0f%%";
+"no_data_available" = "本月暂无数据。";
+
+"monthly_recap_notification_title" = "月度总结已生成";
+"monthly_recap_notification_body" = "点击查看上月爱车表现摘要。";
+"test_notification_title" = "测试通知";
+"test_notification_body" = "这是来自 FuelTrackr 的测试通知。";
+"test_notification" = "测试通知";
+"test_notification_success" = "已安排测试通知。";
+
+"mileage_title" = "里程";
+"purchase_date" = "购买日期";
+"manufacturing_date" = "生产日期";
+
+"currency_section" = "货币";
+"select_currency" = "选择货币";
+
+"ytd" = "年初至今";
+"all_time" = "全部";
+"projected_year" = "预计年度";
+
+"fuel_usage_title" = "燃油使用";
+"add" = "添加";
+"edit" = "编辑";
+"swipe_to_edit_hint" = "编辑";
+
+"edit_fuel_usage_title" = "编辑燃油记录";
+"edit_fuel_usage_description" = "调整本次加油的升数、费用或里程。";
+
+"validation_liters_invalid" = "请输入大于零的有效升数。";
+"validation_cost_invalid" = "请输入有效金额（零或以上）。";
+"validation_mileage_invalid" = "请输入有效里程。";
+"mileage_placeholder_format" = "例如 %d";
+
+/* Onboarding */
+"onboarding_welcome_title" = "欢迎使用 FuelTrackr 👋";
+"onboarding_welcome_description" = "让我们设置您的车辆，以便轻松追踪燃油使用和保养情况。";
+"onboarding_setup_vehicle_button" = "设置我的车辆";
+"onboarding_notifications_title" = "及时了解动态";
+"onboarding_notifications_description" = "启用通知以接收燃油追踪和月度总结提醒。";
+"onboarding_notifications_allow" = "启用通知";
+"onboarding_notifications_skip" = "暂不";
+"onboarding_tracking_title" = "帮助改进 FuelTrackr";
+"onboarding_tracking_description" = "我们使用匿名追踪来改进应用。我们绝不会用个人数据追踪您或分享您的信息。";
+"onboarding_tracking_allow" = "继续";
+"onboarding_tracking_skip" = "请求 App 不追踪";
+"onboarding_unit_selection_title" = "距离与油耗";
+"onboarding_unit_selection_question" = "您使用哪种单位来记录距离和油耗？";
+"onboarding_vehicle_name_title" = "车辆名称";
+"onboarding_vehicle_name_description" = "为您的车辆起个名字，方便识别。";
+"onboarding_vehicle_name_placeholder" = "输入车辆名称";
+"onboarding_vehicle_name_default" = "我的车";
+"onboarding_vehicle_name_use_default" = "使用「%@」";
+"kilometers_liters" = "公里和升";
+"miles_gallons" = "英里和加仑";
+"metric" = "（公制）";
+"imperial" = "（英制）";
+"continue" = "继续";
+"onboarding_license_plate_title" = "车牌号";
+"onboarding_license_plate_description" = "输入车牌号以自动获取公开车辆规格。";
+"onboarding_license_plate_placeholder" = "填写车牌号";
+"onboarding_license_plate_info" = "在支持的地区和车牌格式下，FuelTrackr 将使用公开车辆数据自动填充详情。";
+"onboarding_add_later" = "稍后添加";
+
+"onboarding_vehicle_fuel_type_title" = "车辆燃油类型";
+"onboarding_vehicle_fuel_type_question" = "您的车辆使用哪种燃油？";
+"onboarding_vehicle_fuel_type_placeholder" = "[待定]";
+
+"fuel_liquid" = "汽油或柴油";
+"fuel_electric" = "电动";
+"fuel_hydrogen" = "氢能";
+"fuel_unknown" = "其他";
+
+"onboarding_vehicle_brand_title" = "车辆品牌";
+"onboarding_vehicle_brand_question" = "您的车辆是什么品牌？";
+"onboarding_vehicle_brand_placeholder" = "搜索或选择品牌";
+
+"onboarding_not_on_list" = "不在列表中";
+"onboarding_vehicle_model_title" = "车辆型号";
+"onboarding_vehicle_model_question" = "您驾驶的是哪款车型？";
+"onboarding_vehicle_model_placeholder" = "搜索或输入型号";
+"onboarding_optional_details_title" = "可选信息";
+"onboarding_optional_details_description" = "添加这些信息可改进保养预估和长期成本分析。";
+"onboarding_production_date_title" = "生产月份和年份";
+"onboarding_select_date_placeholder" = "选择日期";
+"onboarding_skip_for_now" = "暂时跳过";
+"onboarding_current_mileage_title" = "当前里程";
+"onboarding_current_mileage_question" = "您车辆的当前里程是多少？\n\n我们需要此信息来准确计算油耗并追踪车辆表现。";
+"onboarding_mileage_placeholder_km" = "例如 125,000 公里";
+"onboarding_mileage_placeholder_miles" = "例如 77,671 英里";
+"onboarding_mileage_new_car" = "从 0 开始";
+"onboarding_add_photo_title" = "添加车辆照片";
+"onboarding_add_photo_description" = "便于在列表中快速识别您的车辆。";
+"onboarding_take_photo" = "拍照";
+"onboarding_choose_from_gallery" = "从相册选择";
+"onboarding_confirm_photo" = "确认照片";
+"onboarding_reset_photo" = "重置照片";
+"onboarding_completion_title" = "车辆设置完成！🎉";
+"onboarding_completion_description" = "FuelTrackr 现已准备好自动帮您追踪燃油、费用和保养。";
+"onboarding_go_to_dashboard" = "进入仪表盘";
+"done" = "完成";
+
+/* Redesigned Active Vehicle View */
+"fuel_consumption" = "燃油消耗";
+"maintenance_history" = "保养历史";
+"show_more" = "显示更多";
+"fuel_history" = "燃油历史";
+"total_distance_km" = "总里程";
+"total_distance_miles" = "总里程";
+"average_price" = "平均价格";
+"fuel" = "燃油";
+"costs" = "费用";
+"odometer" = "里程表";
+"brake_replacement" = "更换刹车";
+"tire_replacement" = "更换轮胎";
+"distribution_belt" = "正时皮带";
+"other_maintenance" = "其他";
+"mileage" = "里程";
+"owned" = "拥有";
+"age" = "车龄";
+
+/* Fuel Detail Page */
+"consumption_overview" = "油耗概览";
+"consumption_over_time" = "油耗趋势";
+"average_consumption" = "平均油耗";
+"total_cost_label" = "总费用";
+"last_refueling" = "上次加油";
+"fuel_entries_last_months" = "过去 %d 个月加油记录（%d）";
+"fuel_entries_last_month" = "上月加油记录（%d）";
+"fuel_entries_all" = "全部加油记录（%d）";
+"add_new_refueling" = "添加新加油";
+"timeframe_all" = "全部";
+"timeframe_1m" = "1月";
+"timeframe_3m" = "3月";
+"timeframe_1y" = "1年";
+"timeframe_ytd" = "年初至今";
+"range" = "范围";
+"location" = "位置";
+"km_per_liter" = "公里/升";
+"liters" = "升";
+"price_per_liter" = "元/升";
+"consumption" = "油耗";
+"cost" = "费用";
+
+/* Partial Fill */
+"partial_fill" = "部分加油";
+"partial_fill_description" = "本次加油似乎为部分加油。为准确计算油耗，将与下次满箱加油合并计算。";
+"partial_fill_badge" = "半箱";
+"mark_as_full_fill" = "标为满箱";
+"mark_as_partial_fill" = "标为部分加油";
+"partial_fill_info" = "当加油量明显低于您的平均加油量时，将自动识别为部分加油。会与下次满箱加油合并，以准确计算油耗。";
+"not_enough_data_for_detection" = "至少需要 %d 次加油记录才能检测部分加油";
+"current_status" = "当前状态";
+"fill_type" = "加油类型";
+"full_fill" = "满箱";
+"average_refill_amount" = "平均加油量";
+"merged_partial_fill_description" = "此记录包含已合并的多次加油。您可以在下方将各记录标为满箱或部分加油。";
+"merged_group_summary" = "合并组摘要";
+"total_fuel" = "燃油总量";
+"entries_count" = "条记录";
+"entries_in_group" = "本组记录";
+"partial_fill_toggle_description" = "若本次非满箱加油，请标为部分加油。部分加油会与下次满箱合并，以准确计算油耗。";
+"merged_group_title" = "合并组";
+"merged_group_info" = "此记录属于合并组。在出现满箱加油之前，下方所有记录将合并计算油耗。";
+"current" = "当前";
+"closing_fill" = "满箱";
+"combined_stats" = "综合统计";
+
+/* In-App Purchase / Pro */
+"pro_title" = "FuelTrackr Pro";
+"pro_subtitle" = "车辆智能的未来";
+"pro_feature_unlimited_history_title" = "无限历史";
+"pro_feature_unlimited_history_subtitle" = "支出明细一目了然";
+"pro_feature_smart_maintenance_title" = "智能保养";
+"pro_feature_smart_maintenance_subtitle" = "智能保养提醒";
+"pro_feature_smart_refill_title" = "智能加油逻辑";
+"pro_feature_smart_refill_subtitle" = "续航预测与成本洞察";
+"restore_purchase" = "恢复购买";
+"privacy_policy" = "隐私政策";
+"terms_of_service" = "服务条款";
+"pro_lifetime_title" = "永久 Pro";
+"pro_yearly_title" = "年度订阅";
+"pro_monthly_title" = "月度订阅";
+"pro_one_time_payment" = "一次性付款";
+"pro_billed_annually" = "按年付费";
+"pro_billed_monthly" = "按月付费";
+"pro_unlock_lifetime" = "解锁永久 Pro";
+"pro_processing_purchase" = "正在处理购买...";
+"pro_purchase_successful" = "购买成功！";
+"pro_thank_you_message" = "感谢升级至 Pro";
+"continue_button" = "继续";
+"pro_status" = "Pro 状态";
+"pro_purchased" = "已购买：%@";
+"pro_renews" = "续订：%@";
+"pro_never_expires" = "永不过期";
+"pro_manage_subscription" = "管理订阅";
+"purchase_display_lifetime" = "永久 Pro";
+"purchase_display_monthly" = "月度订阅";
+"purchase_display_yearly" = "年度订阅";
+"purchase_display_none" = "无有效购买";
+"pro_remove_debug" = "移除 Pro（调试）";
+"pro_upgrade" = "升级至 Pro";
+"pro_best_value_badge" = "超值";
+"offer_reason_introductory" = "应用上线优惠";
+"offer_discount_percent" = "享 %d%% 优惠";
+"offer_free_trial" = "免费试用";
+"offer_valid_for" = "有效期 %@";
+"offer_duration_1_day" = "1 天";
+"offer_duration_n_days" = "%d 天";
+"offer_duration_1_week" = "1 周";
+"offer_duration_n_weeks" = "%d 周";
+"offer_duration_1_month" = "1 个月";
+"offer_duration_n_months" = "%d 个月";
+"offer_duration_1_year" = "1 年";
+"offer_duration_n_years" = "%d 年";
+"unit_km" = "公里";
+"unit_mi" = "英里";
+"unit_l" = "升";
+"unit_g" = "加仑";
+"unit_kwh" = "kWh";
+"unit_kg_h2" = "kg H₂";
+
+/* Review & Feedback */
+"help_feedback_section" = "帮助与反馈";
+"help_feedback_footer" = "分享您的反馈或建议，帮助我们改进";
+"review_app" = "为应用评分";
+"review_share_opinion" = "告诉我们您的想法";
+"review_recent_feedback" = "您最近已提交反馈";
+"review_title" = "您觉得 FuelTrackr 怎么样？";
+"review_subtitle" = "您的意见很重要";
+"review_description" = "您喜欢这个应用吗？还是有什么不足？\n有了您的反馈，我们可以一步一步改进 FuelTrackr，让您和其他用户获得更好的体验。";
+"review_star_rating" = "%d 星";
+"review_feedback_prompt" = "我们可以改进什么？";
+"review_feedback_placeholder" = "告诉我们如何做得更好...";
+"review_feedback_min_chars" = "至少需要 %d 个字符";
+"review_feedback_max_chars" = "最多允许 %d 个字符";
+"review_go_to_app_store" = "前往 App Store";
+"review_submit_feedback" = "提交反馈";
+"review_feedback_required" = "提交前请告诉我们我们可以改进的地方";
+"review_maybe_later" = "稍后再说";
+"review_cooldown_recent" = "您最近已提交反馈";
+"review_cooldown_days" = "您可在 %d 天后再次提交反馈";
+"app_suggestion" = "应用建议";
+"app_suggestion_subtitle" = "分享您的改进想法";
+"suggestion_title" = "应用建议";
+"suggestion_subtitle" = "有改进应用的想法？告诉我们！";
+"suggestion_field_label" = "您的建议";
+"suggestion_field_placeholder" = "描述您对新功能或改进的想法...";
+"suggestion_min_chars" = "至少需要 %d 个字符";
+"suggestion_max_chars" = "最多允许 %d 个字符";
+"suggestion_submit" = "提交";
+
+/* Edit Vehicle */
+"fuel_type_title" = "燃油类型";
+"purchase_status_title" = "购买状态";
+"vehicle_purchased" = "已购买车辆";
+"latest_mileage_title" = "最新里程";
+"odometer_title" = "里程表";
+"odometer_change_warning" = "在有燃油或保养数据的情况下修改里程表可能影响油耗统计和报告。仅在确认新值正确时继续操作。";
+"odometer_change_confirm" = "修改里程表";
+"odometer_save_confirm_title" = "修改里程表？";
+"odometer_save_confirm_message" = "这将更新当前里程。油耗统计可能受到影响。是否继续？";
+"select_photo_source" = "选择照片来源";
+"camera" = "相机";
+"photo_library" = "相册";
+"remove_photo" = "删除照片";
+"manufacturing_date_before_purchase_error" = "生产日期必须早于或等于购买日期。";
+"vehicle_not_found_error" = "未找到车辆，请重试。";
