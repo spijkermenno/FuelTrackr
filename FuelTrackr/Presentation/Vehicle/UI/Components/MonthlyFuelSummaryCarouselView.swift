@@ -96,7 +96,7 @@ public struct MonthlyFuelSummaryCarouselView: View {
 
                     MonthlySummaryPageControl(numberOfPages: summaries.count, currentPage: currentIndex ?? 0)
                 }
-                .padding(.top, 10)
+                //.padding(.top, 10)
             }
             .frame(height: 244)
         }

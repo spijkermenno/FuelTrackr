@@ -14,6 +14,7 @@ public protocol VehicleRepositoryProtocol {
     func refreshActiveVehicle(context: ModelContext) throws -> Vehicle?
     func saveVehicle(vehicle: Vehicle, initialMileage: Int, context: ModelContext) throws
     func updateVehicle(vehicle: Vehicle, context: ModelContext) throws
+    func updateOdometer(vehicle: Vehicle, newValue: Int, context: ModelContext) throws
     func deleteVehicle(context: ModelContext) throws
     func updateVehiclePurchaseStatus(isPurchased: Bool, context: ModelContext) throws
     func migrateVehicles(context: ModelContext) throws

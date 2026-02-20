@@ -47,6 +47,37 @@ public class VehicleRepository: VehicleRepositoryProtocol {
     public func updateVehicle(vehicle: Vehicle, context: ModelContext) throws {
         try context.save()
     }
+
+    /// Updates the current odometer reading. When the vehicle has no fuel entries, updates the latest mileage.
+    /// When the vehicle has data, adds a new mileage record (with strong warning shown in UI).
+    public func updateOdometer(vehicle: Vehicle, newValue: Int, context: ModelContext) throws {
+        guard newValue > 0 else { return }
+
+        let hasFuelData = !vehicle.fuelUsages.isEmpty
+        let hasMaintenanceWithMileage = vehicle.maintenances.contains { $0.mileage != nil }
+
+        if !hasFuelData && !hasMaintenanceWithMileage {
+            // No fuel/maintenance data: update the latest standalone mileage if it exists and isn't linked to anything
+            if let latest = vehicle.latestMileage,
+               !vehicle.fuelUsages.contains(where: { $0.mileage?.persistentModelID == latest.persistentModelID }),
+               !vehicle.maintenances.contains(where: { $0.mileage?.persistentModelID == latest.persistentModelID }) {
+                latest.value = newValue
+                latest.date = Date()
+            } else {
+                // No standalone mileage or all are linked: add new one
+                let mileage = Mileage(value: newValue, date: Date(), vehicle: vehicle)
+                context.insert(mileage)
+                vehicle.mileages.append(mileage)
+            }
+        } else {
+            // Has data: always add new mileage record as the "current" reading
+            let mileage = Mileage(value: newValue, date: Date(), vehicle: vehicle)
+            context.insert(mileage)
+            vehicle.mileages.append(mileage)
+        }
+
+        try context.save()
+    }
     
     public func deleteVehicle(context: ModelContext) throws {
         for vehicle in try context.fetch(FetchDescriptor<Vehicle>()) {

@@ -21,6 +21,7 @@ public final class VehicleViewModel: ObservableObject {
     private let loadActiveVehicleUseCase: LoadActiveVehicleUseCase
     private let saveVehicleUseCase: SaveVehicleUseCase
     private let updateVehicleUseCase: UpdateVehicleUseCase
+    private let updateOdometerUseCase: UpdateOdometerUseCase
     private let deleteVehicleUseCase: DeleteVehicleUseCase
     private let saveFuelUsageUseCase: SaveFuelUsageUseCase
     private let deleteFuelUsageUseCase: DeleteFuelUsageUseCase
@@ -52,6 +53,7 @@ public final class VehicleViewModel: ObservableObject {
         loadActiveVehicleUseCase: LoadActiveVehicleUseCase = LoadActiveVehicleUseCase(),
         saveVehicleUseCase: SaveVehicleUseCase = SaveVehicleUseCase(),
         updateVehicleUseCase: UpdateVehicleUseCase = UpdateVehicleUseCase(),
+        updateOdometerUseCase: UpdateOdometerUseCase = UpdateOdometerUseCase(),
         deleteVehicleUseCase: DeleteVehicleUseCase = DeleteVehicleUseCase(),
         saveFuelUsageUseCase: SaveFuelUsageUseCase = SaveFuelUsageUseCase(),
         deleteFuelUsageUseCase: DeleteFuelUsageUseCase = DeleteFuelUsageUseCase(),
@@ -79,6 +81,7 @@ public final class VehicleViewModel: ObservableObject {
         self.loadActiveVehicleUseCase = loadActiveVehicleUseCase
         self.saveVehicleUseCase = saveVehicleUseCase
         self.updateVehicleUseCase = updateVehicleUseCase
+        self.updateOdometerUseCase = updateOdometerUseCase
         self.deleteVehicleUseCase = deleteVehicleUseCase
         self.saveFuelUsageUseCase = saveFuelUsageUseCase
         self.deleteFuelUsageUseCase = deleteFuelUsageUseCase
@@ -188,6 +191,20 @@ public final class VehicleViewModel: ObservableObject {
             refreshID = UUID()
         } catch {
             print("Error updating vehicle: \(error.localizedDescription)")
+        }
+    }
+
+    public func updateOdometer(newValue: Int, context: ModelContext) {
+        guard let vehicle = resolvedVehicle(context: context) else { return }
+        guard newValue > 0 else { return }
+
+        do {
+            try updateOdometerUseCase(vehicle: vehicle, newValue: newValue, context: context)
+            cachedMonthlySummaries = nil
+            cachedProjectedYearStats = nil
+            refreshID = UUID()
+        } catch {
+            print("Error updating odometer: \(error.localizedDescription)")
         }
     }
     

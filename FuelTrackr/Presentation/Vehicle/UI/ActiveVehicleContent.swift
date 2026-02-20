@@ -59,7 +59,8 @@ public struct ActiveVehicleContent: View {
                     if forceShowOfferBanner ?? (!purchaseManager.hasActiveSubscription && purchaseManager.hasEligibleOffer) {
                         OfferBannerView(
                             onTap: { isShowingPayWall = true },
-                            discountPercent: forceShowOfferBanner == true ? 40 : purchaseManager.eligibleOfferDiscountPercent
+                            discountPercent: forceShowOfferBanner == true ? 40 : purchaseManager.eligibleOfferDiscountPercent,
+                            offerDurationText: forceShowOfferBanner == true ? String(format: NSLocalizedString("offer_valid_for", comment: ""), String(format: NSLocalizedString("offer_duration_n_days", comment: ""), 7)) : purchaseManager.eligibleOfferDurationText
                         )
                         .padding(.horizontal, Theme.dimensions.spacingL)
                     }
@@ -144,7 +145,7 @@ public struct ActiveVehicleContent: View {
                     .environmentObject(settingsViewModel)
                     .padding(.horizontal, Theme.dimensions.spacingL)
                 }
-                .padding(.vertical, Theme.dimensions.spacingM)
+                .padding(.bottom, Theme.dimensions.spacingM)
             } else {
                 Text("No active vehicle found.")
                     .padding()
@@ -152,7 +153,7 @@ public struct ActiveVehicleContent: View {
         }
         .background(Theme.colors(for: colorScheme).background)
         .navigationTitle(vehicleViewModel.resolvedVehicle(context: context)?.displayName ?? "")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: { showEditVehicleSheet = true }) {
