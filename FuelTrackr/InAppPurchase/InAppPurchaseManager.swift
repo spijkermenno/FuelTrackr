@@ -8,6 +8,7 @@
 import Foundation
 import StoreKit
 import ScovilleKit
+import FirebaseAnalytics
 
 enum PurchaseState: Equatable {
     case idle
@@ -130,6 +131,7 @@ class InAppPurchaseManager: ObservableObject {
         } catch {
             Task { @MainActor in
                 Scoville.track(FuelTrackrEvents.failedToLoadProducts)
+                Analytics.logEvent(FuelTrackrEvents.failedToLoadProducts.rawValue, parameters: nil)
             }
         }
     }
@@ -258,6 +260,7 @@ class InAppPurchaseManager: ObservableObject {
                 if !productId.isEmpty {
                     Task { @MainActor in
                         Scoville.track(FuelTrackrEvents.IAPRestored)
+                        Analytics.logEvent(FuelTrackrEvents.IAPRestored.rawValue, parameters: nil)
                     }
                 }
                 // Don't auto-reset - let user dismiss the success overlay

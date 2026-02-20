@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import FirebaseAnalytics
 import Domain
 import Charts
 import SwiftData
@@ -339,13 +340,12 @@ public struct FuelDetailsSheet: View {
                 
                 // Track fuel details viewed
                 Task { @MainActor in
-                    Scoville.track(
-                        FuelTrackrEvents.fuelDetailsViewed,
-                        parameters: [
-                            "timeframe": selectedTimeframe.rawValue,
-                            "fuel_entry_count": String(filteredFuelUsages.count)
-                        ]
-                    )
+                    let params: [String: Any] = [
+                        "timeframe": selectedTimeframe.rawValue,
+                        "fuel_entry_count": String(filteredFuelUsages.count)
+                    ]
+                    Scoville.track(FuelTrackrEvents.fuelDetailsViewed, parameters: params)
+                    Analytics.logEvent(FuelTrackrEvents.fuelDetailsViewed.rawValue, parameters: params)
                 }
             }
         }

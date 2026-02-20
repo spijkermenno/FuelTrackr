@@ -9,6 +9,7 @@
 import Foundation
 import Domain
 import ScovilleKit
+import FirebaseAnalytics
 
 public class SettingsViewModel: ObservableObject {
     // MARK: - UseCases
@@ -87,12 +88,11 @@ public class SettingsViewModel: ObservableObject {
         // Track unit preference change
         if previousValue != isMetric {
             Task { @MainActor in
-                Scoville.track(
-                    FuelTrackrEvents.unitPreferenceChanged,
-                    parameters: [
-                        "unit_system": isMetric ? "metric" : "imperial"
-                    ]
-                )
+                let params: [String: Any] = [
+                    "unit_system": isMetric ? "metric" : "imperial"
+                ]
+                Scoville.track(FuelTrackrEvents.unitPreferenceChanged, parameters: params)
+                Analytics.logEvent(FuelTrackrEvents.unitPreferenceChanged.rawValue, parameters: params)
             }
         }
     }

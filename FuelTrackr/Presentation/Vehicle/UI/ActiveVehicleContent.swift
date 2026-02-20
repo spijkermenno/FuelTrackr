@@ -183,7 +183,6 @@ public struct ActiveVehicleContent: View {
             AddFuelUsageSheet(
                 vehicleViewModel: vehicleViewModel
             )
-            .presentationDetents([.fraction(0.65)])
             .presentationDragIndicator(.visible)
         }
         // Edit Fuel Usage (selected from preview list)

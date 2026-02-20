@@ -10,12 +10,14 @@ import SwiftUI
 import Domain
 import SwiftData
 import ScovilleKit
+import FirebaseAnalytics
 @preconcurrency import Foundation
 
 public final class AddFuelUsageViewModel: ObservableObject {
     @Published public var liters = ""
     @Published public var cost = ""
     @Published public var mileage = ""
+    @Published public var entryDate = Date()
     @Published public var errorMessage: String?
     @Published public var mileageWarning: String?
     @Published public var litersError: Bool = false
@@ -102,24 +104,28 @@ public final class AddFuelUsageViewModel: ObservableObject {
         let vehicle = activeVehicle!
         let isUsingMetric = getUsingMetricUseCase()
         let adjustedMileage = isUsingMetric ? mileageValue! : convertMilesToKm(miles: mileageValue!)
-        
-        // Validate mileage against previous recorded value
-        let previousMileage = getPreviousMileage(from: vehicle)
-        if let previousMileage = previousMileage {
-            // Check if mileage is lower than previous
-            if adjustedMileage < previousMileage {
-                errorMessage = String(format: NSLocalizedString("mileage_too_low_error", comment: ""), previousMileage)
-                mileageError = true
-                return false
-            }
-            
-            // Check if mileage is suspiciously high (more than 2x or more than 10,000 km/miles higher)
-            let threshold = isUsingMetric ? 10000 : 6214 // ~10,000 km or ~6,214 miles
-            let difference = adjustedMileage - previousMileage
-            
-            if adjustedMileage > previousMileage * 2 || difference > threshold {
-                mileageWarning = NSLocalizedString("mileage_suspiciously_high_warning", comment: "")
-                // Don't block save for warnings, just show the warning
+
+        // Skip mileage validation for past entries (calculation can be off for historical data)
+        let isPastEntry = !Calendar.current.isDateInToday(entryDate)
+        if !isPastEntry {
+            // Validate mileage against previous recorded value (only for today's entries)
+            let previousMileage = getPreviousMileage(from: vehicle)
+            if let previousMileage = previousMileage {
+                // Check if mileage is lower than previous
+                if adjustedMileage < previousMileage {
+                    errorMessage = String(format: NSLocalizedString("mileage_too_low_error", comment: ""), previousMileage)
+                    mileageError = true
+                    return false
+                }
+
+                // Check if mileage is suspiciously high (more than 2x or more than 10,000 km/miles higher)
+                let threshold = isUsingMetric ? 10000 : 6214 // ~10,000 km or ~6,214 miles
+                let difference = adjustedMileage - previousMileage
+
+                if adjustedMileage > previousMileage * 2 || difference > threshold {
+                    mileageWarning = NSLocalizedString("mileage_suspiciously_high_warning", comment: "")
+                    // Don't block save for warnings, just show the warning
+                }
             }
         }
         
@@ -129,6 +135,7 @@ public final class AddFuelUsageViewModel: ObservableObject {
                 liters: litersValue!,
                 cost: costValue!,
                 mileageValue: adjustedMileage,
+                date: entryDate,
                 context: context
             )
             
@@ -136,15 +143,14 @@ public final class AddFuelUsageViewModel: ObservableObject {
             let fuelCount = vehicle.fuelUsages.count
             
             Task { @MainActor in
-                Scoville.track(
-                    FuelTrackrEvents.trackedFuel,
-                    parameters: [
-                        "mileage": adjustedMileage,
-                        "cost": costValue!,
-                        "amount": litersValue!
-                    ]
-                )
-                
+                let params: [String: Any] = [
+                    "mileage": adjustedMileage,
+                    "cost": costValue!,
+                    "amount": litersValue!
+                ]
+                Scoville.track(FuelTrackrEvents.trackedFuel, parameters: params)
+                Analytics.logEvent(FuelTrackrEvents.trackedFuel.rawValue, parameters: params)
+
                 // Trigger review prompt based on fuel tracking count
                 ReviewPrompter.shared.handleFuelTracked(trackCount: fuelCount)
             }

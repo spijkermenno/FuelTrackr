@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAnalytics
 import Domain
 import SwiftData
 import ScovilleKit
@@ -99,6 +100,7 @@ public struct OnboardingFlowView: View {
             // Track onboarding started
             Task { @MainActor in
                 Scoville.track(FuelTrackrEvents.onboardingStarted)
+                Analytics.logEvent(FuelTrackrEvents.onboardingStarted.rawValue, parameters: nil)
             }
         }
     }

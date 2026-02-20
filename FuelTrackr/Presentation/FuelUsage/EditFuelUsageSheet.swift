@@ -9,6 +9,7 @@ import SwiftUI
 import Domain
 import SwiftData
 import ScovilleKit
+import FirebaseAnalytics
 
 struct EditFuelUsageSheet: View {
     @StateObject var vehicleViewModel: VehicleViewModel
@@ -43,6 +44,7 @@ struct EditFuelUsageSheet: View {
                             liters: $viewModel.liters,
                             cost: $viewModel.cost,
                             mileage: $viewModel.mileage,
+                            entryDate: $viewModel.entryDate,
                             mileagePlaceholder: mileagePlaceholder,
                             errorMessage: viewModel.errorMessage,
                             mileageWarning: nil,
@@ -60,6 +62,7 @@ struct EditFuelUsageSheet: View {
                             liters: $viewModel.liters,
                             cost: $viewModel.cost,
                             mileage: $viewModel.mileage,
+                            entryDate: $viewModel.entryDate,
                             mileagePlaceholder: mileagePlaceholder,
                             errorMessage: viewModel.errorMessage,
                             mileageWarning: nil,
@@ -124,6 +127,7 @@ struct EditFuelUsageSheet: View {
             liters: validated.liters,
             cost: validated.cost,
             mileageValue: validated.mileageValue,
+            date: viewModel.entryDate,
             context: context
         )
         // Update partial fill status
@@ -135,12 +139,11 @@ struct EditFuelUsageSheet: View {
         
         // Track fuel usage edited
         Task { @MainActor in
-            Scoville.track(
-                FuelTrackrEvents.fuelUsageEdited,
-                parameters: [
-                    "is_partial_fill": viewModel.isPartialFill ? "true" : "false"
-                ]
-            )
+            let params: [String: Any] = [
+                "is_partial_fill": viewModel.isPartialFill ? "true" : "false"
+            ]
+            Scoville.track(FuelTrackrEvents.fuelUsageEdited, parameters: params)
+            Analytics.logEvent(FuelTrackrEvents.fuelUsageEdited.rawValue, parameters: params)
         }
         
         dismiss()

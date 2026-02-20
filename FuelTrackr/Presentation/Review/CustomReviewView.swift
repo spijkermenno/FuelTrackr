@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ScovilleKit
+import FirebaseAnalytics
 
 // Preference key to communicate desired detent size
 struct ReviewDetentPreferenceKey: PreferenceKey {
@@ -319,10 +320,13 @@ struct CustomReviewView: View {
         let feedback: String? = trimmedFeedback.isEmpty ? nil : trimmedFeedback
         
         // For ratings > 3, send event to ScovilleKit before submitting review
+        let ratingParams: [String: Any] = ["rating": String(selectedRating)]
         if selectedRating > 3 {
-            Scoville.track(FuelTrackrEvents.positiveReview, parameters: ["rating": String(selectedRating)])
+            Scoville.track(FuelTrackrEvents.positiveReview, parameters: ratingParams)
+            Analytics.logEvent(FuelTrackrEvents.positiveReview.rawValue, parameters: ratingParams)
         } else {
-            Scoville.track(FuelTrackrEvents.negativeReview, parameters: ["rating": String(selectedRating)])
+            Scoville.track(FuelTrackrEvents.negativeReview, parameters: ratingParams)
+            Analytics.logEvent(FuelTrackrEvents.negativeReview.rawValue, parameters: ratingParams)
         }
         
         let currentRating = selectedRating

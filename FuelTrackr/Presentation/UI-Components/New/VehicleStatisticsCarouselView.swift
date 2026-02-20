@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAnalytics
 import Domain
 import ScovilleKit
 
@@ -88,12 +89,11 @@ struct VehicleStatisticsCarouselView: View {
             .onAppear {
                 // Track statistics viewed
                 Task { @MainActor in
-                    Scoville.track(
-                        FuelTrackrEvents.statisticsViewed,
-                        parameters: [
-                            "statistics_count": String(items.count)
-                        ]
-                    )
+                    let params: [String: Any] = [
+                        "statistics_count": String(items.count)
+                    ]
+                    Scoville.track(FuelTrackrEvents.statisticsViewed, parameters: params)
+                    Analytics.logEvent(FuelTrackrEvents.statisticsViewed.rawValue, parameters: params)
                 }
             }
         }

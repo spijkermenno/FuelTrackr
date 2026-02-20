@@ -13,6 +13,7 @@ public final class EditFuelUsageViewModel: ObservableObject {
     @Published public var liters: String = ""
     @Published public var cost: String = ""
     @Published public var mileage: String = ""
+    @Published public var entryDate: Date = Date()
     @Published public var isPartialFill: Bool = false
     @Published public var errorMessage: String?
     @Published public var litersError: Bool = false
@@ -29,6 +30,7 @@ public final class EditFuelUsageViewModel: ObservableObject {
         liters = String(fuelUsage.liters)
         cost = String(fuelUsage.cost)
         mileage = String(fuelUsage.mileage?.value ?? 0)
+        entryDate = fuelUsage.date
         isPartialFill = fuelUsage.isPartialFill
     }
 

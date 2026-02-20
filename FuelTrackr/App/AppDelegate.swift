@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseCore
+import FirebaseAnalytics
 import UserNotifications
 import ScovilleKit
 import FirebaseCrashlytics
@@ -48,6 +49,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             case .success:
                 Task { @MainActor in
                     Scoville.track(StandardEvent.appOpened)
+                    Analytics.logEvent(StandardEvent.appOpened.rawValue, parameters: nil)
                     
                     // Flush any pending notification events NOW that Scoville is ready
                     self?.flushPendingNotificationEvents()

@@ -8,6 +8,7 @@
 import StoreKit
 import SwiftUI
 import ScovilleKit
+import FirebaseAnalytics
 
 enum ReviewTriggerReason: String {
     case fuelTracked
@@ -49,7 +50,9 @@ final class ReviewPrompter: ObservableObject {
     func maybeRequestReview(reason: ReviewTriggerReason) {
         // Check if feedback submission is on cooldown - don't show sheet if user recently submitted feedback
         if isFeedbackOnCooldown {
-            Scoville.track(FuelTrackrEvents.reviewPromptSkippedCooldown, parameters: ["reason": reason.rawValue])
+            let params: [String: Any] = ["reason": reason.rawValue]
+            Scoville.track(FuelTrackrEvents.reviewPromptSkippedCooldown, parameters: params)
+            Analytics.logEvent(FuelTrackrEvents.reviewPromptSkippedCooldown.rawValue, parameters: params)
             return
         }
         
@@ -61,10 +64,12 @@ final class ReviewPrompter: ObservableObject {
             if let lastPrompt = UserDefaults.standard.object(forKey: key) as? Date {
                 let daysSince = now.timeIntervalSince(lastPrompt) / 86400
                 guard daysSince >= cooldownDays else {
-                    Scoville.track(FuelTrackrEvents.reviewPromptSkipped, parameters: [
+                    let params: [String: Any] = [
                         "reason": reason.rawValue,
                         "days_since": String(Int(daysSince))
-                    ])
+                    ]
+                    Scoville.track(FuelTrackrEvents.reviewPromptSkipped, parameters: params)
+                    Analytics.logEvent(FuelTrackrEvents.reviewPromptSkipped.rawValue, parameters: params)
                     return
                 }
             }
@@ -84,6 +89,7 @@ final class ReviewPrompter: ObservableObject {
             // Save timestamp + track
             UserDefaults.standard.set(now, forKey: key)
             Scoville.track(FuelTrackrEvents.askedForUserReview)
+            Analytics.logEvent(FuelTrackrEvents.askedForUserReview.rawValue, parameters: nil)
         }
     }
     

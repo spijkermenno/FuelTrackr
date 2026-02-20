@@ -6,6 +6,7 @@
 //  Created by Menno Spijker on 26/04/2025.
 //
 
+import Foundation
 import SwiftData
 
 public protocol VehicleRepositoryProtocol {
@@ -17,11 +18,11 @@ public protocol VehicleRepositoryProtocol {
     func updateVehiclePurchaseStatus(isPurchased: Bool, context: ModelContext) throws
     func migrateVehicles(context: ModelContext) throws
 
-    func saveFuelUsage(liters: Double, cost: Double, mileageValue: Int, context: ModelContext) throws
+    func saveFuelUsage(liters: Double, cost: Double, mileageValue: Int, date: Date, context: ModelContext) throws
     func deleteFuelUsage(fuelUsage: FuelUsage, context: ModelContext) throws
     func resetFuelUsage(context: ModelContext) throws
     func getFuelUsage(id: PersistentIdentifier, context: ModelContext) throws -> FuelUsage?
-    func updateFuelUsage(id: PersistentIdentifier, liters: Double, cost: Double, mileageValue: Int, context: ModelContext) throws
+    func updateFuelUsage(id: PersistentIdentifier, liters: Double, cost: Double, mileageValue: Int, date: Date, context: ModelContext) throws
     func updateFuelUsagePartialFillStatus(id: PersistentIdentifier, isPartialFill: Bool, context: ModelContext) throws
     func getFuelUsed(forMonth: Int, year: Int?, context: ModelContext) -> Double
     func getFuelCost(forMonth: Int, year: Int?, context: ModelContext) -> Double

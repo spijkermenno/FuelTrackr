@@ -91,6 +91,7 @@ public class VehicleRepository: VehicleRepositoryProtocol {
         liters: Double,
         cost: Double,
         mileageValue: Int,
+        date: Date,
         context: ModelContext
     ) throws {
         guard let vehicle = try loadActiveVehicle(context: context) else { return }
@@ -98,6 +99,7 @@ public class VehicleRepository: VehicleRepositoryProtocol {
         let mileage = getOrCreateMileage(
             vehicle: vehicle,
             mileageValue: mileageValue,
+            date: date,
             context: context
         )
         
@@ -107,7 +109,7 @@ public class VehicleRepository: VehicleRepositoryProtocol {
         let fuelUsage = FuelUsage(
             liters: liters,
             cost: cost,
-            date: .now,
+            date: date,
             mileage: mileage,
             vehicle: vehicle,
             isPartialFill: isPartialFill,
@@ -141,22 +143,23 @@ public class VehicleRepository: VehicleRepositoryProtocol {
         liters: Double,
         cost: Double,
         mileageValue: Int,
+        date: Date,
         context: ModelContext
     ) throws {
         guard let fuelUsage = try getFuelUsage(id: id, context: context),
               let vehicle = try loadActiveVehicle(context: context)
         else { return }
 
-        // (Re)link mileage (create if needed)
         let mileage = getOrCreateMileage(
             vehicle: vehicle,
             mileageValue: mileageValue,
+            date: date,
             context: context
         )
         fuelUsage.liters = liters
         fuelUsage.cost = cost
+        fuelUsage.date = date
         fuelUsage.mileage = mileage
-        // keep original date (or change if you want a date field in the sheet)
 
         try context.save()
     }
@@ -318,12 +321,13 @@ public class VehicleRepository: VehicleRepositoryProtocol {
     private func getOrCreateMileage(
         vehicle: Vehicle,
         mileageValue: Int,
+        date: Date,
         context: ModelContext
     ) -> Mileage {
         if let existing = vehicle.mileages.first(where: { $0.value == mileageValue }) {
             return existing
         }
-        let mileage = Mileage(value: mileageValue, date: .now, vehicle: vehicle)
+        let mileage = Mileage(value: mileageValue, date: date, vehicle: vehicle)
         context.insert(mileage)
         vehicle.mileages.append(mileage)
         return mileage

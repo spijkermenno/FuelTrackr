@@ -11,6 +11,7 @@ import SwiftUI
 import Domain
 import SwiftData
 import ScovilleKit
+import FirebaseAnalytics
 
 public struct AllMaintenanceView: View {
     @Environment(\.modelContext) var context
@@ -56,12 +57,9 @@ public struct AllMaintenanceView: View {
                     if let maintenance = maintenanceToDelete {
                         // Track maintenance deletion
                         Task { @MainActor in
-                            Scoville.track(
-                                FuelTrackrEvents.maintenanceDeleted,
-                                parameters: [
-                                    "type": maintenance.type.rawValue
-                                ]
-                            )
+                            let params: [String: Any] = ["type": maintenance.type.rawValue]
+                            Scoville.track(FuelTrackrEvents.maintenanceDeleted, parameters: params)
+                            Analytics.logEvent(FuelTrackrEvents.maintenanceDeleted.rawValue, parameters: params)
                         }
                         
                         context.delete(maintenance)
@@ -76,12 +74,11 @@ public struct AllMaintenanceView: View {
             // Track maintenance history viewed
             Task { @MainActor in
                 if let vehicle = vehicle {
-                    Scoville.track(
-                        FuelTrackrEvents.maintenanceHistoryViewed,
-                        parameters: [
-                            "maintenance_count": String(vehicle.maintenances.count)
-                        ]
-                    )
+                    let params: [String: Any] = [
+                        "maintenance_count": String(vehicle.maintenances.count)
+                    ]
+                    Scoville.track(FuelTrackrEvents.maintenanceHistoryViewed, parameters: params)
+                    Analytics.logEvent(FuelTrackrEvents.maintenanceHistoryViewed.rawValue, parameters: params)
                 }
             }
         }
